@@ -27,23 +27,23 @@ class Atom:
     	
     	"""Atom initializer.
 
-    	:param str x: the atom x coordinate.
-    	:param str y: the atom y coordinate.
-    	:param str z: the atom z coordinate.
-    	:param str atom_symbol: atom_symbol.
-    	:param str mass_difference: difference from mass in periodic table.
-    	:param str charge: charge.
-    	:param str atom_stereo_parity: atom stereo parity.
-    	:param str hydrogen_count: 
-    	:param str stereo_care_box:
-    	:param str valence
-    	:param str h0designator
-    	:param str atom_atom_mapping_number
-    	:param str inversion_retention_flag
-    	:param str atom_number
-    	:param str exact_change_flag
-    	:param str default_symbol:
-    	:param str kat: KEGG atom type.
+	:param str x: the atom x coordinate.
+	:param str y: the atom y coordinate.
+	:param str z: the atom z coordinate.
+	:param str atom_symbol: atom_symbol.
+	:param str mass_difference: difference from mass in periodic table.
+	:param str charge: charge.
+	:param str atom_stereo_parity: atom stereo parity.
+	:param str hydrogen_count: 
+	:param str stereo_care_box:
+	:param str valence
+	:param str h0designator
+	:param str atom_atom_mapping_number
+	:param str inversion_retention_flag
+	:param str atom_number
+	:param str exact_change_flag
+	:param str default_symbol:
+	:param str kat: KEGG atom type.
 
     	"""
 
@@ -79,9 +79,9 @@ class Atom:
     def update_symbol(self, symbol):
 
     	"""
-		To update the symbol of the atom.
+	To update the symbol of the atom.
 
-		:return: the updated atom_symbol.
+	:return: the updated atom_symbol.
     	"""
         
         self.atom_symbol = symbol
@@ -91,9 +91,9 @@ class Atom:
     def remove_neighbors(self, neighbors):
 
     	"""
-		To add neighbors to the atom.
+	To add neighbors to the atom.
 
-		:return: the updated list of neighbors of the atom.
+	:return: the updated list of neighbors of the atom.
         """
         
         for atom_index in neighbors:
@@ -105,9 +105,9 @@ class Atom:
     def add_neighbors(self, neighbors):
         
         """
-		To add neighbors to the atom.
+	To add neighbors to the atom.
 
-		:return: the updated list of neighbors of the atom.
+	:return: the updated list of neighbors of the atom.
         """
 
         for atom_index in neighbors:
@@ -119,9 +119,9 @@ class Atom:
     def update_stereochemistry(self, stereo):
 
     	"""
-		To update the stereochemistry of the atom.
+	To update the stereochemistry of the atom.
 
-		:return: the updated stereochemistry.
+	:return: the updated stereochemistry.
     	"""
 
         self.atom_stereo_parity = stereo
@@ -131,8 +131,9 @@ class Atom:
     def is_R(self):
 
     	"""
-		To determine if the atom is an R group.
-		:return: boolean.
+	To determine if the atom is an R group.
+
+	:return: boolean.
     	"""
 
         if "A" in self.default_symbol or "R" in self.default_symbol or "*" in self.default_symbol:
@@ -170,9 +171,9 @@ class Bond:
     def update_bond_type(self, bond_type):
 
     	"""
-		To update the bond type of the atom.
+	To update the bond type of the atom.
 
-		:return: the updated bond type.
+	:return: the updated bond type.
     	"""
 
         self.bond_type = bond_type
@@ -181,9 +182,9 @@ class Bond:
     def update_stereochemistry(self, stereo):
 
     	"""
-		To update the stereochemistry of the bond.
+	To update the stereochemistry of the bond.
 
-		:return: the updated stereochemistry.
+	:return: the updated stereochemistry.
     	"""
 
         self.bond_stereo = stereo
@@ -199,9 +200,9 @@ class Compound:
 
     	"""Compound initializer.
 			
-		:param str compund_name: the compund name.
-		:param list atoms: a list of atom enties in the compound.
-		:param list bonds: a list of bonds enties in the compound.
+	:param str compund_name: the compund name.
+	:param list atoms: a list of atom enties in the compound.
+	:param list bonds: a list of bonds enties in the compound.
     	"""
 
 		self.compund_name = compund_name
@@ -228,9 +229,9 @@ class Compound:
     def R_groups(self):
 
     	"""
-		To get all the R groups in the compound.
+	To get all the R groups in the compound.
 
-		:return: the list of index of all the R groups.
+	:return: the list of index of all the R groups.
     	"""
         
         rs = []
@@ -242,9 +243,9 @@ class Compound:
     def calculate_distance_to_R_groups(self):
         
         """
-        To caluclate the distance of each atom to its nearest R group (using the dijkstra's algorithm). 
+    To caluclate the distance of each atom to its nearest R group (using the dijkstra's algorithm). 
 
-        :return:
+    :return:
         """
 
         distance_matrix = [len(self.heavy_atoms)] * len(self.heavy_atoms) 
@@ -272,9 +273,9 @@ class Compound:
     def heavy_atoms(self):
        
        """
-       To get all the heavy atoms in the compound.
+   To get all the heavy atoms in the compound.
 
-       :return: the list of heavy atoms in the compound.
+   :return: the list of heavy atoms in the compound.
        """
 
         return [atom for atom in self.atoms if atom.atom_symbol != "H"]
@@ -283,9 +284,9 @@ class Compound:
     def index_of_heavy_atoms(self):
 
     	"""
-		To map the atom index to heavy atoms.
+	To map the atom index to heavy atoms.
 
-		:return: the dictionay of atom index to atom entity.
+	:return: the dictionay of atom index to atom entity.
     	"""
 
         return { self.heavy_atoms[i].atom_number: i for i in range(len(self.heavy_atoms)) } 
@@ -294,9 +295,9 @@ class Compound:
     def backbone_matrix(self):
 
     	"""
-		To construct 
-		
-		:return: the  matrix of this compound.
+	To construct graph structure matrix of this compound without distinguishing single and double bonds. This is used to find .
+
+	:return: the  matrix of this compound.
     	"""
 
         backbone_matrix = numpy.zeros((len(self.heavy_atoms), len(self.heavy_atoms)), dtype=numpy.uint8)
@@ -311,10 +312,10 @@ class Compound:
     def structure_matrix(self):
 
     	"""
-		To construct matrix of 
-		matrix[i][j] = 0 suggests the two atoms are not connected directly.
+	To construct graph structure matrix of this compound.
+	matrix[i][j] = 0 suggests the two atoms are not connected directly.
 
-		:return: the structure matrix of this compound.
+	:return: the structure matrix of this compound.
     	"""
 
         matrix = numpy.zeros((len(self.heavy_atoms), len(self.heavy_atoms)), dtype=numpy.uint8)
@@ -330,10 +331,10 @@ class Compound:
     def distance_matrix(self):
 
     	"""
-		To construct the distance matrix of the compound. (using the Floyd Warshall Algorithm)
-		distance[i][j] suggests the distance between atom i and j. 
+	To construct the distance matrix of the compound. (using the Floyd Warshall Algorithm)
+	distance[i][j] suggests the distance between atom i and j. 
 
-		:return: the distance matrix of the compound.
+	:return: the distance matrix of the compound.
     	"""
 
         if self.heavy_atoms:

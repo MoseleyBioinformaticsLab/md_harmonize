@@ -172,7 +172,6 @@ class Bond:
 	To update the bond type of the atom.
 	:param str bond_type: the updated bond type.
 
-
 	:return: the updated bond type.
     	"""
 
@@ -295,9 +294,9 @@ class Compound:
     def heavy_atoms(self):
        
        """
-   To get all the heavy atoms in the compound.
+   	To get all the heavy atoms in the compound.
 
-   :return: the list of heavy atoms in the compound.
+   	:return: the list of heavy atoms in the compound.
        """
 
         return [atom for atom in self.atoms if atom.atom_symbol != "H"]
@@ -361,7 +360,7 @@ class Compound:
         for bond in bond_out_of_cycle:
             bond.bond_type = "1"
 
-    def extractOutdouble_bond_counts(self, atom_in_cycle):
+	def extractOutdouble_bond_counts(self, atom_in_cycle):
 
 
 
@@ -390,7 +389,7 @@ class Compound:
     def calculate_distance_to_R_groups(self):
         
         """
-    To caluclate the distance of each atom to its nearest R group (using the dijkstra's algorithm). 
+   	To caluclate the distance of each atom to its nearest R group (using the dijkstra's algorithm). 
 
     :return:
         """

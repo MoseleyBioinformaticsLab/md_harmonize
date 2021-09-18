@@ -27,23 +27,23 @@ class Atom:
     	
     	"""Atom initializer.
 
-    	:param str x: the x coordinate 
-    	:param str y:
-    	:param str z:
-    	:param str atom_symbol:
-    	:param str mass_difference:
-    	:param str charge:
-    	:param str atom_stereo_parity:
-    	:param str hydrogen_count:
-    	:param str stereo_care_box
+    	:param str x: the atom x coordinate.
+    	:param str y: the atom y coordinate.
+    	:param str z: the atom z coordinate.
+    	:param str atom_symbol: atom_symbol.
+    	:param str mass_difference: difference from mass in periodic table.
+    	:param str charge: charge.
+    	:param str atom_stereo_parity: atom stereo parity.
+    	:param str hydrogen_count: 
+    	:param str stereo_care_box:
     	:param str valence
     	:param str h0designator
     	:param str atom_atom_mapping_number
     	:param str inversion_retention_flag
     	:param str atom_number
     	:param str exact_change_flag
-    	:param str default_symbol
-    	:param str kat
+    	:param str default_symbol:
+    	:param str kat: KEGG atom type.
 
     	"""
 
@@ -77,30 +77,63 @@ class Atom:
 
 
     def update_symbol(self, symbol):
+
+    	"""
+		To update the symbol of the atom.
+
+		:return: the updated atom_symbol.
+    	"""
         
         self.atom_symbol = symbol
+        return self.atom_symbol
 
 
     def remove_neighbors(self, neighbors):
+
+    	"""
+		To add neighbors to the atom.
+
+		:return: the updated list of neighbors of the atom.
+        """
         
         for atom_index in neighbors:
             if atom_index in self.neighbors:
                 self.neighbors.remove(atom_index)
+        return self.neighbors
 
 
     def add_neighbors(self, neighbors):
         
+        """
+		To add neighbors to the atom.
+
+		:return: the updated list of neighbors of the atom.
+        """
+
         for atom_index in neighbors:
             if atom_index not in self.neighbors:
                 self.neighbors.append(atom_index)
+        return self.neighbors
 
 
     def update_stereochemistry(self, stereo):
 
+    	"""
+		To update the stereochemistry of the atom.
+
+		:return: the updated stereochemistry.
+    	"""
+
         self.atom_stereo_parity = stereo
+        return self.atom_stereo_parity
     
 
     def is_R(self):
+
+    	"""
+		To determine if the atom is an R group.
+		:return: boolean.
+    	"""
 
         if "A" in self.default_symbol or "R" in self.default_symbol or "*" in self.default_symbol:
             if self.default_symbol not in notR:
@@ -116,7 +149,13 @@ class Bond:
 
     	"""Bond initializer.
 
-
+		:param str first_atom_number: the index of the first atom forming this bond.
+		:param str second_atom_number: the index of the second atom forming this bond.
+		:param str bond_type: the bond type. (1 = Single, 2 = Double, 3 = Triple, 4 = Aromatic, 5 = Single or Double, 
+		6 = Single or Aromatic, 7 = double or Aromatic 8 = Any)
+		:param str bond_stereo: the bond stereo. ()
+		:param str bond_topology: bond topology. (O = Either, 1 = Ring, 2 = Chain)
+		:param str reacting_center_status: reacting center status.
 
     	"""
 
@@ -130,46 +169,69 @@ class Bond:
     
     def update_bond_type(self, bond_type):
 
+    	"""
+		To update the bond type of the atom.
+
+		:return: the updated bond type.
+    	"""
+
         self.bond_type = bond_type
+        return self.bond_type
 
     def update_stereochemistry(self, stereo):
 
+    	"""
+		To update the stereochemistry of the bond.
+
+		:return: the updated stereochemistry.
+    	"""
+
         self.bond_stereo = stereo
+        return self.bond_stereo
+
 
 
 class Compound:
 
 	""" Compound class describes the :class:`~MDH.compound.Compound` entity. """
 
-    def __init__(self, entry, atoms, bonds):
+    def __init__(self, compund_name, atoms, bonds):
 
     	"""Compound initializer.
 			
-
+		:param str compund_name: the compund name.
+		:param list atoms: a list of atom enties in the compound.
+		:param list bonds: a list of bonds enties in the compound.
     	"""
 
+		self.compund_name = compund_name
         self.atoms = atoms
         self.bonds = bonds
-        self.entry = entry
         self.color_groups = collections.defaultdict(list)
         self.bond_lookup = {}
         self.has_cycle = False
         
         for bond in self.bonds:
             if bond.bond_type != "8":
-                firstAtom, secondAtom = self.atoms[bond.first_atom_number], self.atoms[bond.second_atom_number]
+                first_atom, second_atom = self.atoms[bond.first_atom_number], self.atoms[bond.second_atom_number]
                 self.bond_lookup[(bond.first_atom_number, bond.second_atom_number)] = bond
                 self.bond_lookup[(bond.second_atom_number, bond.first_atom_number)] = bond
-                firstAtom.neighbors.append(bond.second_atom_number)
-                firstAtom.bond_counts += int(bond.bond_type)
-                secondAtom.neighbors.append(bond.first_atom_number)
-                secondAtom.bond_counts += int(bond.bond_type)     
+                first_atom.neighbors.append(bond.second_atom_number)
+                first_atom.bond_counts += int(bond.bond_type)
+                second_atom.neighbors.append(bond.first_atom_number)
+                second_atom.bond_counts += int(bond.bond_type)     
         
         self.find_cycles()
         self.calculate_distance_to_R_groups()
     
     @property
     def R_groups(self):
+
+    	"""
+		To get all the R groups in the compound.
+
+		:return: the list of index of all the R groups.
+    	"""
         
         rs = []
         for index, atom in enumerate(self.atoms):
@@ -180,53 +242,81 @@ class Compound:
     def calculate_distance_to_R_groups(self):
         
         """
+        To caluclate the distance of each atom to its nearest R group (using the dijkstra's algorithm). 
 
+        :return:
         """
+
         distance_matrix = [len(self.heavy_atoms)] * len(self.heavy_atoms) 
-        
+
         if self.R_groups:
             for r_index in self.R_groups:
                 ques = [(0, r_index)]
                 seen = {}
                 while ques:
-                    l, atom_index = heapq.heappop(ques)
-                    if atom_index in seen and seen[atom_index] <= l:
+                    dist, atom_index = heapq.heappop(ques)
+                    if atom_index in seen and seen[atom_index] <= dist:
                         continue
-                    seen[atom_index] = l
-                    distance_matrix[self.index_of_heavy_atoms[atom_index]] = min(distance_matrix[self.index_of_heavy_atoms[atom_index]], l)
+                    seen[atom_index] = dist
+                    distance_matrix[self.index_of_heavy_atoms[atom_index]] = min(distance_matrix[self.index_of_heavy_atoms[atom_index]], dist)
                     for neighbor in self.atoms[atom_index].neighbors:
                         if self.atoms[neighbor].atom_symbol != "H":
-                            if neighbor not in seen or seen[neighbor] > l + 1:
-                                if distance_matrix[self.index_of_heavy_atoms[neighbor]] > l+1:
-                                    heapq.heappush(ques, (l+1, neighbor))
+                            if neighbor not in seen or seen[neighbor] > dist+ 1:
+                                if distance_matrix[self.index_of_heavy_atoms[neighbor]] > dist+1:
+                                    heapq.heappush(ques, (dist+1, neighbor))
         
-            for i, l in enumerate(distance_matrix):
-                self.heavy_atoms[i].distance_to_R = l
-
+            for i, dist in enumerate(distance_matrix):
+                self.heavy_atoms[i].distance_to_R = dist
 
     @property
     def heavy_atoms(self):
        
+       """
+       To get all the heavy atoms in the compound.
+
+       :return: the list of heavy atoms in the compound.
+       """
+
         return [atom for atom in self.atoms if atom.atom_symbol != "H"]
     
     @property
     def index_of_heavy_atoms(self):
 
+    	"""
+		To map the atom index to heavy atoms.
+
+		:return: the dictionay of atom index to atom entity.
+    	"""
+
         return { self.heavy_atoms[i].atom_number: i for i in range(len(self.heavy_atoms)) } 
 
     @property
-    def loose_matrix(self):
+    def backbone_matrix(self):
 
-        loose_matrix = numpy.zeros((len(self.heavy_atoms), len(self.heavy_atoms)), dtype=numpy.uint8)
+    	"""
+		To construct 
+		
+		:return: the  matrix of this compound.
+    	"""
+
+        backbone_matrix = numpy.zeros((len(self.heavy_atoms), len(self.heavy_atoms)), dtype=numpy.uint8)
         for bond in self.bonds:
             atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
             if atom_1 in self.index_of_heavy_atoms and atom_2 in self.index_of_heavy_atoms:
-                loose_matrix[self.index_of_heavy_atoms[atom_1]][self.index_of_heavy_atoms[atom_2]] = 
-                loose_matrix[self.index_of_heavy_atoms[atom_2]][self.index_of_heavy_atoms[atom_1]] = int(bond.bond_type) if int(bond.bond_type) != 2 else 1
-        return loose_matrix
+                backbone_matrix[self.index_of_heavy_atoms[atom_1]][self.index_of_heavy_atoms[atom_2]] = 
+                backbone_matrix[self.index_of_heavy_atoms[atom_2]][self.index_of_heavy_atoms[atom_1]] = int(bond.bond_type) if int(bond.bond_type) != 2 else 1
+        return backbone_matrix
 
     @property
-    def strict_matrix(self):
+    def structure_matrix(self):
+
+    	"""
+		To construct matrix of 
+		matrix[i][j] = 0 suggests the two atoms are not connected directly.
+
+		:return: the structure matrix of this compound.
+    	"""
+
         matrix = numpy.zeros((len(self.heavy_atoms), len(self.heavy_atoms)), dtype=numpy.uint8)
         for bond in self.bonds:
             atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
@@ -238,21 +328,29 @@ class Compound:
 
     @property
     def distance_matrix(self):
+
+    	"""
+		To construct the distance matrix of the compound. (using the Floyd Warshall Algorithm)
+		distance[i][j] suggests the distance between atom i and j. 
+
+		:return: the distance matrix of the compound.
+    	"""
+
         if self.heavy_atoms:
-            dis_matrix = numpy.ones((len(self.heavy_atoms), len(self.heavy_atoms)),dtype=numpy.uint16 ) * len(self.heavy_atoms)
+            distance_matrix = numpy.ones((len(self.heavy_atoms), len(self.heavy_atoms)),dtype=numpy.uint16 ) * len(self.heavy_atoms)
             for bond in self.bonds:
                 atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
                 if atom_1 in self.index_of_heavy_atoms and atom_2 in self.index_of_heavy_atoms:
-                    dis_matrix[self.index_of_heavy_atoms[atom_1]][self.index_of_heavy_atoms[atom_2]] = 
-                    dis_matrix[self.index_of_heavy_atoms[atom_2]][self.index_of_heavy_atoms[atom_1]] = 1
+                    distance_matrix[self.index_of_heavy_atoms[atom_1]][self.index_of_heavy_atoms[atom_2]] = 
+                    distance_matrix[self.index_of_heavy_atoms[atom_2]][self.index_of_heavy_atoms[atom_1]] = 1
 
             n = len(self.heavy_atoms)
             for k in range(n):
                 for i in range(n):
                     for j in range(n):
-                        if dis_matrix[i][j] > dis_matrix[i][k] + dis_matrix[k][j]:
-                            dis_matrix[i][j] = dis_matrix[i][k] + dis_matrix[k][j]
-            return dis_matrix
+                        if distance_matrix[i][j] > distance_matrix[i][k] + distance_matrix[k][j]:
+                            distance_matrix[i][j] = distance_matrix[i][k] + distance_matrix[k][j]
+            return distance_matrix
         return None
 
     def create_loose_color_tuple(self):
@@ -273,11 +371,11 @@ class Compound:
             atom.color_tuple = (components["C"], components["N"], components["S"], components["O"], single_bond, aromatic_bond)
 
 
-    def colorCpd(self, R=True,stereo_resolved=True, atom_stereo=True, strict=True):
+    def color_compound(self, R=True,stereo_resolved=True, atom_stereo=True, strict=True):
 
         self.firstRoundColor(R=R, stereo_resolved=stereo_resolved, atom_stereo=atom_stereo, strict=strict)
         self.curateSymmetry(stereo_resolved=stereo_resolved, strict=strict)
-        self.colorMetals(stereo_resolved=stereo_resolved, strict=strict)
+        self.color_metals(stereo_resolved=stereo_resolved, strict=strict)
     
     def create_strict_color_tuple(self):
 
@@ -329,7 +427,7 @@ class Compound:
         mmat = mappping_matrix(another, self, True, True)
         #print("strict mappings", sum(sum(row) for row in mmat))
         if mmat is not None:
-            substructures = find_mappings(another.strict_matrix, another.distance_matrix, self.strict_matrix, self.distance_matrix, mmat)
+            substructures = find_mappings(another.structure_matrix, another.distance_matrix, self.structure_matrix, self.distance_matrix, mmat)
 
         indexMatch = []
 
@@ -353,7 +451,7 @@ class Compound:
         mmat = mappping_matrix(another, self, True, True)
         #print("loose mappings", sum(sum(row) for row in mmat))
         if mmat is not None:
-            substructures = find_mappings(another.loose_matrix, another.distance_matrix, self.loose_matrix, self.distance_matrix, mmat)
+            substructures = find_mappings(another.backbone_matrix, another.distance_matrix, self.backbone_matrix, self.distance_matrix, mmat)
         
         indexMatch = []
         
@@ -489,16 +587,16 @@ class Compound:
     def defineEZ(self):
         for bond in self.bonds:
             if bond.bond_type == "2":
-                bond.bond_stereo = self.calculateEZ(bond)
+                bond.bond_stereo = self.calculate_EZ(bond)
     
-    def calculateEZ(self, bond):
+    def calculate_EZ(self, bond):
 
         vertical = False
 
-        firstAtom = self.atoms[bond.first_atom_number]
-        secondAtom = self.atoms[bond.second_atom_number]
-        xf, yf = firstAtom.x, firstAtom.y
-        xs, ys = secondAtom.x, secondAtom.y
+        first_atom = self.atoms[bond.first_atom_number]
+        second_atom = self.atoms[bond.second_atom_number]
+        xf, yf = first_atom.x, first_atom.y
+        xs, ys = second_atom.x, second_atom.y
 
         if xf != xs:
             slope = (yf-ys)/(xf-xs)
@@ -506,42 +604,42 @@ class Compound:
         else:
             vertical = True
 
-        firstIndex = [neighbor for neighbor in firstAtom.neighbors if neighbor != secondAtom.atom_number]
-        secondIndex = [neighbor for neighbor in secondAtom.neighbors if neighbor != firstAtom.atom_number]
+        first_atom_neighor_index = [neighbor for neighbor in first_atom.neighbors if neighbor != second_atom.atom_number]
+        second_atom_neighor_index = [neighbor for neighbor in second_atom.neighbors if neighbor != first_atom.atom_number]
         
-        if not len(firstIndex) or not len(secondIndex):
+        if not len(first_atom_neighor_index) or not len(second_atom_neighor_index):
             return 0
         
-        if len(firstIndex) == 1:
-            firstH, firstL = self.atoms[firstIndex[0]], None
+        if len(first_atom_neighor_index) == 1:
+            first_heavy_side, first_light_side = self.atoms[first_atom_neighor_index[0]], None
         else:
-            firstH, firstL = self.getAtomRank(self.atoms[firstIndex[0]], self.atoms[firstIndex[1]], firstAtom)
+            first_heavy_side, first_light_side = self.atom_rank(self.atoms[first_atom_neighor_index[0]], self.atoms[first_atom_neighor_index[1]], first_atom)
         
-        if len(secondIndex) == 1:
-            secondH, secondL = self.atoms[secondIndex[0]], None
+        if len(second_atom_neighor_index) == 1:
+            second_heavy_side, second_light_side = self.atoms[second_atom_neighor_index[0]], None
         else:
-            secondH, secondL = self.getAtomRank(self.atoms[secondIndex[0]], self.atoms[secondIndex[1]], secondAtom)
+            second_heavy_side, second_light_side = self.atom_rank(self.atoms[second_atom_neighor_index[0]], self.atoms[second_atom_neighor_index[1]], second_atom)
         
 
-        if (firstL and firstH.atom_number == firstL.atom_number) or (secondL and secondH.atom_number == secondL.atom_number):
+        if (first_light_side and first_heavy_side.atom_number == first_light_side.atom_number) or (second_light_side and second_heavy_side.atom_number == second_light_side.atom_number):
             return 0
 
         if vertical:
-            if (firstH.x - xs) * (secondH.x - xs) > 0:
+            if (first_heavy_side.x - xs) * (second_heavy_side.x - xs) > 0:
                 return 1
             else:
                 return -1
         else:
-            if (self.calculateY(slope, b, firstH) - firstH.y) * (self.calculateY(slope, b, secondH) - secondH.y) > 0:
+            if (self.calculate_Y(slope, b, first_heavy_side) - first_heavy_side.y) * (self.calculate_Y(slope, b, second_heavy_side) - second_heavy_side.y) > 0:
                 return 1
             else:
                 return -1
 
-    def calculateY(self, slope, b, atom):
+    def calculate_Y(self, slope, b, atom):
 
         return atom.x * slope + b
 
-    def getAtomRank(self, atomLeft, atomRight, pre):
+    def atom_rank(self, atomLeft, atomRight, pre):
 
         if atomicNumbers[atomLeft.default_symbol] > atomicNumbers[atomRight.default_symbol]:
             return [atomLeft, atomRight]
@@ -598,7 +696,7 @@ class Compound:
                 return True
         return False
 
-    def connectedComponent(self):
+    def connected_components(self):
 
         visited = set()
         group_id = 0
@@ -617,6 +715,7 @@ class Compound:
         components = [[] for i in range(group_id)]
         for index, atom in enumerate(self.atoms):
             components[atom.group_id].append(index)
+
         return components
 
     def abnormalBond(self):
@@ -850,10 +949,10 @@ class Compound:
                 self.atoms[targetatom_index].color = targetColor
 
         if self.checkSymmetry():
-            print(self.entry)
+            print(self.compund_name)
         #print(self.color_groups)
 
-    def colorMetals(self, charge=False, isotope_resolved=False, stereo_resolved=False, strict=True):
+    def color_metals(self, charge=False, isotope_resolved=False, stereo_resolved=False, strict=True):
         
         for atom_index in self.isolatedMetalIndex:
             atom = self.atoms[atom_index]
@@ -878,7 +977,7 @@ class Compound:
             for name in sorted(colorComponents.keys()):
                 atom.color += "({0})({1})".format(colorComponents[name], name)
 
-    def colorH(self, stereo_resolved=False, charge=False, isotope_resolved=False):
+    def color_H(self, stereo_resolved=False, charge=False, isotope_resolved=False):
 
         for index in self.HIndex:
             atom = self.atoms[index]
@@ -898,11 +997,11 @@ class Compound:
             atom.color = atom.color_0 + "".join(["(" + a + "," + b + ")" for (a, b) in sorted(colorComponents)])
 
 
-    def changeAromaticBonds(self, cycles):
+    def update_aromatic_bonds(self, cycles):
 
         atomInCyle = [atom for cycle in cycles for atom in cycle]
         for cycle in cycles:
-            aromaticBonds = self.extractAromaticBond(cycle)
+            aromaticBonds = self.extract_aromatic_bonds(cycle)
             for bond in aromaticBonds:
                 bond.bond_type = "4"
         outBonds = self.extractOutdouble_bond_counts(atomInCyle)
@@ -919,7 +1018,7 @@ class Compound:
                             double_bond_countsOutCycle.append(self.bond_lookup[(atom_index, neighbor_index)])
         return double_bond_countsOutCycle
 
-    def extractAromaticBond(self, cycle):
+    def extract_aromatic_bonds(self, cycle):
         aromaticBonds = []
         allPairs = list(itertools.combinations(cycle, 2))
         visited = set()
@@ -932,10 +1031,10 @@ class Compound:
 
     def changedouble_bond_countsStereo(self, bonds):
         for bond in bonds:
-            firstAtom = bond.first_atom_number
-            secondAtom = bond.second_atom_number
-            if self.bond_lookup[(firstAtom, secondAtom)].bond_type == "2":
-                self.bond_lookup[(firstAtom, secondAtom)].bond_stereo = str(bond.bond_stereo)
+            first_atom = bond.first_atom_number
+            second_atom = bond.second_atom_number
+            if self.bond_lookup[(first_atom, second_atom)].bond_type == "2":
+                self.bond_lookup[(first_atom, second_atom)].bond_stereo = str(bond.bond_stereo)
 
     def metalString(self, noBond=True):
         if noBond:  

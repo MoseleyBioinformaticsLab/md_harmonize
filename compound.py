@@ -243,9 +243,9 @@ class Compound:
     def calculate_distance_to_R_groups(self):
         
         """
-    To caluclate the distance of each atom to its nearest R group (using the dijkstra's algorithm). 
+	    To caluclate the distance of each atom to its nearest R group (using the dijkstra's algorithm). 
 
-    :return:
+	    :return:
         """
 
         distance_matrix = [len(self.heavy_atoms)] * len(self.heavy_atoms) 
@@ -273,9 +273,9 @@ class Compound:
     def heavy_atoms(self):
        
        """
-   To get all the heavy atoms in the compound.
+	   To get all the heavy atoms in the compound.
 
-   :return: the list of heavy atoms in the compound.
+	   :return: the list of heavy atoms in the compound.
        """
 
         return [atom for atom in self.atoms if atom.atom_symbol != "H"]
@@ -284,9 +284,9 @@ class Compound:
     def index_of_heavy_atoms(self):
 
     	"""
-	To map the atom index to heavy atoms.
+		To map the atom index to heavy atoms.
 
-	:return: the dictionay of atom index to atom entity.
+		:return: the dictionay of atom index to atom entity.
     	"""
 
         return { self.heavy_atoms[i].atom_number: i for i in range(len(self.heavy_atoms)) } 

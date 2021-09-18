@@ -357,7 +357,7 @@ class Compound:
         """
    	To caluclate the distance of each atom to its nearest R group (using the dijkstra's algorithm). 
 
-    :return:
+   	:return:
         """
         distance_matrix = [len(self.heavy_atoms)] * len(self.heavy_atoms) 
 

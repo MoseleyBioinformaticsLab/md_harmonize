@@ -277,7 +277,7 @@ class Compound:
     	"""
         return { self.heavy_atoms[i].atom_number: i for i in range(len(self.heavy_atoms)) }
 
-	def metals(self):
+    def metals(self):
 		"""
 	To get all the metals in the compound.
 
@@ -289,7 +289,7 @@ class Compound:
                 metals[atom.default_symbol].append(index)
         return metals
 
-	def update_double_bond_stereo(self, bonds):
+    def update_double_bond_stereo(self, bonds):
 		"""
 	To update the stereochemistry of the double bonds.
 	:param list bonds: the list of bonds whose bond stereo needs update. 
@@ -302,7 +302,7 @@ class Compound:
 			if self.bond_lookup[(first_atom, second_atom)].bond_type == "2":
 	            self.bond_lookup[(first_atom, second_atom)].bond_stereo = str(bond.bond_stereo)
 
-	def update_aromatic_bond_type(self, cycles):
+    def update_aromatic_bond_type(self, cycles):
 		"""
 	Update the aromatic bond types. 
 	Two cases: 1) change the bond in the aromatic ring to aromatic bond (bond type = 4)
@@ -320,7 +320,8 @@ class Compound:
         for bond in bond_out_of_cycle:
             bond.bond_type = "1"
 
-	def extract_double_bond_connecting_cycle(self, atom_in_cycle):
+
+    def extract_double_bond_connecting_cycle(self, atom_in_cycle):
 		"""
 	Extract the double bonds connecting to the aromatic cycles.
 	:param list atom_in_cycle: the list of indexes of atoms in the aromatic cycles.

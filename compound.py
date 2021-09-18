@@ -149,13 +149,13 @@ class Bond:
 
     	"""Bond initializer.
 
-		:param str first_atom_number: the index of the first atom forming this bond.
-		:param str second_atom_number: the index of the second atom forming this bond.
-		:param str bond_type: the bond type. (1 = Single, 2 = Double, 3 = Triple, 4 = Aromatic, 5 = Single or Double, 
-		6 = Single or Aromatic, 7 = double or Aromatic 8 = Any)
-		:param str bond_stereo: the bond stereo. ()
-		:param str bond_topology: bond topology. (O = Either, 1 = Ring, 2 = Chain)
-		:param str reacting_center_status: reacting center status.
+	:param str first_atom_number: the index of the first atom forming this bond.
+	:param str second_atom_number: the index of the second atom forming this bond.
+	:param str bond_type: the bond type. (1 = Single, 2 = Double, 3 = Triple, 4 = Aromatic, 5 = Single or Double, 
+	6 = Single or Aromatic, 7 = double or Aromatic 8 = Any)
+	:param str bond_stereo: the bond stereo. ()
+	:param str bond_topology: bond topology. (O = Either, 1 = Ring, 2 = Chain)
+	:param str reacting_center_status: reacting center status.
 
     	"""
 

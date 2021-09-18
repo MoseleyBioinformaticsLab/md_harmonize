@@ -275,7 +275,7 @@ class Compound:
 
 	:return: the dictionay of atom index to atom entity.
     	"""
-        return { self.heavy_atoms[i].atom_number: i for i in range(len(self.heavy_atoms)) } 
+        return { self.heavy_atoms[i].atom_number: i for i in range(len(self.heavy_atoms)) }
 
 	def metals(self):
 		"""
@@ -415,14 +415,12 @@ class Compound:
 
     @property
     def distance_matrix(self):
-
     	"""
 	To construct the distance matrix of the compound. (using the Floyd Warshall Algorithm)
 	distance[i][j] suggests the distance between atom i and j. 
 
 	:return: the distance matrix of the compound.
     	"""
-
         if self.heavy_atoms:
             distance_matrix = numpy.ones((len(self.heavy_atoms), len(self.heavy_atoms)),dtype=numpy.uint16 ) * len(self.heavy_atoms)
             for bond in self.bonds:

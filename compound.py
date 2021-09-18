@@ -24,7 +24,6 @@ class Atom:
 
     def __init__(self, x, y, z, atom_symbol, mass_difference, charge, atom_stereo_parity, hydrogen_count, stereo_care_box, 
     	valence, h0designator, atom_atom_mapping_number, inversion_retention_flag, atom_number, exact_change_flag, default_symbol, kat=""):
-    	
     	"""Atom initializer.
 
 	:param str x: the atom x coordinate.
@@ -44,9 +43,7 @@ class Atom:
 	:param str exact_change_flag: exact_change_flag.
 	:param str default_symbol: default_symbol.
 	:param str kat: KEGG atom type.
-
     	"""
-
         self.x = float(x.strip())
         self.y = float(y.strip())
         self.z = float(z.strip())
@@ -76,65 +73,55 @@ class Atom:
         self.kat = kat
 
     def update_symbol(self, symbol):
-
     	"""
 	To update the symbol of the atom.
 	:param str symbol: the updated atom symbol.
 
 	:return: the updated atom_symbol.
     	"""
-        
         self.atom_symbol = symbol
         return self.atom_symbol
 
     def remove_neighbors(self, neighbors):
-
     	"""
 	To add neighbors to the atom.
 	:param list neighbors: the index of neighbors that will be removed from this atom.
 
 	:return: the updated list of neighbors of the atom.
         """
-        
         for atom_index in neighbors:
             if atom_index in self.neighbors:
                 self.neighbors.remove(atom_index)
         return self.neighbors
 
     def add_neighbors(self, neighbors):
-        
         """
 	To add neighbors to the atom.
 	:param list neighbors: the index of neighbors that will be added to this atom.
 
 	:return: the updated list of neighbors of the atom.
         """
-
         for atom_index in neighbors:
             if atom_index not in self.neighbors:
                 self.neighbors.append(atom_index)
         return self.neighbors
 
     def update_stereochemistry(self, stereo):
-
     	"""
 	To update the stereochemistry of the atom.
 	:param str stereo: the updated atom stereochemistry.
 
 	:return: the updated stereochemistry.
     	"""
-
         self.atom_stereo_parity = stereo
         return self.atom_stereo_parity
     
     def is_R(self):
-
     	"""
 	To determine if the atom is an R group.
 
 	:return: boolean.
     	"""
-
         if "A" in self.default_symbol or "R" in self.default_symbol or "*" in self.default_symbol:
             if self.default_symbol not in notR:
                 return True
@@ -146,7 +133,6 @@ class Bond:
 	""" Bond class describes the :class:`~MDH.compound.Bond` entity in the compound. """
 
     def __init__(self, first_atom_number, second_atom_number, bond_type, bond_stereo, bond_topology, reacting_center_status):
-
     	"""Bond initializer.
 
 	:param str first_atom_number: the index of the first atom forming this bond.
@@ -156,9 +142,7 @@ class Bond:
 	:param str bond_stereo: the bond stereo. (Single bonds: 0 = not stereo, 1 = Up, 4 = Either, 6 = Down; Double bonds: determined by x, y, z coordinates)
 	:param str bond_topology: bond topology. (O = Either, 1 = Ring, 2 = Chain)
 	:param str reacting_center_status: reacting center status.
-
     	"""
-
         self.first_atom_number = int(first_atom_number) - 1
         self.second_atom_number = int(second_atom_number) - 1
         self.bond_type = bond_type.strip()
@@ -167,26 +151,22 @@ class Bond:
         self.reacting_center_status = reacting_center_status.strip()
  
     def update_bond_type(self, bond_type):
-
     	"""
 	To update the bond type of the atom.
 	:param str bond_type: the updated bond type.
 
 	:return: the updated bond type.
     	"""
-
         self.bond_type = bond_type
         return self.bond_type
 
     def update_stereochemistry(self, stereo):
-
     	"""
 	To update the stereochemistry of the bond.
 	:param str stereo: the updated atom stereochemistry.
 
 	:return: the updated stereochemistry.
     	"""
-
         self.bond_stereo = stereo
         return self.bond_stereo
 
@@ -196,14 +176,12 @@ class Compound:
 	""" Compound class describes the :class:`~MDH.compound.Compound` entity. """
 
     def __init__(self, compund_name, atoms, bonds):
-
     	"""Compound initializer.
 			
 	:param str compund_name: the compund name.
 	:param list atoms: a list of atom enties in the compound.
 	:param list bonds: a list of bonds enties in the compound.
     	"""
-
 		self.compund_name = compund_name
         self.atoms = atoms
         self.bonds = bonds
@@ -226,13 +204,11 @@ class Compound:
 
     @property
     def formula(self):
-
     	"""
 	To construct the formula of this compound (only consider heavy atoms).
 
 	:return: string.
     	"""
-        
         counter = collections.Counter()
         for atom in self.atoms:
             if atom.default_symbol == "H":
@@ -246,13 +222,11 @@ class Compound:
     
     @property
     def R_groups(self):
-
     	"""
 	To get all the R groups in the compound.
 
 	:return: the list of index of all the R groups.
     	"""
-        
         rs = []
         for index, atom in enumerate(self.atoms):
             if atom.is_R():
@@ -260,13 +234,11 @@ class Compound:
         return rs
 
     def contains_R_groups(self):
-
     	"""
 	To check if the compound contains R group(s).
 
 	:return: boolean.
     	"""
-        
         return self.R_groups != []
 
     @property
@@ -276,50 +248,41 @@ class Compound:
 
 	:return: the list of index of isolated metals.
         """
-
         return [index for index, atom in enumerate(self.atoms) if atom.atom_symbol in metalSymbols]
     
     @property
     def HIndex(self):
-
     	"""
 	To get the index of H(s) in the compound. 
 
 	:return: the list of index of Hs.
     	"""
-
         return [index for index, atom in enumerate(self.atoms) if atom.atom_symbol == "H"]
 
     @property
     def heavy_atoms(self):
-       
        """
    	To get all the heavy atoms in the compound.
 
    	:return: the list of heavy atoms in the compound.
        """
-
         return [atom for atom in self.atoms if atom.atom_symbol != "H"]
     
     @property
     def index_of_heavy_atoms(self):
-
     	"""
 	To map the atom index to heavy atoms.
 
 	:return: the dictionay of atom index to atom entity.
     	"""
-
         return { self.heavy_atoms[i].atom_number: i for i in range(len(self.heavy_atoms)) } 
 
 	def metals(self):
-
 		"""
 	To get all the metals in the compound.
 
 	:return: the dictionary of metal and the corresponding list of index.
 		"""
-
         metals = collections.defaultdict(list)
         for index, atom in enumerate(self.atoms):
             if atom.default_symbol in metalSymbols:
@@ -327,14 +290,12 @@ class Compound:
         return metals
 
 	def update_double_bond_stereo(self, bonds):
-
 		"""
 	To update the stereochemistry of the double bonds.
-	:param list bonds: the list of bonds 
+	:param list bonds: the list of bonds whose bond stereo needs update. 
 
 	:return: 
 		"""
-
 		for bond in bonds:
 			first_atom = bond.first_atom_number
 			second_atom = bond.second_atom_number
@@ -342,58 +303,62 @@ class Compound:
 	            self.bond_lookup[(first_atom, second_atom)].bond_stereo = str(bond.bond_stereo)
 
 	def update_aromatic_bond_type(self, cycles):
-
 		"""
 	Update the aromatic bond types. 
 	Two cases: 1) change the bond in the aromatic ring to aromatic bond (bond type = 4)
 			   2) change the double bond connecting to the aromatic ring to single bond.
+	:param list cycles: the list of cycls of aromatic atom indexes.
 
 	:return: 
 		"""
-
         atom_in_cycle = [atom for cycle in cycles for atom in cycle]
         for cycle in cycles:
             aromatic_bonds = self.extract_aromatic_bonds(cycle)
             for bond in aromatic_bonds:
                 bond.bond_type = "4"
-        bond_out_of_cycle = self.extractOutdouble_bond_counts(atom_in_cycle)
+        bond_out_of_cycle = self.extract_double_bond_connecting_cycle(atom_in_cycle)
         for bond in bond_out_of_cycle:
             bond.bond_type = "1"
 
-	def extractOutdouble_bond_counts(self, atom_in_cycle):
+	def extract_double_bond_connecting_cycle(self, atom_in_cycle):
+		"""
+	Extract the double bonds connecting to the aromatic cycles.
+	:param list atom_in_cycle: the list of indexes of atoms in the aromatic cycles.
 
-
-
-        double_bond_countsOutCycle = []
+	:return: the list of double bonds connecting to the aromatic cycles.
+		"""
+        double_bond_connecting_cycle = []
         for atom_index in atom_in_cycle:
             if self.atoms[atom_index].atom_symbol == "C":
                 for neighbor_index in self.atoms[atom_index].neighbors:
                     if neighbor_index not in atom_in_cycle:
                         if self.bond_lookup[(atom_index, neighbor_index)].bond_type == "2":
-                            double_bond_countsOutCycle.append(self.bond_lookup[(atom_index, neighbor_index)])
-        return double_bond_countsOutCycle
+                            double_bond_connecting_cycle.append(self.bond_lookup[(atom_index, neighbor_index)])
+        return double_bond_connecting_cycle
 
     def extract_aromatic_bonds(self, cycle):
+    	"""
+	Extract the aromatic bonds based on the atom indexes in the cycle.
+	:param list cycle: the 
+
+	:return: the list of aromatic bonds.
+    	"""
         aromatic_bonds = []
-        allPairs = list(itertools.combinations(cycle, 2))
+        all_pairs = list(itertools.combinations(cycle, 2))
         visited = set()
-        for pair in allPairs:
+        for pair in all_pairs:
             if (pair[0], pair[1]) not in visited and (pair[0], pair[1]) in self.bond_lookup:
                 aromatic_bonds.append(self.bond_lookup[(pair[0], pair[1])])
                 visited.add((pair[0], pair[1]))
                 visited.add((pair[1], pair[1]))
         return aromatic_bonds
 
-
-
     def calculate_distance_to_R_groups(self):
-        
         """
    	To caluclate the distance of each atom to its nearest R group (using the dijkstra's algorithm). 
 
     :return:
         """
-
         distance_matrix = [len(self.heavy_atoms)] * len(self.heavy_atoms) 
 
         if self.R_groups:
@@ -417,14 +382,12 @@ class Compound:
 
     @property
     def resonance_targeted_structure_matrix(self):
-
     	"""
 	To construct graph structural matrix of this compound without distinguishing single and double bonds. 
 	This is used to find compounds with different resonance structures.
 
 	:return: the matrix of this compound.
     	"""
-
         resonance_targeted_structure_matrix = numpy.zeros((len(self.heavy_atoms), len(self.heavy_atoms)), dtype=numpy.uint8)
         for bond in self.bonds:
             atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
@@ -435,14 +398,12 @@ class Compound:
 
     @property
     def structure_matrix(self):
-
     	"""
 	To construct graph structural matrix of this compound.
 	matrix[i][j] = 0 suggests the two atoms are not connected directly.
 
 	:return: the structure matrix of this compound.
     	"""
-
         matrix = numpy.zeros((len(self.heavy_atoms), len(self.heavy_atoms)), dtype=numpy.uint8)
         for bond in self.bonds:
             atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number

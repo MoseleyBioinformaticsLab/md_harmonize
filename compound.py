@@ -182,8 +182,8 @@ class Compound:
 	:param str compund_name: the compund name.
 	:param list atoms: a list of :class:`~MDH.compound.Atom` enties in the compound.
 	:param list bonds: a list of :class:`~MDH.compound.Bond` enties in the compound.
-    	"""
-		self.compund_name = compund_name
+    	"""    
+    	self.compund_name = compund_name
         self.atoms = atoms
         self.bonds = bonds
         self.color_groups = collections.defaultdict(list)
@@ -355,6 +355,31 @@ class Compound:
                 visited.add((pair[1], pair[1]))
         return aromatic_bonds
 
+    def connected_components(self):
+    	"""
+	Detect the connected components in the compound structure. (using the breadth first search)
+
+	:return: the dictionary of the connected components.
+    	"""
+        visited = set()
+        group_id = 0
+        components = collections.defaultdict(list)
+
+        for index, atom in enumerate(self.atoms):
+            if index not in visited:
+            	ques = collections.deque(index)
+            	while ques:
+            		cur = ques.popleft()
+            		self.atoms[cur].group_id = group_id
+            		visited.add(cur)
+            		components[group_id].append(cur)
+            		for neighbor in self.atoms[cur].neighbors:
+            			if neighbor not in visited:
+            				ques.append(neighbor)
+                group_id += 1
+
+        return components
+
     def calculate_distance_to_R_groups(self):
         """
    	To caluclate the distance of each atom to its nearest R group (using the dijkstra's algorithm). 
@@ -471,7 +496,6 @@ class Compound:
                 matrix[self.index_of_heavy_atoms[atom_2]][self.index_of_heavy_atoms[atom_1]] = int(bond.bond_type)
         return matrix
 
-
     @property
     def distance_matrix(self):
     	"""
@@ -499,14 +523,14 @@ class Compound:
 
     def color_compound(self, R=True,stereo_resolved=True, atom_stereo=True, strict=True):
 
-        self.firstRoundColor(R=R, stereo_resolved=stereo_resolved, atom_stereo=atom_stereo, strict=strict)
+        self.first_round_color(R=R, stereo_resolved=stereo_resolved, atom_stereo=atom_stereo, strict=strict)
         self.curate_symmetry(stereo_resolved=stereo_resolved, strict=strict)
         self.color_metals(stereo_resolved=stereo_resolved, strict=strict)
     
     def update_color_tuple(self, resonance=False):
     	"""
         To update the color tuple of the atoms in the compound. This color tuple includes information of its neighboring atoms and bonds.
-        If we need to find the resonant structure. We need to turn on resonance, which will ignore the difference between single and double bonds.
+	:param boolean resonance: to find the resonant structure. This will ignore the difference between single and double bonds.
 
         :return:
     	"""
@@ -546,27 +570,18 @@ class Compound:
  #                    self.atoms[atom_1].atom_mappings.append(atom_2)
  #                    the_other.atoms[atom_2].atom_mappings.append(atom_1)
 
-    def generate_atom_mappings(self, the_other, mappings):
+   
+
+    def find_mappings(self, the_other, resonance=False, R=False, default_mappings=None):
     	"""
-	Update the mappings atoms between two compounds.
-	:param the_other: the mappings compound entity.
+	Find the atom mappings between two compounds.
+	param the_other: the mappings compound entity.
 	:type the_other: :class:`~MDH.compound.compound`
-	:param list mappings: the mappings of heavy atom indexes.
-
-	:return: the list of dictionary of one to one mapping of index in the original order 
-    	"""
-    	one_to_one_mappings = []
-
-        for sub in mappings:
-            cur_mappings = {}
-            for f, t in enumerate(sub):
-                cur_mappings[self.heavy_atoms[t].atom_number] = the_other.heavy_atoms[f].atom_number
-            one_to_one_mappings.append(cur_mappings)
-        return one_to_one_mappings
-
-    def find_mappings(self, the_other, resonance=False, R=False, mappings=None):
-    	"""
-
+	:param boolean resonance: to find the resonant structure. This will ignore the difference between single and double bonds.
+	:param boolean R: to take account of positon of R groups.
+	:param list default_mappings: the default mappings between the two compounds.
+	
+	:return: the list of atom mappings in the heavy atom order.
     	"""
         mappping_matrix = BASS_1.make_mapping_matrix_R if R else BASS_1.make_mapping_matrix 
         find_mappings = BASS_1.find_mappings
@@ -574,53 +589,73 @@ class Compound:
         self.update_color_tuple(resonance=resonance)
         the_other.update_color_tuple(resonance=resonance)
         mappings = []
-        
-        # self.update_mappings_atoms(the_other, mappings)
+        # self.update_mappings_atoms(the_other, default_mappings)
 
         mmat = mappping_matrix(the_other, self, True, True)
         if mmat is not None:
             mappings = find_mappings(the_other.structure_matrix, the_other.distance_matrix, 
             	self.structure_matrix, self.distance_matrix, mmat)
+        return mappings
 
-        return generate_atom_mappings(self, the_other, mappings)
+    def generate_one_to_one_mappings(self, the_other, mappings):
+    	"""
+	Generate the one to one atom mappings between two compounds.
+	:param the_other: the mappings compound entity.
+	:type the_other: :class:`~MDH.compound.compound`
+	:param list mappings: the mappings of heavy atom indexes.
+
+	:return: the list of dictionary of one to one atom mappings in the original order. 
+    	"""
+    	one_to_one_mappings = []
+        for sub in mappings:
+            cur_mappings = {}
+            for from_index, to_index in enumerate(sub):
+                cur_mappings[self.heavy_atoms[to_index].atom_number] = the_other.heavy_atoms[from_index].atom_number
+            one_to_one_mappings.append(cur_mappings)
+        return one_to_one_mappings
 
     def match_loosely(self, the_other, R=False):
+    	"""
 
-        one_to_one_mappings = self.find_loose_mappings(the_other, R=R)
+    	"""
+    	mappings = self.find_mappings(self, the_other, resonance=True, R=False)
+        one_to_one_mappings = self.generate_one_to_one_mappings(the_other, mappings)
+
         validMatch = []
         for cur_mappings in one_to_one_mappings:
             flag = True
-            reverseMatch = { cur_mappings[key] : key for key in cur_mappings }
-            for f in sorted(cur_mappings.keys()):
-                t = cur_mappings[f]
-                if 1 in self.atoms[f].color_layers and 1 in the_other.atoms[t].color_layers and self.atoms[f].color_layers[1] == the_other.atoms[t].color_layers[1]:
+            reversed_mappings = { cur_mappings[key] : key for key in cur_mappings }
+            for from_index in sorted(cur_mappings.keys()):
+                to_index = cur_mappings[from_index]
+                if 1 in self.atoms[from_index].color_layers and 1 in the_other.atoms[to_index].color_layers and 
+                self.atoms[from_index].color_layers[1] == the_other.atoms[to_index].color_layers[1]:
                     continue
                 
-                three = {f}
-                fNeighbor = self.find_double_bond_linked_atom(f)
-                nNeighbor = the_other.find_double_bond_linked_atom(t)
+                three = {from_index}
+                from_index_neighbor = self.find_double_bond_linked_atom(from_index)
+                to_index_neighbor = the_other.find_double_bond_linked_atom(to_index)
                 
-                if fNeighbor == -1 and nNeighbor == -1:
+                if from_index_neighbor == -1 and to_index_neighbor == -1:
                     flag = False
                     break
 
-                elif fNeighbor == -1:
-                    reverseFNeighbor = reverseMatch[nNeighbor]
-                    three.add(reverseFNeighbor)
-                    fNextNeighbor = self.find_double_bond_linked_atom(reverseFNeighbor)
+                elif from_index_neighbor == -1:
+                    reversed_from_index_neighbor = reversed_mappings[to_index_neighbor]
+                    three.add(reversed_from_index_neighbor)
+                    fNextNeighbor = self.find_double_bond_linked_atom(reversed_from_index_neighbor)
                     if fNextNeighbor != -1:
                         three.add(fNextNeighbor)
 
-                elif nNeighbor == -1 and fNeighbor in cur_mappings:
-                    three.add(fNeighbor)
-                    reverseNNeighbor = cur_mappings[fNeighbor]
-                    nNextNeighbor = the_other.find_double_bond_linked_atom(reverseNNeighbor)
+                elif to_index_neighbor == -1 and from_index_neighbor in cur_mappings:
+                    three.add(from_index_neighbor)
+                    reverseto_index_neighbor = cur_mappings[from_index_neighbor]
+                    nNextNeighbor = the_other.find_double_bond_linked_atom(reverseto_index_neighbor)
                     if nNextNeighbor != -1:
-                        three.add(reverseMatch[nNextNeighbor])
+                        three.add(reversed_mappings[nNextNeighbor])
 
-                elif fNeighbor != -1 and nNeighbor != -1:
-                    three.add(fNeighbor)
-                    three.add(reverseMatch[nNeighbor])
+                elif from_index_neighbor != -1 and to_index_neighbor != -1:
+                    three.add(from_index_neighbor)
+                    three.add(reversed_mappings[to_index_neighbor])
                 
                 if len(three) < 3:
                     flag = False
@@ -635,13 +670,25 @@ class Compound:
         return []
     
     def find_double_bond_linked_atom(self, i):
+    	"""
+        Find the index of the atom that is doubly linked to the target atom[i].
+        param int i: the index of the target atom.
 
+        :return: the index of the doubly linked atom.
+    	"""
         for neighbor_index in self.atoms[i].neighbors:
             if neighbor_index in self.index_of_heavy_atoms and self.bond_lookup[(i, neighbor_index)].bond_type == "2":
                 return neighbor_index
         return -1
 
-    def linear_circular_interchange(self, the_other):
+    def detect_linear_circular_interchange(self, the_other):
+    	"""
+	Detect if the two compounds 
+	:param the_other: the mappings compound entity.
+	:type the_other: :class:`~MDH.compound.compound`
+
+	:return: boolean.
+    	"""
         sAtoms = [atom.color_layers[1] if 1 in atom.color_layers else atom.atom_symbol for atom in self.heavy_atoms]
         aAtoms = [atom.color_layers[1] if 1 in atom.color_layers else atom.atom_symbol for atom in self.heavy_atoms]
         atom_1ntersect = list((collections.Counter(sAtoms) & collections.Counter(aAtoms)).elements())
@@ -654,50 +701,46 @@ class Compound:
                 return True
         return False
 
-   
+    def define_EZ(self):
+    	"""
+	Define the stereochemistry of double bonds in the compounds.
 
-    def defineEZ(self):
+	:return:
+    	"""
         for bond in self.bonds:
             if bond.bond_type == "2":
                 bond.bond_stereo = self.calculate_EZ(bond)
     
     def calculate_EZ(self, bond):
-
+    	"""
+	Calculate the stereochemisty of double bond based on the geometric properties.
+	:param bond: the bond entity.
+	:type bond: :class:`~MDH.compound.bond`
+	
+	:return: the calculated bond stereochemistry.
+    	"""
         vertical = False
 
         first_atom = self.atoms[bond.first_atom_number]
         second_atom = self.atoms[bond.second_atom_number]
-        xf, yf = first_atom.x, first_atom.y
-        xs, ys = second_atom.x, second_atom.y
 
-        if xf != xs:
-            slope = (yf-ys)/(xf-xs)
-            b = yf - slope * xf 
+        if first_atom.x != second_atom.x:
+            slope = (first_atom.y-second_atom.y)/(first_atom.x-second_atom.x)
+            b = first_atom.y - slope * first_atom.x 
         else:
             vertical = True
 
         first_atom_neighor_index = [neighbor for neighbor in first_atom.neighbors if neighbor != second_atom.atom_number]
         second_atom_neighor_index = [neighbor for neighbor in second_atom.neighbors if neighbor != first_atom.atom_number]
         
-        if not len(first_atom_neighor_index) or not len(second_atom_neighor_index):
+        if not first_atom_neighor_index or not second_atom_neighor_index:
             return 0
         
-        if len(first_atom_neighor_index) == 1:
-            first_heavy_side, first_light_side = self.atoms[first_atom_neighor_index[0]], None
-        else:
-            first_heavy_side, first_light_side = self.atom_rank(self.atoms[first_atom_neighor_index[0]], self.atoms[first_atom_neighor_index[1]], first_atom)
-        
-        if len(second_atom_neighor_index) == 1:
-            second_heavy_side, second_light_side = self.atoms[second_atom_neighor_index[0]], None
-        else:
-            second_heavy_side, second_light_side = self.atom_rank(self.atoms[second_atom_neighor_index[0]], self.atoms[second_atom_neighor_index[1]], second_atom)
-        
-
-        if (first_light_side and first_heavy_side.atom_number == first_light_side.atom_number) or (second_light_side and second_heavy_side.atom_number == second_light_side.atom_number):
-            return 0
-
+        first_heavy_side, first_light_side = self.atom_rank(first_atom_neighor_index, first_atom)
+        second_heavy_side, second_light_side = self.atom_rank(second_atom_neighor_index, second_atom)
+       
         if vertical:
-            if (first_heavy_side.x - xs) * (second_heavy_side.x - xs) > 0:
+            if (first_heavy_side.x - first_atom.x) * (second_heavy_side.x - second_atom.x) > 0:
                 return 1
             else:
                 return -1
@@ -711,53 +754,59 @@ class Compound:
 
         return atom.x * slope + b
 
-    def atom_rank(self, atomLeft, atomRight, pre):
+    def atom_rank(self, neighbors, core_atom):
 
-        if atom_1cNumbers[atomLeft.default_symbol] > atom_1cNumbers[atomRight.default_symbol]:
-            return [atomLeft, atomRight]
-        elif atom_1cNumbers[atomLeft.default_symbol] < atom_1cNumbers[atomRight.default_symbol]:
-            return [atomRight, atomLeft]
+    	if len(neighbors) < 2:
+    		return self.atoms[neighbors[0]], None
+
+    	one_atom, the_other_atom = self.atoms[neighbors[0]], self.atoms[neighbors[1]]
+
+        if atomic_numbers[one_atom.default_symbol] > atomic_numbers[the_other_atom.default_symbol]:
+            return [one_atom, the_other_atom]
+
+        elif atomic_numbers[one_atom.default_symbol] < atomic_numbers[the_other_atom.default_symbol]:
+            return [the_other_atom, one_atom]
+
         else:
-            leftNeighbors = [(atomLeft, pre.atom_number)]
-            leftVisited = set([pre.atom_number])
-            rightNeighbors = [(atomRight, pre.atom_number)]
-            rightVisited = set([pre.atom_number])
-            leftNeighborsAtomNumberList = self.getNeighborsatom_1cNumber(leftNeighbors)
-            rightNeighborsAtomNumberList = self.getNeighborsatom_1cNumber(rightNeighbors)
+            one_neighbors = [(one_atom, core_atom.atom_number)]
+            one_visited = set([core_atom.atom_number])
+            the_other_neighbors = [(the_other_atom, core_atom.atom_number)]
+            the_other_visited = set([pcore_atom.atom_number])
+            one_neighborsAtomNumberList = self.getNeighborsatom_1cNumber(one_neighbors)
+            the_other_neighborsAtomNumberList = self.getNeighborsatom_1cNumber(the_other_neighbors)
 
-            while leftNeighborsAtomNumberList == rightNeighborsAtomNumberList and leftNeighborsAtomNumberList:
-                leftNeighborsNew = []
-                for atom, preIndex in leftNeighbors:
-                    leftVisited.add(atom.atom_number)
+            while one_neighborsAtomNumberList == the_other_neighborsAtomNumberList and one_neighborsAtomNumberList:
+                one_neighbors_updated = []
+                for atom, pre_index in one_neighbors:
+                    one_visited.add(atom.atom_number)
                     for neighbor in atom.neighbors:
-                        if neighbor != preIndex and neighbor not in leftVisited:
-                            leftNeighborsNew.append((self.atoms[neighbor], atom.atom_number))
-                leftNeighbors = leftNeighborsNew
-                leftNeighborsAtomNumberList = self.getNeighborsatom_1cNumber(leftNeighbors)
+                        if neighbor != pre_index and neighbor not in one_visited:
+                            one_neighbors_updated.append((self.atoms[neighbor], atom.atom_number))
+                one_neighbors = one_neighbors_updated
+                one_neighborsAtomNumberList = self.getNeighborsatom_1cNumber(one_neighbors)
 
-                rightNeighborsNew = []
-                for atom, preIndex in rightNeighbors:
-                    rightVisited.add(atom.atom_number)
+                the_other_neighbors_updated = []
+                for atom, pre_index in the_other_neighbors:
+                    the_other_visited.add(atom.atom_number)
                     for neighbor in atom.neighbors:
-                        if neighbor!= preIndex and neighbor not in rightVisited:
-                            rightNeighborsNew.append((self.atoms[neighbor], atom.atom_number))
-                rightNeighbors = rightNeighborsNew
-                rightNeighborsAtomNumberList = self.getNeighborsatom_1cNumber(rightNeighbors)
+                        if neighbor!= pre_index and neighbor not in the_other_visited:
+                            the_other_neighbors_updated.append((self.atoms[neighbor], atom.atom_number))
+                the_other_neighbors = the_other_neighbors_updated
+                the_other_neighborsAtomNumberList = self.getNeighborsatom_1cNumber(the_other_neighbors)
 
 
-            if tuple(leftNeighborsAtomNumberList) > tuple(rightNeighborsAtomNumberList):
-                return [atomLeft, atomRight]
-            elif tuple(leftNeighborsAtomNumberList) < tuple(rightNeighborsAtomNumberList):
-                return [atomRight, atomLeft]
+            if tuple(one_neighborsAtomNumberList) > tuple(the_other_neighborsAtomNumberList):
+                return [one_atom, the_other_atom]
+            elif tuple(one_neighborsAtomNumberList) < tuple(the_other_neighborsAtomNumberList):
+                return [the_other_atom, one_atom]
             else:
-                return [atomLeft, atomLeft]
+                return [one_atom, one_atom]
 
-    def getNeighborsatom_1cNumber(self, leftNeighbors):
-
+    def getNeighborsatom_1cNumber(self, one_neighbors):
 
         leftList = []
-        for atom, pre in leftNeighbors:
-            leftList.extend([atom_1cNumbers[self.atoms[neighbor].default_symbol] for neighbor in atom.neighbors if neighbor != pre])
+        for atom, pre in one_neighbors:
+            leftList.extend([atomic_numbers[self.atoms[neighbor].default_symbol] for neighbor in atom.neighbors if neighbor != pre])
         leftList.sort(reverse=True)
         return leftList
 
@@ -768,27 +817,7 @@ class Compound:
                 return True
         return False
 
-    def connected_elements(self):
-
-        visited = set()
-        group_id = 0
-
-        def dfs(i, group_id):
-            self.atoms[i].group_id = group_id
-            visited.add(i)
-            for neighbor in self.atoms[i].neighbors:
-                dfs(neighbor, group_id)
-
-        for index, atom in enumerate(self.atoms):
-            if index not in visited:
-                dfs(index, group_id)
-                group_id += 1
-
-        elements = [[] for i in range(group_id)]
-        for index, atom in enumerate(self.atoms):
-            elements[atom.group_id].append(index)
-
-        return elements
+    
 
     def abnormalBond(self):
 
@@ -817,7 +846,7 @@ class Compound:
                         self.atoms[neighbor].charge -= 1
                         self.bond_lookup[(atom.atom_number, neighbor)].bond_type = "1"
 
-    def clearColor(self):
+    def clean_colors(self):
 
         for atom in self.atoms:
             atom.color_0 = ""
@@ -827,12 +856,12 @@ class Compound:
     
 
 
-    def firstRoundColor(self, isotope_resolved=False, stereo_resolved=False, charge=False, R=False, atom_stereo=False, strict=True, depth=5000):
+    def first_round_color(self, isotope_resolved=False, stereo_resolved=False, charge=False, R=False, atom_stereo=False, strict=True, depth=5000):
         
         atomNeighbors = collections.defaultdict(list)
         color_groups = collections.defaultdict(list)
         excluded = self.isolated_metal_index + self.HIndex
-        self.clearColor()
+        self.clean_colors()
 
         for index, atom in enumerate(self.atoms):
             if index not in excluded:

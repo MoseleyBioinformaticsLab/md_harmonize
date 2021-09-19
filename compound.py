@@ -576,7 +576,7 @@ class Compound:
     	"""
 	Find the atom mappings between two compounds.
 	param the_other: the mappings compound entity.
-	:type the_other: :class:`~MDH.compound.compound`
+	:type the_other: :class:`~MDH.compound.Compound`
 	:param boolean resonance: to find the resonant structure. This will ignore the difference between single and double bonds.
 	:param boolean R: to take account of positon of R groups.
 	:param list default_mappings: the default mappings between the two compounds.
@@ -601,7 +601,7 @@ class Compound:
     	"""
 	Generate the one to one atom mappings between two compounds.
 	:param the_other: the mappings compound entity.
-	:type the_other: :class:`~MDH.compound.compound`
+	:type the_other: :class:`~MDH.compound.Compound`
 	:param list mappings: the mappings of heavy atom indexes.
 
 	:return: the list of dictionary of one to one atom mappings in the original order. 
@@ -685,7 +685,7 @@ class Compound:
     	"""
 	Detect if the two compounds 
 	:param the_other: the mappings compound entity.
-	:type the_other: :class:`~MDH.compound.compound`
+	:type the_other: :class:`~MDH.compound.Compound`
 
 	:return: boolean.
     	"""
@@ -701,7 +701,7 @@ class Compound:
                 return True
         return False
 
-    def define_EZ(self):
+    def define_bond_stereochemistry(self):
     	"""
 	Define the stereochemistry of double bonds in the compounds.
 
@@ -709,13 +709,22 @@ class Compound:
     	"""
         for bond in self.bonds:
             if bond.bond_type == "2":
-                bond.bond_stereo = self.calculate_EZ(bond)
+            	bond.update_stereochemistry(self.calculate_bond_stereochemistry(bond))
     
-    def calculate_EZ(self, bond):
+    def calculate_bond_stereochemistry(self, bond):
     	"""
-	Calculate the stereochemisty of double bond based on the geometric properties.
+	Calculate the stereochemisty of double bond based on the geometric properties. The line of double bond divivdes the plane into two parts. For the atom forming the 
+	doble bond, it normally has two branches. If the two branches are not the same, we can them heavy side and light side (heavy side containing atoms with heavier atomic weights).
+	We determine the bond stereochemisty by checking if the two heavy sides lie on the same part of the divided plane.
+
+	   H     L     H     H
+		\___/		\___/
+		 ___         ___
+		/	\       /   \ 
+	   L 	 H     L     L
+	   	trans         cis
 	:param bond: the bond entity.
-	:type bond: :class:`~MDH.compound.bond`
+	:type bond: :class:`~MDH.compound.Bond`
 	
 	:return: the calculated bond stereochemistry.
     	"""
@@ -736,8 +745,12 @@ class Compound:
         if not first_atom_neighor_index or not second_atom_neighor_index:
             return 0
         
-        first_heavy_side, first_light_side = self.atom_rank(first_atom_neighor_index, first_atom)
-        second_heavy_side, second_light_side = self.atom_rank(second_atom_neighor_index, second_atom)
+        first_heavy_side, first_light_side = self.rank_sides(first_atom_neighor_index, first_atom)
+        second_heavy_side, second_light_side = self.rank_sides(second_atom_neighor_index, second_atom)
+
+        if (first_light_side and first_light_side.atom_number == first_heavy_side.atom_number) or 
+        (second_light_side and second_light_side.atom_number == second_heavy_side.atom_number):
+        	return 0
        
         if vertical:
             if (first_heavy_side.x - first_atom.x) * (second_heavy_side.x - second_atom.x) > 0:
@@ -745,37 +758,49 @@ class Compound:
             else:
                 return -1
         else:
-            if (self.calculate_Y(slope, b, first_heavy_side) - first_heavy_side.y) * (self.calculate_Y(slope, b, second_heavy_side) - second_heavy_side.y) > 0:
+            if (self.calculate_y_coordinate(slope, b, first_heavy_side) - first_heavy_side.y) * (self.calculate_y_coordinate(slope, b, second_heavy_side) - second_heavy_side.y) > 0:
                 return 1
             else:
                 return -1
 
-    def calculate_Y(self, slope, b, atom):
+    def calculate_y_coordinate(self, slope, b, atom):
+    	"""
+    Calculate the y coordinate of the atom based on linear function. y = slope * x + b
+    :param float slope: the slope of the targeted line.
+    :param float b: the intercept of the targeted line.
 
+    :return: the calculated y coordinate.
+    	"""
         return atom.x * slope + b
 
-    def atom_rank(self, neighbors, core_atom):
-
+    def rank_sides(self, neighbors, atom_forming_double_bond):
+    	"""
+    To determine the rank of the two branches connecting the atom forming the double bond. This is based on comparison of the atomic weights of the two branches.
+    Breadth first algorithm.
+    :param list neighbors: the list of atom indexed of the atoms connecting the atom forming the double bond.
+    :param atom_forming_double_bond: the bond entity.
+	:type atom_forming_double_bond: :class:`~MDH.compound.Atom`
+    	"""
     	if len(neighbors) < 2:
     		return self.atoms[neighbors[0]], None
 
     	one_atom, the_other_atom = self.atoms[neighbors[0]], self.atoms[neighbors[1]]
 
-        if atomic_numbers[one_atom.default_symbol] > atomic_numbers[the_other_atom.default_symbol]:
+        if atomic_weights[one_atom.default_symbol] > atomic_weights[the_other_atom.default_symbol]:
             return [one_atom, the_other_atom]
 
-        elif atomic_numbers[one_atom.default_symbol] < atomic_numbers[the_other_atom.default_symbol]:
+        elif atomic_weights[one_atom.default_symbol] < atomic_weights[the_other_atom.default_symbol]:
             return [the_other_atom, one_atom]
 
         else:
-            one_neighbors = [(one_atom, core_atom.atom_number)]
-            one_visited = set([core_atom.atom_number])
-            the_other_neighbors = [(the_other_atom, core_atom.atom_number)]
-            the_other_visited = set([pcore_atom.atom_number])
-            one_neighborsAtomNumberList = self.getNeighborsatom_1cNumber(one_neighbors)
-            the_other_neighborsAtomNumberList = self.getNeighborsatom_1cNumber(the_other_neighbors)
+            one_neighbors = [(one_atom, atom_forming_double_bond.atom_number)]
+            one_visited = set([atom_forming_double_bond.atom_number])
+            the_other_neighbors = [(the_other_atom, atom_forming_double_bond.atom_number)]
+            the_other_visited = set([patom_forming_double_bond.atom_number])
+            one_neighbor_atomic_weight_list = self.collect_atomic_weights_of_neighbors(one_neighbors)
+            the_other_neighbor_atomic_weight_list = self.collect_atomic_weights_of_neighbors(the_other_neighbors)
 
-            while one_neighborsAtomNumberList == the_other_neighborsAtomNumberList and one_neighborsAtomNumberList:
+            while one_neighbor_atomic_weight_list == the_other_neighbor_atomic_weight_list and one_neighbor_atomic_weight_list:
                 one_neighbors_updated = []
                 for atom, pre_index in one_neighbors:
                     one_visited.add(atom.atom_number)
@@ -783,7 +808,7 @@ class Compound:
                         if neighbor != pre_index and neighbor not in one_visited:
                             one_neighbors_updated.append((self.atoms[neighbor], atom.atom_number))
                 one_neighbors = one_neighbors_updated
-                one_neighborsAtomNumberList = self.getNeighborsatom_1cNumber(one_neighbors)
+                one_neighbor_atomic_weight_list = self.collect_atomic_weights_of_neighbors(one_neighbors)
 
                 the_other_neighbors_updated = []
                 for atom, pre_index in the_other_neighbors:
@@ -792,23 +817,28 @@ class Compound:
                         if neighbor!= pre_index and neighbor not in the_other_visited:
                             the_other_neighbors_updated.append((self.atoms[neighbor], atom.atom_number))
                 the_other_neighbors = the_other_neighbors_updated
-                the_other_neighborsAtomNumberList = self.getNeighborsatom_1cNumber(the_other_neighbors)
+                the_other_neighbor_atomic_weight_list = self.collect_atomic_weights_of_neighbors(the_other_neighbors)
 
 
-            if tuple(one_neighborsAtomNumberList) > tuple(the_other_neighborsAtomNumberList):
+            if tuple(one_neighbor_atomic_weight_list) > tuple(the_other_neighbor_atomic_weight_list):
                 return [one_atom, the_other_atom]
-            elif tuple(one_neighborsAtomNumberList) < tuple(the_other_neighborsAtomNumberList):
+            elif tuple(one_neighbor_atomic_weight_list) < tuple(the_other_neighbor_atomic_weight_list):
                 return [the_other_atom, one_atom]
             else:
                 return [one_atom, one_atom]
 
-    def getNeighborsatom_1cNumber(self, one_neighbors):
+    def collect_atomic_weights_of_neighbors(self, neighbors):
+    	"""
+	To collect the atomic weights of the next layer's neighbors.
+	:param list neighbors: the list of this layer's atom with its parent atom. The parent is used to avoid recalculating the former layer.
 
-        leftList = []
-        for atom, pre in one_neighbors:
-            leftList.extend([atomic_numbers[self.atoms[neighbor].default_symbol] for neighbor in atom.neighbors if neighbor != pre])
-        leftList.sort(reverse=True)
-        return leftList
+	:return: the list of atomic weights of next layer's neighbors
+    	"""
+        updated_neighbors = []
+        for atom, pre in neighbors:
+            updated_neighbors.extend([atomic_weights[self.atoms[neighbor].default_symbol] for neighbor in atom.neighbors if neighbor != pre])
+        updated_neighbors.sort(reverse=True)
+        return updated_neighbors
 
     def isolatedCpd(self):
 

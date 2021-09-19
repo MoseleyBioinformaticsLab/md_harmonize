@@ -718,11 +718,11 @@ class Compound:
 	We determine the bond stereochemisty by checking if the two heavy sides lie on the same part of the divided plane.
 
 	   H     L     H     H
-		\___/		\___/
-		 ___         ___
-		/	\       /   \ 
+	    \___/	\___/
+	     ___         ___
+	    /	\       /   \ 
 	   L 	 H     L     L
-	   	trans         cis
+	    trans        cis
 	:param bond: the bond entity.
 	:type bond: :class:`~MDH.compound.Bond`
 	
@@ -765,22 +765,24 @@ class Compound:
 
     def calculate_y_coordinate(self, slope, b, atom):
     	"""
-    Calculate the y coordinate of the atom based on linear function. y = slope * x + b
-    :param float slope: the slope of the targeted line.
-    :param float b: the intercept of the targeted line.
+        Calculate the y coordinate of the atom based on linear function. y = slope * x + b
+        :param float slope: the slope of the targeted line.
+        :param float b: the intercept of the targeted line.
 
-    :return: the calculated y coordinate.
+        :return: the calculated y coordinate.
     	"""
         return atom.x * slope + b
 
     def rank_sides(self, neighbors, atom_forming_double_bond):
     	"""
-    To determine the rank of the two branches connecting the atom forming the double bond. This is based on comparison of the atomic weights of the two branches.
-    Breadth first algorithm.
-    :param list neighbors: the list of atom indexed of the atoms connecting the atom forming the double bond.
-    :param atom_forming_double_bond: the bond entity.
+        To determine the rank of the two branches connecting the atom forming the double bond. This is based on comparison of the atomic weights of the two branches.
+        Breadth first algorithm.
+        :param list neighbors: the list of atom indexed of the atoms connecting the atom forming the double bond.
+        :param atom_forming_double_bond: the bond entity.
 	:type atom_forming_double_bond: :class:`~MDH.compound.Atom`
-    	"""
+    	
+        :return: the list ranked atoms. [heavy_side, light_side]
+        """
     	if len(neighbors) < 2:
     		return self.atoms[neighbors[0]], None
 

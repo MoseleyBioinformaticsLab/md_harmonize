@@ -674,48 +674,70 @@ class Compound:
             one_to_one_mappings.append(cur_mappings)
         return one_to_one_mappings
 
-    def match_loosely(self, the_other, R=False):
+    def validate_resonance_mappings(self, the_other, R=False):
     	"""
+	Check if the resonant mappings are valid between the two compound structures. If the mapped atoms don't share the same 
+	local coloring identifier, we check if the difference is caused by the position of double bonds. 
+	Find the three atoms involved in the resonant structure and check if one of the atom is not C.
+	:param the_other: the mappings compound entity.
+	:type the_other: :class:`~MDH.compound.Compound`
+	:param R: to take account of positon of R groups.
+	:type R: :py:obj:`True` or :py:obj:`False`.
+		
+		 N (a)            N (a)
+		/ \\            // \
+           (b) C   N (c)    (b) C   N (c)
 
+	:return: the list of valid atom mappings between the two compound structures. 
     	"""
     	mappings = self.find_mappings(self, the_other, resonance=True, R=False)
         one_to_one_mappings = self.generate_one_to_one_mappings(the_other, mappings)
 
-        validMatch = []
+        valid_mappings = []
         for cur_mappings in one_to_one_mappings:
             flag = True
             reversed_mappings = { cur_mappings[key] : key for key in cur_mappings }
             for from_index in sorted(cur_mappings.keys()):
                 to_index = cur_mappings[from_index]
+
+                "Detect if the two atoms have the same local binding environment by comparing the first layer color identifier."
                 if 1 in self.atoms[from_index].color_layers and 1 in the_other.atoms[to_index].color_layers and 
                 self.atoms[from_index].color_layers[1] == the_other.atoms[to_index].color_layers[1]:
                     continue
                 
                 three = {from_index}
-                from_index_neighbor = self.find_double_bond_linked_atom(from_index)
-                to_index_neighbor = the_other.find_double_bond_linked_atom(to_index)
+                from_dbond_atom_index = self.find_double_bond_linked_atom(from_index)
+                to_dbond_atom_index = the_other.find_double_bond_linked_atom(to_index)
                 
-                if from_index_neighbor == -1 and to_index_neighbor == -1:
+                "cannot find directly linked double bond."
+                if from_dbond_atom_index == -1 and to_dbond_atom_index == -1:
                     flag = False
                     break
 
-                elif from_index_neighbor == -1:
-                    reversed_from_index_neighbor = reversed_mappings[to_index_neighbor]
-                    three.add(reversed_from_index_neighbor)
-                    fNextNeighbor = self.find_double_bond_linked_atom(reversed_from_index_neighbor)
-                    if fNextNeighbor != -1:
-                        three.add(fNextNeighbor)
+                "Need to conduct second search"
+                "atom b in the picture"
+                elif from_dbond_atom_index == -1:
+                    reversed_from_dbond_atom_index = reversed_mappings[to_dbond_atom_index] # here we can find the atom a
+                    three.add(reversed_from_dbond_atom_index)
+                    from_next_dbond_atom_index = self.find_double_bond_linked_atom(reversed_from_dbond_atom_index) 
+                    # based on atom a we can find atom c
+                    if from_next_dbond_atom_index != -1:
+                        three.add(from_next_dbond_atom_index)
 
-                elif to_index_neighbor == -1 and from_index_neighbor in cur_mappings:
-                    three.add(from_index_neighbor)
-                    reverseto_index_neighbor = cur_mappings[from_index_neighbor]
-                    nNextNeighbor = the_other.find_double_bond_linked_atom(reverseto_index_neighbor)
-                    if nNextNeighbor != -1:
-                        three.add(reversed_mappings[nNextNeighbor])
+                "atom c in the picture"
+                elif to_dbond_atom_index == -1 and from_dbond_atom_index in cur_mappings:
+                    three.add(from_dbond_atom_index) # here we find atom a
+                    reversed_to_dbond_atom_index = cur_mappings[from_dbond_atom_index]
+                    # based on atom a find atom b in the other compound.
+                    to_next_dbond_atom_index = the_other.find_double_bond_linked_atom(reversed_to_dbond_atom_index)
+                    if to_next_dbond_atom_index != -1:
+                        three.add(reversed_mappings[to_next_dbond_atom_index])
 
-                elif from_index_neighbor != -1 and to_index_neighbor != -1:
-                    three.add(from_index_neighbor)
-                    three.add(reversed_mappings[to_index_neighbor])
+                "atom a in the picture"       	
+                "find the other two atoms directly."
+                elif from_dbond_atom_index != -1 and to_dbond_atom_index != -1:
+                    three.add(from_dbond_atom_index)
+                    three.add(reversed_mappings[to_dbond_atom_index])
                 
                 if len(three) < 3:
                     flag = False
@@ -726,8 +748,8 @@ class Compound:
                     flag = False
                     break
             if flag:
-                validMatch.append(cur_mappings)
-        return []
+                valid_mappings.append(cur_mappings)
+        return valid_mappings
     
     def find_double_bond_linked_atom(self, index):
     	"""
@@ -736,29 +758,30 @@ class Compound:
 
         :return: the index of the doubly linked atom.
     	"""
-        for neighbor_index in self.atoms[i].neighbors:
+        for neighbor_index in self.atoms[index].neighbors:
             if neighbor_index in self.index_of_heavy_atoms and self.bond_lookup[(index, neighbor_index)].bond_type == "2":
                 return neighbor_index
         return -1
 
     def detect_linear_circular_interchange(self, the_other):
     	"""
-	Detect if the two compounds 
+	Detect if the two compounds have linear and circular interchangeable representations. This mainly targets at sugar like structure.
+	We check how many atoms don't share the same local (first layer) identifiers and then detect if the difference is casued by the 
+	ring structure.
 	:param the_other: the mappings compound entity.
 	:type the_other: :class:`~MDH.compound.Compound`
 
 	:return: boolean.
     	"""
     	# 1 in color_layers indicate this atom is not H or metals.
-        sAtoms = [atom.color_layers[1] if 1 in atom.color_layers else atom.atom_symbol for atom in self.heavy_atoms]
-        aAtoms = [atom.color_layers[1] if 1 in atom.color_layers else atom.atom_symbol for atom in self.heavy_atoms]
-        atom_1ntersect = list((collections.Counter(sAtoms) & collections.Counter(aAtoms)).elements())
-        #print("atom name cnt: ", len(sAtoms), len(aAtoms), len(atom_1ntersect))
-        if 2 <= len(sAtoms) - len(atom_1ntersect) <= 3:
-            sinCycle = [ atom.in_cycle for atom in self.heavy_atoms].count(True)
-            ainCycle = [ atom.in_cycle for atom in the_other.heavy_atoms].count(True)
-            #print("incycle number: ", sinCycle, ainCycle)
-            if sinCycle != ainCycle:
+        one_atom_colors = [atom.color_layers[1] if 1 in atom.color_layers else atom.atom_symbol for atom in self.heavy_atoms]
+        the_other_atom_colors = [atom.color_layers[1] if 1 in atom.color_layers else atom.atom_symbol for atom in self.heavy_atoms]
+        atom_color_intersection = list((collections.Counter(one_atom_colors) & collections.Counter(the_other_atom_colors)).elements())
+        if 2 <= len(one_atom_colors) - len(atom_color_intersection) <= 3:
+            one_num_of_atoms_in_cycle = [ atom.in_cycle for atom in self.heavy_atoms].count(True)
+            the_other_num_of_atoms_in_cycle = [ atom.in_cycle for atom in the_other.heavy_atoms].count(True)
+            #print("incycle number: ", one_num_of_atoms_in_cycle, the_other_num_of_atoms_in_cycle)
+            if one_num_of_atoms_in_cycle != the_other_num_of_atoms_in_cycle:
                 return True
         return False
 
@@ -917,7 +940,7 @@ class Compound:
 	:return:
     	"""
         self.first_round_color(R=R, bond_stereo=bond_stereo, atom_stereo=atom_stereo, resonance=resonance)
-        self.curate_symmetry(bond_stereo=bond_stereo, resonance=resonance)
+        self.curate_invalid_symmetric_atoms(bond_stereo=bond_stereo, resonance=resonance)
         self.color_metals(bond_stereo=bond_stereo, resonance=resonance)
     
     def reset_color(self):
@@ -1016,6 +1039,7 @@ class Compound:
 	:return:
     	"""
         atom_neighbors = collections.defaultdict(list)
+        visited = collections.defaultdict(set)
         excluded_index = self.metal_index + self.H_index
         self.reset_color()
 
@@ -1026,17 +1050,17 @@ class Compound:
         atoms_to_color = []
         for index, atom in enumerate(self.atoms):
             atom_neighbors[index].append(atom)
+            visited[index].add(index)
             if atom.color_0:
             	number_of_atoms_to_color += 1
             	atoms_to_color.append(atom)
         
-        visited = collections.defaultdict(set)
-
         i = 0
         if depth != 5000:
             number_of_atoms_to_color = depth
 
         while i < number_of_atoms_to_color and atoms_to_color:
+
             current_layer_color_groups = collections.defaultdict(list)
             for atom in atoms_to_color:
                 next_layer_neighbors = []
@@ -1044,10 +1068,10 @@ class Compound:
 
                 for neighbor in atom_neighbors[atom.atom_number]:
                     color_list.append(atom_color_with_neighbors[neighbor.atom_number])
-                    if neighbor.atom_number not in visited[atom.atom_number]:
-                        visited[atom.atom_number].add(neighbor.atom_number)
-                        next_layer_neighbors.extend([self.atoms[new_neighbor_index] for new_neighbor_index 
-                        	in neighbor.neighbors if self.atoms[new_neighbor_index].color_0])
+                    for next_neighbor_index in neighbor.neighbors: 
+                    	if next_neighbor_index not in visited[atom.atom_number]:
+                        	visited[atom.atom_number].add(next_neighbor_index)
+                        	next_layer_neighbors.append(self.atoms[next_neighbor_index])
 
                 if color_list:
                     color_list.sort()
@@ -1065,11 +1089,11 @@ class Compound:
                 atoms_to_color = atom_to_color_update
             i += 1
     
-    def check_symmetry(self, bond_stereo=False, resonance=True):
+    def invalid_symmetric_atoms(self, bond_stereo=False, resonance=True):
     	"""
 	Check if the atoms with the same color identifier are symmetric.
 
-	:return: the dictionary of atom color identifier with the atom index of asymmetry.
+	:return: the dictionary of atom color identifier with the corresponding invalid symmetric atom index.
     	"""
         atom_color_with_neighbors = self.generate_atom_color_with_neighbors(zero_layer=False, resonance=resonance, bond_stereo=bond_stereo)
         not_valid = {}
@@ -1077,77 +1101,88 @@ class Compound:
             if len(self.color_groups[name]) > 1:
                 atom_index_with_same_color = self.color_groups[name]
                 visited = collections.defaultdict(set)
+                for atom_index in atom_index_with_same_color:
+                	visited[atom_index].add(atom_index)
                 current_layer = {atom_index: [atom_index] for atom_index in atom_index_with_same_color}
                 count = 0
                 flag = True
                 while flag:
                     count += 1
-                    target_atom_index = atom_index_with_same_color[0]
-                    target_atom_color_list = [atom_color_with_neighbors[atom_index] for atom_index in current_layer[target_atom_index]]
-                    target_atom_color_list.sort()
-                    target_atom_color = ''.join(target_atom_color_list)
+                    target_index = atom_index_with_same_color[0]
+                    target_color_list = [atom_color_with_neighbors[atom_index] for atom_index in current_layer[target_index]]
+                    target_color_list.sort()
+                    target_color = ''.join(target_color_list)
 
-                    for compared_atom_index in current_layer.keys():
-                        if compared_atom_index != target_atom_index:
-                            compared_atom_color_list = [atom_color_with_neighbors[atom_index] for atom_index in current_layer[compared_atom_index]]
-                            compared_atom_color_list.sort()
-                            compared_atom_color = ''.join(compared_atom_color_list)
+                    "check if neighors of this layer are the same among all the atoms with the same color identifier."
+                    for compared_index in current_layer.keys():
+                        if compared_index != target_index:
+                            compared_color_list = [atom_color_with_neighbors[atom_index] for atom_index in current_layer[compared_index]]
+                            compared_color_list.sort()
+                            compared_atom_color = ''.join(compared_color_list)
 
-                            if target_atom_color != compared_atom_color:
+                            if target_color != compared_atom_color:
                                 not_valid[name] = (atom_index_with_same_color, count)
                                 flag = False
                                 break
+                                
+                    "If the share the same neighbors, check the next layer."
                     if flag:
                         for atom_index in current_layer.keys():
                             next_layer_neighbors = []
                             for neighbor_index in current_layer[atom_index]:
-                                if neighbor_index not in visited[atom_index]:
-                                    visited[atom_index].add(neighbor_index)
-                                    next_layer_neighbors.extend([newIndex for newIndex in self.atoms[neighbor_index].neighbors 
-                                    	if self.atoms[newIndex].color])
+                                for next_neighbor_index in self.atoms[neighbor_index].neighbors:
+                                	if next_neighbor_index not in visited[atom_index] and self.atoms[next_neighbor_index].color:
+                                    	visited[atom_index].add(next_neighbor_index)
+                                    	next_layer_neighbors.append(next_neighbor_index)
                             current_layer[atom_index] = next_layer_neighbors
-                        target_length = len(current_layer[target_atom_index])
+
+                        # pruning check, to see if the have the same number of next layer's neighbors.
+                        target_length = len(current_layer[target_index])
                         for atom_index in current_layer.keys():
                             if len(current_layer[atom_index]) != target_length:
                                 not_valid[name] = (atom_index_with_same_color, count)
                                 flag = False
                                 break
+
+                        # we have checked all the neighbors.
                         if target_length == 0:
                             flag = False
         return not_valid
 
-    def curate_symmetry(self, bond_stereo=False, resonance=True):
+    def curate_invalid_symmetric_atoms(self, bond_stereo=False, resonance=True):
+    	"""
+	Curate the atom color identifier of invalid symmetric atom.
+	We recolor those invalid atoms with the full color identifiers of its neighbors layer by layer until where the difference can be captured.
 
-        not_valid = self.check_symmetry()
+	:return: 
+    	"""
+        not_valid = self.invalid_symmetric_atoms()
         if not not_valid:
             return
         
         while not_valid:
 	        atom_color_with_neighbors = self.generate_atom_color_with_neighbors(zero_layer=False, resonance=resonance, bond_stereo=bond_stereo)
-
 	        for name in not_valid:
-	            
-	            notSameIndex, layer = not_valid[name]
-	            
-	            for target_atom_index in notSameIndex:
-	                visited = set()
-	                current_layer = [target_atom_index]
-	                targetColor = ""
+	            invalid_symmetric_atom_index, layer = not_valid[name]
+	            for atom_index in invalid_symmetric_atom_index:
+	                visited = {atom_index}
+	                current_layer_neighbors = [atom_index]
+	                atom_color = ""
 	                count = layer + 1
-	                while count  and current_layer:
-	                    curColorList = [atom_color_with_neighbors[atom_index] for atom_index in current_layer]
-	                    curColorList.sort()
-	                    targetColor += "".join(curColorList)
+	                while count  and current_layer_neighbors:
+	                    color_list = [atom_color_with_neighbors[atom_index] for atom_index in current_layer_neighbors]
+	                    color_list.sort()
+	                    atom_color += "".join(color_list)
 	                    next_layer_neighbors = []
-	                    for neighbor_index in current_layer:
-	                        if neighbor_index not in visited:
-	                            visited.add(neighbor_index)
-	                            next_layer_neighbors.extend([newIndex for newIndex in self.atoms[neighbor_index].neighbors if self.atoms[newIndex].color])
+	                    for neighbor_index in current_layer_neighbors:
+	                    	for next_neighbor_index in self.atoms[neighbor_index].neighbors:
+	                        	if next_neighbor_index not in visited and self.atoms[next_neighbor_index].color:
+	                            	visited.add(next_neighbor_index)
+	                            	next_layer_neighbors.append(next_neighbor_index)
 	                    current_layer = next_layer_neighbors
 	                    count -= 1
-	                self.atoms[target_atom_index].color = targetColor
-        	not_valid = self.check_symmetry()
-      
+	                self.atoms[atom_index].color = atom_color
+        	not_valid = self.invalid_symmetric_atoms()
 
     def color_left_atom(self, atom_index, charge=False, isotope_resolved=False, bond_stereo=False, resonance=True):
     	"""
@@ -1222,7 +1257,7 @@ class Compound:
 	:param details: if true, add full metal color when constructing color identifier.
 	:type details: :py:obj:`True` or :py:obj:`False`.
 
-        :return: the string color identifier for this compound containing metals.
+        :return: the color string representation containing metals for this compound.
     	"""
         return self.backbone_color_identifier + self.metal_color_identifier(details=details)
     
@@ -1231,7 +1266,6 @@ class Compound:
     	"""
 	To generate the backbone color identifier for this compound. Exclude Hs and metals.
 
-	:return: the string color identifier for this compound.
+	:return: the color string identifier for this compound.
     	"""
     	return "".join(["({0})({1})".format(len(self.color_groups[key]), key) for key in sorted(self.color_groups)])
-        

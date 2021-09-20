@@ -1260,5 +1260,3 @@ class Compound:
     	"""
     	color_groups = self.color_groups(excluded=self.metal_index + self.H_index)
     	return "".join(["({0})({1})".format(len(color_groups[key]), key) for key in sorted(color_groups)])
-
-    def 

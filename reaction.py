@@ -34,4 +34,8 @@ class Reaction:
     def create_edge(self):
 
     
-    def 
+    def find_reaction_pair(self, the_other):
+        """
+    
+        """
+        

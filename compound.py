@@ -1162,9 +1162,6 @@ class Compound:
 	:return: 
     	"""
         not_valid = self.invalid_symmetric_atoms()
-        if not not_valid:
-            return
-        
         while not_valid:
 	        atom_color_with_neighbors = self.generate_atom_color_with_neighbors(zero_layer=False, resonance=resonance, bond_stereo=bond_stereo)
 	        for name in not_valid:
@@ -1263,3 +1260,5 @@ class Compound:
     	"""
     	color_groups = self.color_groups(excluded=self.metal_index + self.H_index)
     	return "".join(["({0})({1})".format(len(color_groups[key]), key) for key in sorted(color_groups)])
+
+    def 

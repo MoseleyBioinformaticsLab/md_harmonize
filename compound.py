@@ -116,6 +116,32 @@ class Atom:
     	"""
         self.atom_stereo_parity = stereo
         return self.atom_stereo_parity
+    
+    def color_atom(self, isotope_resolved=False, charge=False, atom_stereo=False):
+    	"""
+        To generate the zero layer atom color.	
+	param isotope_resolved: If true, add isotope information when constructing colors.
+	:type isotope_resolved: :py:obj:`True` or :py:obj:`False`.
+	:param charge: If true, add charge information when constructing colors.
+	:type charge: :py:obj:`True` or :py:obj:`False`.
+	:param atom_stereo: If true, add atom stereochemistry information when constructing colors.
+	:type atom_stereo: :py:obj:`True` or :py:obj:`False`.
+
+	:return: the zero layer atom color.
+    	"""
+    	self.color_0 = ""
+    	if not self.is_R():
+            self.color_0 += self.atom_symbol
+        else:
+           	self.color_0 += "R"
+        if atom_stereo:
+            self.color_0 += self.atom_stereo_parity
+        if charge:
+            self.color_0 += str(self.charge)
+        if isotope_resolved:
+        	self.color_0 += self.mass_difference
+        self.color = self.color_0
+    	return self.color_0
 
     def reset_color(self):
     	"""
@@ -295,10 +321,10 @@ class Compound:
 
 	:return: the dictionay of atom index to atom entity.
     	"""
-        return { self.heavy_atoms[i].atom_number: i for i in range(len(self.heavy_atoms)) }
+        return { atom.atom_number: i for i, atom in enumerate(self.heavy_atoms) }
 
-    @property    
-    def color_groups(self):
+       
+    def color_groups(self, excluded=None):
     	"""
 	To update the compound color groups after coloring.
 
@@ -306,7 +332,7 @@ class Compound:
     	"""
     	color_groups = collections.defaultdict(list)
         for atom in self.atoms:
-            if atom.color_0:
+            if atom.atom_number not in excluded:
                 color_groups[atom.color].append(atom.atom_number)
         return color_groups
 
@@ -356,18 +382,18 @@ class Compound:
                 metals[atom.default_symbol].append(index)
         return metals
 
-    def update_double_bond_stereo(self, bonds):
-	"""
-	To update the stereochemistry of the double bonds.
-	:param list bonds: the list of bonds whose bond stereo needs update. 
+ #    def update_double_bond_stereo(self, bonds):
+	# """
+	# To update the stereochemistry of the double bonds.
+	# :param list bonds: the list of bonds whose bond stereo needs update. 
 
-	:return: 
-	"""
-	for bond in bonds:
-	    first_atom = bond.first_atom_number
-	    second_atom = bond.second_atom_number
-	    if self.bond_lookup[(first_atom, second_atom)].bond_type == "2":
-	        self.bond_lookup[(first_atom, second_atom)].update_stereochemistry(bond.bond_stereo)
+	# :return: 
+	# """
+	# for bond in bonds:
+	#     first_atom = bond.first_atom_number
+	#     second_atom = bond.second_atom_number
+	#     if self.bond_lookup[(first_atom, second_atom)].bond_type == "2":
+	#         self.bond_lookup[(first_atom, second_atom)].update_stereochemistry(bond.bond_stereo)
 
     def update_aromatic_bond_type(self, cycles):
 	"""
@@ -780,7 +806,6 @@ class Compound:
         if 2 <= len(one_atom_colors) - len(atom_color_intersection) <= 3:
             one_num_of_atoms_in_cycle = [ atom.in_cycle for atom in self.heavy_atoms].count(True)
             the_other_num_of_atoms_in_cycle = [ atom.in_cycle for atom in the_other.heavy_atoms].count(True)
-            #print("incycle number: ", one_num_of_atoms_in_cycle, the_other_num_of_atoms_in_cycle)
             if one_num_of_atoms_in_cycle != the_other_num_of_atoms_in_cycle:
                 return True
         return False
@@ -832,17 +857,18 @@ class Compound:
         first_heavy_side, first_light_side = self.rank_sides(first_atom_neighor_index, first_atom)
         second_heavy_side, second_light_side = self.rank_sides(second_atom_neighor_index, second_atom)
 
-        if (first_light_side and first_light_side.atom_number == first_heavy_side.atom_number) or 
-        (second_light_side and second_light_side.atom_number == second_heavy_side.atom_number):
+        if (first_light_side and first_light_side == first_heavy_side) or 
+        (second_light_side and second_light_side == second_heavy_side):
         	return 0
        
         if vertical:
-            if (first_heavy_side.x - first_atom.x) * (second_heavy_side.x - second_atom.x) > 0:
+            if (self.atoms[first_heavy_side].x - first_atom.x) * (self.atoms[second_heavy_side].x - second_atom.x) > 0:
                 return 1
             else:
                 return -1
         else:
-            if (self.calculate_y_coordinate(slope, b, first_heavy_side) - first_heavy_side.y) * (self.calculate_y_coordinate(slope, b, second_heavy_side) - second_heavy_side.y) > 0:
+            if (self.calculate_y_coordinate(slope, b, self.atoms[first_heavy_side]) - self.atoms[first_heavy_side].y) 
+            * (self.calculate_y_coordinate(slope, b, self.atoms[second_heavy_side]) - self.atoms[second_heavy_side].y) > 0:
                 return 1
             else:
                 return -1
@@ -857,6 +883,17 @@ class Compound:
     	"""
         return atom.x * slope + b
 
+    def collect_atomic_weights_of_neighbors(self, neighbors):
+    	"""
+	To collect the atomic weights of the next layer's neighbors.
+	:param list neighbors: the list of this layer's atom with its parent atom. The parent is used to avoid recalculating the former layer.
+
+	:return: the list of atomic weights of next layer's neighbors
+    	"""
+        neighbor_atomic_weights = [atomic_weights[self.atoms[index].default_symbol] for index in neighbors]
+        neighbor_atomic_weights.sort(reverse=True)
+        return neighbor_atomic_weights
+
     def rank_sides(self, neighbors, atom_forming_double_bond):
     	"""
         To determine the rank of the two branches connecting the atom forming the double bond. This is based on comparison of the atomic weights of the two branches.
@@ -870,39 +907,26 @@ class Compound:
     	if len(neighbors) < 2:
     		return self.atoms[neighbors[0]], None
 
-    	one_atom, the_other_atom = self.atoms[neighbors[0]], self.atoms[neighbors[1]]
+    	one_atom, the_other_atom = neighbors[0], neighbors[1]
 
-        if atomic_weights[one_atom.default_symbol] > atomic_weights[the_other_atom.default_symbol]:
+        if atomic_weights[self.atoms[one_atom].default_symbol] > atomic_weights[self.atoms[the_other_atom].default_symbol]:
             return [one_atom, the_other_atom]
 
-        elif atomic_weights[one_atom.default_symbol] < atomic_weights[the_other_atom.default_symbol]:
+        elif atomic_weights[self.atoms[one_atom].default_symbol] < atomic_weights[self.atoms[the_other_atom].default_symbol]:
             return [the_other_atom, one_atom]
 
         else:
-            one_neighbors = [(one_atom, atom_forming_double_bond.atom_number)]
-            one_visited = set([atom_forming_double_bond.atom_number])
-            the_other_neighbors = [(the_other_atom, atom_forming_double_bond.atom_number)]
-            the_other_visited = set([patom_forming_double_bond.atom_number])
+            one_neighbors = [one_atom]
+            one_visited = {atom_forming_double_bond.atom_number}
+            the_other_neighbors = [the_other_atom]
+            the_other_visited = {atom_forming_double_bond.atom_number}
             one_neighbor_atomic_weight_list = self.collect_atomic_weights_of_neighbors(one_neighbors)
             the_other_neighbor_atomic_weight_list = self.collect_atomic_weights_of_neighbors(the_other_neighbors)
 
             while one_neighbor_atomic_weight_list == the_other_neighbor_atomic_weight_list and one_neighbor_atomic_weight_list:
-                one_neighbors_updated = []
-                for atom, pre_index in one_neighbors:
-                    one_visited.add(atom.atom_number)
-                    for neighbor in atom.neighbors:
-                        if neighbor != pre_index and neighbor not in one_visited:
-                            one_neighbors_updated.append((self.atoms[neighbor], atom.atom_number))
-                one_neighbors = one_neighbors_updated
+                one_neighbors = self.get_next_layer_neighbors(one_neighbors, one_visited)
                 one_neighbor_atomic_weight_list = self.collect_atomic_weights_of_neighbors(one_neighbors)
-
-                the_other_neighbors_updated = []
-                for atom, pre_index in the_other_neighbors:
-                    the_other_visited.add(atom.atom_number)
-                    for neighbor in atom.neighbors:
-                        if neighbor!= pre_index and neighbor not in the_other_visited:
-                            the_other_neighbors_updated.append((self.atoms[neighbor], atom.atom_number))
-                the_other_neighbors = the_other_neighbors_updated
+                the_other_neighbors = self.get_next_layer_neighbors(the_other_neighbors, the_other_visited)
                 the_other_neighbor_atomic_weight_list = self.collect_atomic_weights_of_neighbors(the_other_neighbors)
 
             if tuple(one_neighbor_atomic_weight_list) > tuple(the_other_neighbor_atomic_weight_list):
@@ -912,18 +936,21 @@ class Compound:
             else:
                 return [one_atom, one_atom]
 
-    def collect_atomic_weights_of_neighbors(self, neighbors):
+    def get_next_layer_neighbors(self, cur_layer_neighbors, visited):
     	"""
-	To collect the atomic weights of the next layer's neighbors.
-	:param list neighbors: the list of this layer's atom with its parent atom. The parent is used to avoid recalculating the former layer.
+	To get the next layer's neighbors.
+	:param list cur_layer_neighbors: the list of atom index of neighoring atoms at the current layer.
+	:param set visited: the set of atom indexes that have already been visited.
 
-	:return: the list of atomic weights of next layer's neighbors
+	:return: the next layer's neighbors.
     	"""
-        neighbor_atomic_weights = []
-        for atom, pre in neighbors:
-            neighbor_atomic_weights.extend([atomic_weights[self.atoms[neighbor].default_symbol] for neighbor in atom.neighbors if neighbor != pre])
-        neighbor_atomic_weights.sort(reverse=True)
-        return neighbor_atomic_weights
+    	next_layer_neighbors = []
+    	for index in cur_layer_neighbors:
+    		for next_neighbor in self.atoms[index].neighbors:
+    			if next_neighbor not in visited:
+    				next_layer_neighbors.append(next_neighbor)
+    				visited.add(next_neighbor)
+    	return next_layer_neighbors
 
     def color_compound(self, R=True, bond_stereo=True, atom_stereo=True, resonance=True):
     	"""
@@ -952,7 +979,7 @@ class Compound:
         for atom in self.atoms:
             atom.reset_color()
 
-    def generate_atom_zero_layer_color(self, isotope_resolved=False, charge=False, R=False, atom_stereo=False):
+    def generate_atom_zero_layer_color(self, isotope_resolved=False, charge=False, atom_stereo=False):
     	"""
 	To generate the zero layer color identifier for each atom. We don't consider H and metals here.
 	:param isotope_resolved: If true, add isotope information when constructing colors.
@@ -966,25 +993,10 @@ class Compound:
 
 	:return:
     	"""
-    	excluded_index = self.metal_index + self.H_index
     	for index, atom in enumerate(self.atoms):
-            if index not in excluded_index:
-                if not atom.is_R():
-                    atom.color_0 += atom.atom_symbol
-                else:
-                    if R:
-                        atom.color_0 += "R"
-                    else:
-                        continue
-                if atom_stereo:
-                    atom.color_0 += atom.atom_stereo_parity
-                if charge:
-                    atom.color_0 += str(atom.charge)
-                if isotope_resolved:
-                    atom.color_0 += atom.mass_difference
-                atom.color = atom.color_0
+            atom.color_atom(isotope_resolved=isotope_resolved, charge=charge, atom_stereo=atom_stereo)
 
-    def generate_atom_color_with_neighbors(self, zero_layer=True, resonance=False, bond_stereo=False):
+    def generate_atom_color_with_neighbors(self, atom_index, excluded=None, zero_layer=True, resonance=False, bond_stereo=False):
     	"""
         To generate the atom color with its neighbors. We add this color name when we try to incorprate neighbors' information in naming.
         Here, we don't need to care about the atom stereo. It has been taken care of in generating color_0.
@@ -999,22 +1011,24 @@ class Compound:
 	:return: the dictionary of atom index to its color name containing neighbors.
     	"""
     	atom_color_with_neighbors = collections.defaultdict(str)
-    	for index, atom in enumerate(self.atoms):
-            if atom.color_0:
-            	atom_color = atom.color_0 if zero_layer else atom.color
-                color_elements = []
-                for neighbor_index in atom.neighbors:
-                    if self.atoms[neighbor_index].color_0:
-                    	neighbor_color = self.atoms[neighbor_index].color_0 if zero_layer else self.atoms[neighbor_index].color
-                        connecting_bond = self.bond_lookup[(atom.atom_number, neighbor_index)]
-                        bond_type = connecting_bond.bond_type
-                        if resonance and bond_type == "2":
-                            bond_type = "1"
-                        if bond_stereo:
-                            color_elements.append((neighbor_color, bond_type + connecting_bond.bond_stereo))
-                        else:
-                            color_elements.append((neighbor_color, bond_type))
-                atom_color_with_neighbors[index] = atom_color + "".join(["(" + a + "," + b + ")" for (a, b) in sorted(color_elements)])
+    	for index in atom_index:
+            atom_color = atom.color_0 if zero_layer else atom.color
+            color_elements = collections.Counter()
+           	for neighbor_index in atom.neighbors:
+           		if neighobr_index not in excluded:
+                    neighbor_color = self.atoms[neighbor_index].color_0 if zero_layer else self.atoms[neighbor_index].color
+                    connecting_bond = self.bond_lookup[(atom.atom_number, neighbor_index)]
+                    bond_type = connecting_bond.bond_type
+                    if resonance and bond_type == "2":
+                        bond_type = "1"
+                    if bond_stereo:
+                        component = "({0}.{1})".format(neighbor_color, bond_type+connecting_bond.bond_stereo)
+                    else:
+                        component = "({0}.{1})".format(neighbor_color, bond_type)
+                    color_elements[component] += 1
+            for name in sorted(color_elements):
+            	atom_color += "({0}_{1})".format(color_elements[name], name) if color_elements[name] > 1 else "({0})".format(name)
+            atom_color_with_neighbors[index] = atom_color
         return atom_color_with_neighbors
 
     def first_round_color(self, isotope_resolved=False, bond_stereo=False, charge=False, R=False, atom_stereo=False, resonance=True, depth=5000):
@@ -1038,47 +1052,39 @@ class Compound:
 
 	:return:
     	"""
+        excluded_index = self.metal_index + self.H_index
+        excluded_index += self.R_groups if R else []
+        atoms_to_color = [i for i in range(len(self.atoms)) if i not in excluded_index]
+
+        self.reset_color()
+        self.generate_atom_zero_layer_color(isotope_resolved=isotope_resolved, charge=charge, atom_stereo=atom_stereo)
+        atom_color_with_neighbors = self.generate_atom_color_with_neighbors(atoms_to_color, excluded=excluded_index,
+        	zero_layer=True, resonance=resonance, bond_stereo=bond_stereo)
+
         atom_neighbors = collections.defaultdict(list)
         visited = collections.defaultdict(set)
-        excluded_index = self.metal_index + self.H_index
-        self.reset_color()
-
-        self.generate_atom_zero_layer_color(isotope_resolved=isotope_resolved, charge=charge, R=R, atom_stereo=atom_stereo)
-        atom_color_with_neighbors = self.generate_atom_color_with_neighbors(zero_layer=True, resonance=resonance, bond_stereo=bond_stereo)
-
-        number_of_atoms_to_color = 0
-        atoms_to_color = []
-        for index, atom in enumerate(self.atoms):
-            atom_neighbors[index].append(atom)
-            visited[index].add(index)
-            if atom.color_0:
-            	number_of_atoms_to_color += 1
-            	atoms_to_color.append(atom)
         
+        for index in atoms_to_color:
+            atom_neighbors[index].append(index)
+            visited[index].add(index)
+            
         i = 0
-        if depth != 5000:
-            number_of_atoms_to_color = depth
+        if depth == 5000:
+            depth = len(atoms_to_color)
 
-        while i < number_of_atoms_to_color and atoms_to_color:
-
+        while i < depth and atoms_to_color:
             current_layer_color_groups = collections.defaultdict(list)
-            for atom in atoms_to_color:
-                next_layer_neighbors = []
-                color_list = []
-
-                for neighbor in atom_neighbors[atom.atom_number]:
-                    color_list.append(atom_color_with_neighbors[neighbor.atom_number])
-                    for next_neighbor_index in neighbor.neighbors: 
-                    	if next_neighbor_index not in visited[atom.atom_number]:
-                        	visited[atom.atom_number].add(next_neighbor_index)
-                        	next_layer_neighbors.append(self.atoms[next_neighbor_index])
-
-                if color_list:
-                    color_list.sort()
-                    atom.color += "(" + "".join(color_list) + ")"
-                    atom.color_layers[i+1] = atom.color
-                atom_neighbors[atom.atom_number] = next_layer_neighbors
-                current_layer_color_groups[atom.color].append(atom)
+            for atom_index in atoms_to_color:
+                color_elements = collections.Counter()
+                for neighbor_index in atom_neighbors[atom_index]:
+                    color_elements[atom_color_with_neighbors[neighbor_index]] += 1
+                added = ""
+                for name in sorted(color_elements):
+            		added += "({0}_{1})".format(color_elements[name], name) if color_elements[name] > 1 else "({0})".format(name)
+                atom.color += added
+                atom.color_layers[i+1] = atom.color
+                atom_neighbors[atom.atom_number] = self.get_next_layer_neighbors(atom_neighbors[atom_index], visited[atom_index])
+                current_layer_color_groups[atom.color].append(atom_index)
 
             if i > 3:
             	# avoid early stop
@@ -1089,17 +1095,25 @@ class Compound:
                 atoms_to_color = atom_to_color_update
             i += 1
     
-    def invalid_symmetric_atoms(self, bond_stereo=False, resonance=True):
+    def invalid_symmetric_atoms(self, bond_stereo=False, resonance=True, R=False):
     	"""
 	Check if the atoms with the same color identifier are symmetric.
 
 	:return: the dictionary of atom color identifier with the corresponding invalid symmetric atom index.
     	"""
-        atom_color_with_neighbors = self.generate_atom_color_with_neighbors(zero_layer=False, resonance=resonance, bond_stereo=bond_stereo)
+
+        excluded_index = self.metal_index + self.H_index
+        excluded_index += self.R_groups if R else []
+        atoms_to_color = [i for i in range(len(self.atoms)) if i not in excluded_index]
+
+        atom_color_with_neighbors = self.generate_atom_color_with_neighbors(atoms_to_color, excluded=excluded_index, 
+        	zero_layer=False, resonance=resonance, bond_stereo=bond_stereo)
+
         not_valid = {}
-        for name in self.color_groups.keys():
-            if len(self.color_groups[name]) > 1:
-                atom_index_with_same_color = self.color_groups[name]
+        color_groups = self.color_groups(excluded=excluded_index)
+        for name in color_groups.keys():
+            if len(color_groups[name]) > 1:
+                atom_index_with_same_color = color_groups[name]
                 visited = collections.defaultdict(set)
                 for atom_index in atom_index_with_same_color:
                 	visited[atom_index].add(atom_index)
@@ -1124,16 +1138,11 @@ class Compound:
                                 not_valid[name] = (atom_index_with_same_color, count)
                                 flag = False
                                 break
-                                
+
                     "If the share the same neighbors, check the next layer."
                     if flag:
                         for atom_index in current_layer.keys():
-                            next_layer_neighbors = []
-                            for neighbor_index in current_layer[atom_index]:
-                                for next_neighbor_index in self.atoms[neighbor_index].neighbors:
-                                	if next_neighbor_index not in visited[atom_index] and self.atoms[next_neighbor_index].color:
-                                    	visited[atom_index].add(next_neighbor_index)
-                                    	next_layer_neighbors.append(next_neighbor_index)
+                            next_layer_neighbors = self.get_next_layer_neighbors(current_layer[atom_index], visited[atom_index])
                             current_layer[atom_index] = next_layer_neighbors
 
                         # pruning check, to see if the have the same number of next layer's neighbors.
@@ -1169,24 +1178,22 @@ class Compound:
 	                current_layer_neighbors = [atom_index]
 	                atom_color = ""
 	                count = layer + 1
-	                while count  and current_layer_neighbors:
-	                    color_list = [atom_color_with_neighbors[atom_index] for atom_index in current_layer_neighbors]
-	                    color_list.sort()
-	                    atom_color += "".join(color_list)
-	                    next_layer_neighbors = []
-	                    for neighbor_index in current_layer_neighbors:
-	                    	for next_neighbor_index in self.atoms[neighbor_index].neighbors:
-	                        	if next_neighbor_index not in visited and self.atoms[next_neighbor_index].color:
-	                            	visited.add(next_neighbor_index)
-	                            	next_layer_neighbors.append(next_neighbor_index)
-	                    current_layer = next_layer_neighbors
+	                while count and current_layer_neighbors:
+	                	color_elements = collections.Counter()
+                		for neighbor_index in current_layer_neighbors:
+                    		color_elements[atom_color_with_neighbors[neighbor_index]] += 1
+	                    added = ""
+                		for name in sorted(color_elements):
+            				added += "({0}_{1})".format(color_elements[name], name) if color_elements[name] > 1 else "({0})".format(name)
+	                    atom_color += added
+	                    current_layer_neighbors = self.get_next_layer_neighbors(current_layer_neighbors, visited)
 	                    count -= 1
 	                self.atoms[atom_index].color = atom_color
         	not_valid = self.invalid_symmetric_atoms()
 
-    def color_left_atom(self, atom_index, charge=False, isotope_resolved=False, bond_stereo=False, resonance=True):
+    def color_metal(self, charge=False, isotope_resolved=False, bond_stereo=False, resonance=True):
     	"""
-	To color left in the compound. Like metals and Hs. Here we just incorprate information of directly connected atoms.
+	To color the metals in the compound. Here we just incorprate information of directly connected atoms.
 	:param list atom_index: the list of atom index that needs coloring.
 	:param bond_stereo:  If true, add stereo information to bonds when constructing colors.
 	:type bond_stereo: :py:obj:`True` or :py:obj:`False`.
@@ -1199,28 +1206,29 @@ class Compound:
 	
 	:return:
     	"""
-        for atom_index in atom_index:
-            atom = self.atoms[atom_index]
-            color_elements = collections.Counter()
-            for neighbor_index in atom.neighbors:
-                if self.atoms[neighbor_index].color:
-                    connecting_bond = self.bond_lookup[(atom.atom_number, neighbor_index)]
-                    bond_type = connecting_bond.bond_type
-                    if not resonance and bond_type == "2":
-                        bond_type = "1"
-                    if bond_stereo:
-                        component = "({0}, {1})".format(self.atoms[neighbor_index].color, bond_type+connecting_bond.bond_stereo)
-                    else:
-                        component = "({0}, {1})".format(self.atoms[neighbor_index].color, bond_type)
-                    color_elements[component] += 1
-            atom.color_0 = atom.atom_symbol
-            if charge:
-                atom.color_0 += str(atom.charge)
-            if isotope_resolved:
-                atom.color_0 += atom.mass_difference
-            atom.color = atom.color_0
-            for name in sorted(color_elements.keys()):
-                atom.color += "({0})({1})".format(color_elements[name], name)
+    	atom_color_with_neighbors = self.generate_atom_color_with_neighbors(self.metal_index, excluded=self.H_index, 
+    		zero_layer=False, resonance=False, bond_stereo=False)
+    	for atom_index in self.metal_index:
+    		self.atoms[atom_index] = atom_color_with_neighbors[atom_index]
+      
+    def color_H(self, charge=False, isotope_resolved=False, bond_stereo=False, resonance=True):  
+    	"""To color the metals in the compound. Here we just incorprate information of directly connected atoms.
+	:param list atom_index: the list of atom index that needs coloring.
+	:param bond_stereo:  If true, add stereo information to bonds when constructing colors.
+	:type bond_stereo: :py:obj:`True` or :py:obj:`False`.
+	:param charge: If true, add charge information when constructing colors.
+	:type charge: :py:obj:`True` or :py:obj:`False`.
+	:param isotope_resolved: If true, add isotope information when constructing colors.
+	:type isotope_resolved: :py:obj:`True` or :py:obj:`False`.
+	:param resonance: If true, detect resonant compound pairs without disginguish between double bonds and single bonds.
+	:type resonance: :py:obj:`True` or :py:obj:`False`.
+	
+	:return:
+    	"""
+    	atom_color_with_neighbors = self.generate_atom_color_with_neighbors(self.H_index, zero_layer=False, 
+    		resonance=False, bond_stereo=False)
+    	for atom_index in self.H_index:
+    		self.atoms[atom_index] = atom_color_with_neighbors[atom_index]
 
     def metal_color_identifier(self, details=True):
     	"""
@@ -1251,21 +1259,11 @@ class Compound:
         return "".join(["({0})({1})".format(color_counter[key], key) for key in sorted(color_counter)])
 
     @property
-    def color_with_metals(self, details=True):
-    	"""
-        To generate the compound color identifier containing metals.
-	:param details: if true, add full metal color when constructing color identifier.
-	:type details: :py:obj:`True` or :py:obj:`False`.
-
-        :return: the color string representation containing metals for this compound.
-    	"""
-        return self.backbone_color_identifier + self.metal_color_identifier(details=details)
-    
-    @property
     def backbone_color_identifier(self):
     	"""
 	To generate the backbone color identifier for this compound. Exclude Hs and metals.
 
 	:return: the color string identifier for this compound.
     	"""
-    	return "".join(["({0})({1})".format(len(self.color_groups[key]), key) for key in sorted(self.color_groups)])
+    	color_groups = self.color_groups(excluded=self.metal_index + self.H_index)
+    	return "".join(["({0})({1})".format(len(color_groups[key]), key) for key in sorted(color_groups)])

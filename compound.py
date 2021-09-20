@@ -133,13 +133,13 @@ class Atom:
     	if not self.is_R():
             self.color_0 += self.atom_symbol
         else:
-           	self.color_0 += "R"
+            self.color_0 += "R"
         if atom_stereo:
             self.color_0 += self.atom_stereo_parity
         if charge:
             self.color_0 += str(self.charge)
         if isotope_resolved:
-        	self.color_0 += self.mass_difference
+            self.color_0 += self.mass_difference
         self.color = self.color_0
     	return self.color_0
 
@@ -262,11 +262,7 @@ class Compound:
 
 	:return: the list of index of all the R groups.
     	"""
-        rs = []
-        for index, atom in enumerate(self.atoms):
-            if atom.is_R():
-                rs.append(index)
-        return rs
+        return [ index for index, atom in enumerate(self.atoms) if atom.is_R() ]
 
     def contains_R_groups(self):
     	"""

@@ -2,58 +2,95 @@
 
 import ctfile
 import compound
+import reaction
+import KEGG_parser
+import MetaCyc_parser
 
+# class CompoundConstructor:
 
-class CompoundConstructor:
+#     def __init__(mofile):
 
-    def __init__(mofile):
-
-        self.molfile = molfile
+#         self.molfile = molfile
     
+#     @property
+#     def ctfile(self):
+ 
+#         ctObject = ctifle.load(self.mofile)
+#         return ctObject
+    
+#     def create(self):
+        
+#         # take care of aromatic substructure detection and bond stereochemistry.
+
+#         return compound.Compound(self.ctfile)
+
+class MolfileCompoundConstructor:
+    
+    def __init__(self, compund_name, molfile):
+
+        self.compound_name = compound_name
+        self.molfile = molfile
+
     @property
     def ctfile(self):
- 
-        ctObject = ctifle.load(self.mofile)
+
+        ctObject = ctifile.load(self.mofile)
         return ctObject
-    
+
     def create(self):
-        
-        # take care of aromatic substructure detection and bond stereochemistry.
 
-        return compound.Compound(self.ctfile)
+        atoms = [ Atom(atom['x'], atom['y'], atom['z'], atom.atom_symbol, atom['mass_difference'], atom.charge, atom['atom_stereo_parity'],
+            atom['hydrogen_count'], atom['stereo_care_box'], atom['valence'], atom['h0designator'], atom['atom_atom_mapping_number'], 
+            atom['inversion_retention_flag'], i, atom['exact_change_flag']) for i, atom in enumeate(self.ctfile.atoms) ]
 
+        bonds = [Bond(bond['first_atom_number'], bond['second_atom_number'], bond['bond_type'], bond['bond_stereo'], bond['bond_topology'], 
+            bond['reacting_center_status']) for bond in self.ctfile.bonds]
 
-#class KEGGCompoundConstructor(CompoundConstructor):
-
-#    def create(self):
-        
-        
-
-
-#class MetaCycCompoundConstructor(CompoundConstructor):
-
-#    def create(self)
-
-
-
-class ReactionConstructor:
-
-    def __init__(self,)
+        return compound.Compound(self.compound_name, atoms, bonds)
     
-    # take care of atom mapping check
+        
+class KCFCompoundConstructor:
+
+    def __init__(self, kcf):
+
+        self.kcf = kcf
+
+    def 
+
+
 
 
 class KEGGReactionConstructor:
+
+
+    def __init__(self, reaction):
+
+        self.
+
+
+    def generate_atom_mappings(self, )
+
+
 
 
 
 class MetaCycReactionConstructor:
 
 
+    def __init__(self, reaction_dict, atom_mappings):
 
-class NetworkConstructor:
+        self.reaction_dict = reaction_dict
+        self.atom_mappings = atom_mappings
 
-    def __init__(self, compounds, reactions):
+    def create(self):
 
-        self.compounds = compounds
-        self.reactions = reactions
+
+
+
+
+# class NetworkConstructor:
+
+#     def __init__(self, compounds, reactions):
+
+#         self.compounds = compounds
+#         self.reactions = reactions

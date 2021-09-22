@@ -3,7 +3,7 @@
 import json
 
 
-class Edge:
+class ReactionCompoundEdge:
 
 
     def __init__(self, one_compound, one_atom_idx, the_other_compound, the_other_atom_idx):

@@ -4,7 +4,7 @@
 update.py is used to download KEGG compound and reaction data from web.
 """
 
-import multiprocessing
+
 import requests
 import os
 import urllib
@@ -46,8 +46,7 @@ if __name__ == '__main__':
     update_entity(entry_list(KEGG_rclass_list_URL), "rclass/")
     update_entity(entry_list(KEGG_compound_list_URL), "compound_molfile/", suffix="mol")
     update_entity(entry_list(KEGG_compound_list_URL), "compound_kcf/", suffix="kcf")
-
-	# compound_list()
+    # compound_list()
     # multiprocess(compound_list(), update_compound)
     # multiprocess(reaction_list(), update_reaction)
 

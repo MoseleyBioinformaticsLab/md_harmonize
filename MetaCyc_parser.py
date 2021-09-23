@@ -8,7 +8,7 @@ Note: All MetaCyc reactions atom_mappings are stored in a single text file.
 import collections
 import copy
 
-def reaction_side_parser(atom_mappings_text):
+def reaction_side_parser(reaction_side):
     """
     This is to parse FROM_SIDE or TO_SIDE in the reaction.
 
@@ -19,19 +19,19 @@ def reaction_side_parser(atom_mappings_text):
     """
     i = 0
     compounds = collections.defaultdict(list)
-    while i < len(mapping):
-        if mapping[i] == "(":
+    while i < len(reaction_side):
+        if reaction_side[i] == "(":
             i += 1
             count = 1
             start_point = i
             while count > 0:
-                if mapping[i] == "(":
+                if reaction_side[i] == "(":
                     count += 1
-                if mapping[i] == ")":
+                if reaction_side[i] == ")":
                     count -= 1
                 i += 1
             i -= 1
-            inner_substring = mapping[start_point: i]
+            inner_substring = reaction_side[start_point: i]
             if "(" in inner_substring:
                 compound, n, s, e = inner_substring.split()
                 compounds[compound[1:]].append((int(s), int(e)))
@@ -41,8 +41,7 @@ def reaction_side_parser(atom_mappings_text):
         i += 1
     return compounds
 
-
-def generate_one_to_one_mappings(from_side, to_side, indices):
+# def generate_one_to_one_mappings(from_side, to_side, indices):
 
 
 
@@ -69,8 +68,7 @@ def reaction_with_reaction_side_parser(atom_mappings):
         if line.startswith("#"):
             continue
         elif line.startswith("//"):
-            reaction_dicts["ONE_TO_ONE_MAPPINGS"] = generate_one_to_one_mappings(current_reaction["FROM-SIDE"],
-                                                                                 current_reaction["TO-SIDE"], current_reaction["INDICES"])
+            # reaction_dicts["ONE_TO_ONE_MAPPINGS"] = generate_one_to_one_mappings(current_reaction["FROM-SIDE"],current_reaction["TO-SIDE"], current_reaction["INDICES"])
             reaction_dicts[current_reaction['REACTION']] = copy.deepcopy(current_reaction)
             current_reaction = {}
         else:

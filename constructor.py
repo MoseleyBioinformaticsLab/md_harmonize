@@ -26,25 +26,25 @@ import MetaCyc_parser
 
 class MolfileCompoundConstructor:
     
-    def __init__(self, compund_name, molfile):
+    def __init__(self, compound_name, molfile):
 
         self.compound_name = compound_name
         self.molfile = molfile
 
     @property
-    def ctfile(self):
+    def ctfile_object(self):
 
-        ctObject = ctifile.load(self.mofile)
-        return ctObject
+        ct_object = ctfile.load(self.molfile)
+        return ct_object
 
     def create(self):
 
-        atoms = [ Atom(atom['x'], atom['y'], atom['z'], atom.atom_symbol, atom['mass_difference'], atom.charge, atom['atom_stereo_parity'],
+        atoms = [ compound.Atom(atom.atom_symbol, i, atom['x'], atom['y'], atom['z'],  atom['mass_difference'], atom.charge, atom['atom_stereo_parity'],
             atom['hydrogen_count'], atom['stereo_care_box'], atom['valence'], atom['h0designator'], atom['atom_atom_mapping_number'], 
-            atom['inversion_retention_flag'], i, atom['exact_change_flag']) for i, atom in enumeate(self.ctfile.atoms) ]
+            atom['inversion_retention_flag'],  atom['exact_change_flag']) for i, atom in enumerate(self.ctfile_object.atoms) ]
 
-        bonds = [Bond(bond['first_atom_number'], bond['second_atom_number'], bond['bond_type'], bond['bond_stereo'], bond['bond_topology'], 
-            bond['reacting_center_status']) for bond in self.ctfile.bonds]
+        bonds = [compound.Bond(bond['first_atom_number'], bond['second_atom_number'], bond['bond_type'], bond['bond_stereo'], bond['bond_topology'],
+            bond['reacting_center_status']) for bond in self.ctfile_object.bonds]
 
         return compound.Compound(self.compound_name, atoms, bonds)
     

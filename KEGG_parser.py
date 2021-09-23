@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 
 import collections
+import compound
 
-def kegg_reaction_parser(reaction):
-
+def kegg_data_parser(reaction):
     """
-    This is to parse KEGG reaction file to a dictionary.
+    This is to parse KEGG data (reaction, rclass, compound) file to a dictionary.
 
     eg:
     ENTRY       R00259                      Reaction
@@ -41,14 +41,15 @@ def kegg_reaction_parser(reaction):
     key = ""
     for line in reaction:
         if line.startswith("  "):
-            reaction_dict[key].append(line)
+            reaction_dict[key].append(line[12:].rstrip())
+        elif line.startswith("///"):
+            break
         else:
-
-
-
+            key = line[:12].strip()
+            reaction_dict[key].append(line[12:].rstrip())
+    return reaction_dict
 
 def kegg_kcf_parser(kcf):
-
     """
     This is to parse KEGG kcf file to a dictionary.
 
@@ -84,11 +85,11 @@ def kegg_kcf_parser(kcf):
         if tokens[0] == "ENTRY":
             compound_name = tokens[1]
         elif tokens[0] == "ATOM":
-            atom_count = tokens[1]
+            atom_count = int(tokens[1])
         elif tokens[0] == "BOND":
-            bond_count = tokens[1]
+            bond_count = int(tokens[1])
         elif tokens[0] == "///":
-            continue
+            break
         else:
             if len(atoms) < atom_count:
                 atoms.append({"atom_symbol": tokens[2], "atom_number": int(tokens[0])-1, "x": tokens[3], "y": tokens[4], "kat": tokens[1]})
@@ -96,52 +97,375 @@ def kegg_kcf_parser(kcf):
                 bonds.append({"first_atom_number":tokens[1], "second_atom_number": tokens[2], "bond_type": tokens[3]})
     return {"compound_name": compound_name, "atoms": atoms, "bonds": bonds}
 
-def kegg_rclass_parser(rclass):
 
-    """
-    This is to parse KEGG Rclass text file to a dictionary.
+reaction_center = collections.namedtuple('reaction_center', ['i', 'kat', 'label', 'match', 'difference'])
 
-    eg:
-    ENTRY       RC00001                     RClass
-    DEFINITION  C1x-C8x:*-*:C2x+C2y-C8x+C8y
-                N1y-N5y:*-*:C1y+C2x+C2x-C1y+C8x+C8x
-    RPAIR       C00003_C00004    C00005_C00006
-    REACTION    R00090 R00112 R00267 R00282 R01528 R02034 R02163 R02736
-                R07141 R07171 R07172 R10517 R10518 R12579
-    ENZYME      1.1.1.42        1.1.1.43        1.1.1.44        1.1.1.49
-                1.1.1.285       1.1.1.351       1.1.1.363       1.6.1.1
-                1.6.1.2         1.6.1.3         1.6.3.1         1.6.3.2
-                1.6.3.3         1.6.3.4         1.6.5.9         1.6.99.1
-                1.11.1.1        1.11.1.26
-    PATHWAY     rn00480  Glutathione metabolism
-    ORTHOLOGY   K00031  isocitrate dehydrogenase [EC:1.1.1.42]
-                K00032  phosphogluconate 2-dehydrogenase [EC:1.1.1.43]
-                K00033  6-phosphogluconate dehydrogenase [EC:1.1.1.44 1.1.1.343]
-                K00036  glucose-6-phosphate 1-dehydrogenase [EC:1.1.1.49 1.1.1.363]
-                K00322  NAD(P) transhydrogenase [EC:1.6.1.1]
-                K00323  H+-translocating NAD(P) transhydrogenase [EC:1.6.1.2 7.1.1.1]
-                K00324  H+-translocating NAD(P) transhydrogenase subunit alpha [EC:1.6.1.2 7.1.1.1]
-                K00325  H+-translocating NAD(P) transhydrogenase subunit beta [EC:1.6.1.2 7.1.1.1]
-                K00354  NADPH2 dehydrogenase [EC:1.6.99.1]
-                K13937  hexose-6-phosphate dehydrogenase [EC:1.1.1.47 3.1.1.31]
-    ///
+class RpairParser:
 
-    :param rclass: the rclass text description.
-    :return: the dictionary of the parsed rclass.
+    """This is to get one to one atom mappings between two compounds based on the rclass definition.
+
+        Several steps are involved in this process:
+        1) First we need to find the center atoms based on the rlcass descriptions. The number of center atoms equals to
+        the number of rclass RMD descriptions.
+        2) For each center atom, there are can multiple candidate atoms. In other words, based on the RDM description,
+        several different atoms in the compound can meet the descriptions.
+        3) Therefore, we need to generate the all the combinations for the center atoms in a compound. In this case, each
+        compound has a set of list of center atom index.
+        4) Next, we need to find the one to one atom mappings between the two compounds based on the mapped center atoms.
+        5) To solve this issue, we first disassemble each compound into several different components. This is due to the
+        difference atoms in the two compounds.
+
+        Here, we can see that several different combinations are involved. Please pay attention to this!
     """
 
+    def __init__(self, rclass_name, rclass_definitions, one_compound, the_other_compound):
+        """
+
+        :param rclass_name:
+        :param rclass_definitions:
+        :param one_compound:
+        :param the_other_compound:
+        """
+        self.rclass_name = rclass_name
+        self.rclass_definitions = rclass_definitions
+        self.one_compound = one_compound
+        self.the_other_compound = the_other_compound
+
+    @staticmethod
+    def generate_kat_neighbors(compound):
+        """
+        To generate the
+        :param compound:
+        :return:
+        """
+        atoms = []
+        for atom in compound.atoms:
+            kat_neighbors = [compound.atoms[i].kat for i in atom.neighbors if compound.atoms[i].default_symbol != "H"]
+            kat_neighbors.sort()
+            atoms.append((atom.kat, kat_neighbors))
+        return atoms
+
+    @staticmethod
+    def search_target_atom(atoms, target):
+        """
+
+        :param atoms:
+        :param target:
+        :return:
+        """
+        target_index = []
+        for i, atom in enumerate(atoms):
+            if atom == target:
+                target_index.append(i)
+        return target_index
+
+    @staticmethod
+    def create_reaction_center(i, kat, difference, the_other_difference, match, the_other_match):
+        """
+
+        :param i:
+        :param kat:
+        :param difference:
+        :param the_other_difference:
+        :param match:
+        :param the_other_match:
+        :return:
+        """
+        match = list(zip(match, the_other_match))
+        difference = list(zip(difference, the_other_difference))
+        neighbors = [item for item in match if item != "*"]
+        neighbors.sort()
+        label = (kat, tuple(neighbors))
+        return reaction_center(i, kat, label, match, difference)
+
+    @staticmethod
+    def center_index_combinations(center_atom_index):
+        """
+        To generate the combinations of reaction center index.
+        :param center_atom_index: list of atom index list for each reaction centers.
+        :return:
+        """
+
+        combines = []
+        def dfs(i, seen):
+            if i == len(center_atom_index):
+                combines.append(list(seen))
+                return
+            for idx in center_atom_index[i]:
+                if idx not in seen:
+                    seen.append(idx)
+                    dfs(i+1, seen)
+                    seen.pop()
+        dfs(0, [])
+        return combines
+
+    @staticmethod
+    def remove_difference_bonds(compound, reaction_center_index, reaction_centers):
+        """
+        To remove the bonds connecting to different atoms. For each reaction center, multiple atoms can be the different atoms.
+        We need to get all the combinations.
+        :param compound:
+        :param reaction_center_index:
+        :param reaction_centers:
+        :return:
+        """
+        removed_bonds = [[]]
+        for i, idx in enumerate(reaction_center_index):
+            for different_atom in reaction_centers[i].difference:
+                if different_atom[0] != "*":
+                    removed_bonds_update = []
+                    possible_bonds = []
+                    for neighbor_index in compound.atoms[idx].neighbors:
+                        if compound.atoms[neighbor_index].kat == different_atom[0]:
+                            possible_bonds.append((idx, neighbor_index))
+                        for possible_bond in possible_bonds:
+                            for pre_removed in removed_bonds:
+                                removed_bonds_update.append(pre_removed + [possible_bond])
+                    removed_bonds = removed_bonds_update
+        return removed_bonds
+
+    def find_center_atoms(self):
+        """
+
+        Example of rclass definition:
+        C8x-C8y:*-C1c:N5y+S2x-N5y+S2x
+        The RDM pattern is defined as KEGG atom type changes at the reaction center (R), the difference region (D),
+        and the matched region (M) for each reactant pair. It characterizes chemical structure transformation patterns
+        associated with enzymatic reactions.
+
+        :return:
+        """
+        left_center_atoms, right_center_atoms = [], []
+        left_center_atom_index, right_center_atom_index = [], []
+        left_kat_neighbors = self.generate_kat_neighbors(self.one_compound)
+        right_kat_neighbors = self.generate_kat_neighbors(self.the_other_compound)
+        for i, definition in enumerate(self.rclass_definitions):
+            center, difference, match = definition.split(":")
+            left_center, right_center = center.split("-")
+            left_difference = [ item for item in difference.split("-")[0].split("+") ]
+            right_difference = [ item for item in difference.split("-")[1].split("+") ]
+            left_match = [ item for item in match.split("-")[0].split("+") ]
+            right_match = [ item for item in match.split("-")[1].split("+") ]
+            left_neighbors = [item for item in left_difference if item != "*"] + [item for item in left_match if item != "*"]
+            right_neighbors = [item for item in right_difference if item != "*"] + [item for item in right_match if item != "*"]
+            left_neighbors.sort()
+            right_neighbors.sort()
+            left_atom_index = self.search_target_atom(left_kat_neighbors, (left_center, left_neighbors))
+            right_atom_index = self.search_target_atom(right_kat_neighbors, (right_center, right_neighbors))
+            left_center_atoms.append(self.create_reaction_center(i, left_center, left_difference, right_difference, left_match, right_match))
+            right_center_atoms.append(self.create_reaction_center(i, right_center, right_difference, left_difference, right_match, left_match))
+            left_center_atom_index.append(left_atom_index)
+            right_center_atom_index.append(right_atom_index)
+        return left_center_atom_index, right_center_atom_index, left_center_atoms, right_center_atoms
+
+    def map_center_atoms(self):
+        """
+
+        :return:
+        """
+
+        left_center_atom_index, right_center_atom_index, left_center_atoms, right_center_atoms = self.find_center_atoms()
+        left_index_combs = self.center_index_combinations(left_center_atom_index)
+        right_index_combs = self.center_index_combinations(right_center_atom_index)
+
+        minimum_miss_count = float("inf")
+        optimal_atom_mappings = {}
+        for left_index_comb in left_index_combs:
+            for right_index_comb in right_index_combs:
+                # After removing the bonds, the compound will be disassembled into several parts. Try to match these pieces.
+                left_removed_bond_list = self.remove_difference_bonds(self.one_compound, left_index_comb, left_center_atoms)
+                right_removed_bonds_list = self.remove_difference_bonds(self.the_other_compound, right_index_comb, right_center_atoms)
+                for left_removed_bonds in left_removed_bond_list:
+                    for right_removed_bonds in right_removed_bonds_list:
+                        this_mapping = self.map_separate_components(left_removed_bonds, right_removed_bonds,
+                                                                    left_index_comb, right_index_comb)
+                        if this_mapping:
+                            miss_count = self.count_different_atom_identifiers(this_mapping)
+                            if len(optimal_atom_mappings) < len(this_mapping) or \
+                                    (len(optimal_atom_mappings) == len(this_mapping) and minimum_miss_count > miss_count):
+                                minimum_miss_count = miss_count
+                                optimal_atom_mappings = this_mapping
+        return optimal_atom_mappings
+
+    @staticmethod
+    def detect_separate_components(compound, removed_bonds, center_atom_index):
+        """
+
+        :param compound:
+        :param removed_bonds:
+        :param center_atom_index:
+        :return:
+        """
+        graph = collections.defaultdict(list)
+        for bond in compound.bonds:
+            i, j = bond.first_atom_number, bond.second_atom_number
+            if (i, j) not in removed_bonds and (j, i) not in removed_bonds:
+                if compound.atoms[i].default_symbol != "H" and compound.atoms[j].default_symbol != "H":
+                    graph[i].append(j)
+                    graph[j].append(i)
+
+        nodes = set(graph.keys() + center_atom_index)
+        visited = set()
+        components = []
+        for node in nodes:
+            if node not in visited:
+                ques = collections.deque([node])
+                component = []
+                visited.add(node)
+                while ques:
+                    node = ques.popleft()
+                    component.append(node)
+                    for neighbor_node in graph[node]:
+                        if neighbor_node not in visited:
+                            visited.add(neighbor_node)
+                            ques.append(neighbor_node)
+                components.append(component)
+        return components
+
+    @staticmethod
+    def get_component_pairs(left_components, right_components):
+        """
+        To get the component pairs with the same number of atoms.
+        :param left_components:
+        :param right_components:
+        :return:
+        """
+        component_pairs = []
+        for left_component in left_components:
+            for right_component in right_components:
+                if len(left_component) == len(right_component):
+                    component_pairs.append((left_component, right_component))
+        return component_pairs
+
+    @staticmethod
+    def construct_partial_compound(cpd, atom_index, removed_bonds):
+        """
+        To construct a partial compound based on the atom index and the removed bonds.
+        :param cpd:
+        :param atom_index:
+        :param removed_bonds:
+        :return:
+        """
+        atoms = [cpd.atoms[idx] for idx in atom_index]
+        bonds = []
+        for bond in cpd.bonds:
+            atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
+            if atom_1 in atom_index and atom_2 in atom_index and (atom_1, atom_2) not in removed_bonds and \
+                    (atom_2, atom_1) not in removed_bonds:
+                bonds.append(bond)
+        return compound.Compound("partial_compound", atoms, bonds)
+
+    @staticmethod
+    def preliminary_atom_mappings_check(left_partial_compound, right_partial_compound):
+        """
+        To roughly evaluate if the atoms between the two partial compounds can be mapped.
+        :param left_partial_compound:
+        :param right_partial_compound:
+        :return:
+        """
+        left_partial_compound.color_compound(r_groups=False, bond_stereo=False, atom_stereo=False, resonance=True)
+        right_partial_compound.color_compound(r_groups=False, bond_stereo=False, atom_stereo=False, resonance=True)
+        mapped_atoms = collections.Counter()
+        for atom_left in left_partial_compound.atoms:
+            for atom_right in right_partial_compound.atoms:
+                if atom_left.color_layers == atom_right.color_layers:
+                    mapped_atoms[atom_left.atom_number] += 1
+        return len(mapped_atoms) == len(left_partial_compound.atoms)
+
+    def map_separate_components(self, left_removed_bonds, right_removed_bonds, left_index_comb, right_index_comb):
+        """
+
+        :param left_removed_bonds:
+        :param right_removed_bonds:
+        :param left_index_comb:
+        :param right_index_comb:
+        :return:
+        """
+
+        left_components = self.detect_separate_components(self.one_compound, left_removed_bonds, left_index_comb)
+        right_components = self.detect_separate_components(self.the_other_compound, right_removed_bonds, right_index_comb)
+        component_pairs = self.get_component_pairs(left_components, right_components)
+        atom_mappings = []
+        for left_component, right_component in component_pairs:
+            left_partial_compound = self.construct_partial_compound(self.one_compound, left_component, left_removed_bonds)
+            right_partial_compound = self.construct_partial_compound(self.the_other_compound, right_component, right_removed_bonds)
+            if not self.preliminary_atom_mappings_check(left_partial_compound, right_partial_compound):
+                continue
+            mappings = left_partial_compound.find_mappings(right_partial_compound, resonance=True, r_distance=False)
+            one_to_one_mappings_list = left_partial_compound.generate_one_to_one_mappings(right_partial_compound, mappings)
+            optimal_one_to_one_mappings = None
+            minimum_miss_count = float("inf")
+            for one_to_one_mappings in one_to_one_mappings_list:
+                original_index_mappings = {}
+                for i in one_to_one_mappings:
+                    original_index_mappings[left_component[i]] = right_component[one_to_one_mappings[i]]
+                    if self.validate_component_atom_mappings(left_index_comb, right_index_comb, original_index_mappings):
+                        miss_count = self.count_different_atom_identifiers(original_index_mappings)
+                        if miss_count < minimum_miss_count:
+                            minimum_miss_count = miss_count
+                            optimal_one_to_one_mappings = original_index_mappings
+            if optimal_one_to_one_mappings:
+                atom_mappings.append(optimal_one_to_one_mappings)
+        return self.combine_component_atom_mappings(atom_mappings)
+
+    def combine_component_atom_mappings(self, atom_mappings):
+        """
+
+        :param atom_mappings:
+        :return:
+        """
+        groups = collections.defaultdict(list)
+        collective_mappings = {}
+        for i, atom_mapping in enumerate(atom_mappings):
+            groups[len(atom_mapping)].append(i)
+        for g in groups:
+            if len(groups[g]) == 1:
+                collective_mappings |= atom_mappings[groups[g][0]]
+            else:
+                orders = groups[g]
+                orders.sort(key=lambda x: self.count_different_atom_identifiers(atom_mappings[x]))
+                for idx in orders:
+                    if all(atom_index not in collective_mappings for atom_index in atom_mappings[idx]) and \
+                            all(atom_index not in collective_mappings.values() for atom_index in atom_mappings[idx].values()):
+                        collective_mappings |= atom_mappings[idx]
+        return collective_mappings
+
+    @staticmethod
+    def validate_component_atom_mappings(left_index_comb, right_index_comb, component_atom_mappings):
+        """
+        To check if the mapped the atoms can corresponds to the mapped reaction center atoms.
+        :param left_index_comb: the list of center atom index in the left compound.
+        :param right_index_comb: the list of center atom index in the right compound.
+        :param component_atom_mappings: the one to one atom mappings of one separate component.
+        :return:
+        """
+
+        for i, j in zip(left_index_comb, right_index_comb):
+            if i in component_atom_mappings and j != component_atom_mappings[i]:
+                return False
+        return True
+
+    def count_different_atom_identifiers(self, one_to_one_mappings):
+        """
+        To count the mapped atoms with different local atom identifier.
+        :param one_to_one_mappings:
+        :return:
+        """
+        count = 0
+        for idx_1 in one_to_one_mappings:
+            idx_2 = one_to_one_mappings[idx_1]
+            if self.one_compound.atoms[idx_1].color_layers and self.the_other_compound.atoms[idx_2].color_layers and \
+                    self.one_compound.atoms[idx_1].color_layers[1] == self.the_other_compound.atoms[idx_2].color_layers[1]:
+                continue
+            count += 1
+        return count
 
 
-def rpair_parser(rclass, one_compound, the_other_compound):
 
-    """
-    This is to get one to one atom mappings between two compounds based on the rclass definition.
-    :param list rclass: the list of rclass definition.
-    :param one_compound:
-    :type one_compound:
-    :param the_other_compound:
-    :type
-    :return:
-    """
+
+
+
+
+
 
 

@@ -55,9 +55,6 @@ class KCFCompoundConstructor:
 
         self.kcf = kcf
 
-    def 
-
-
 
 
 class KEGGReactionConstructor:
@@ -65,10 +62,9 @@ class KEGGReactionConstructor:
 
     def __init__(self, reaction):
 
-        self.
 
 
-    def generate_atom_mappings(self, )
+    def generate_atom_mappings(self, ):
 
 
 

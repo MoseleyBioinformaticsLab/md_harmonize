@@ -33,8 +33,8 @@ def compound_harmonization(compound_list_1, compound_list_2, save_file):
     :return:
     """
     harmonized_compound_edges = []
-    for cpd_1 in compound_list_1:
-        for cpd_2 in compound_list_2:
+    for cpd_name_1 in compound_list_1:
+        for cpd_name_2 in compound_list_2:
 
 
     return harmonized_compound_edges

@@ -12,6 +12,8 @@ from pathlib import Path
 import compound
 import ctfile
 import aromatize
+import tools
+import reaction
 
 def reaction_side_parser(reaction_side):
     """
@@ -46,7 +48,31 @@ def reaction_side_parser(reaction_side):
         i += 1
     return compounds
 
-# def generate_one_to_one_mappings(from_side, to_side, indices):
+def generate_one_to_one_mappings(from_side, to_side, indices):
+    """
+
+    :param from_side:
+    :param to_side:
+    :param indices:
+    :return:
+    """
+    n = len(indices)
+    from_index_dict = {}
+    for cpd_name in from_side:
+        start_index, end_index = from_side[cpd_name][0]
+        for i in range(start_index, end_index+1):
+            atom_index = i - start_index
+            from_index_dict[i] = (cpd_name, atom_index)
+    to_index_dict = {}
+    for cpd_name in to_side:
+        start_index, end_index = to_side[cpd_name][0]
+        for i in range(start_index, end_index+1):
+            atom_index = i - start_index
+            to_index_dict[i] = (cpd_name, atom_index)
+    one_to_one_mappings = []
+    for to_index, from_index in enumerate(indices):
+        one_to_one_mappings.append((from_index_dict[from_index], to_index_dict[to_index]))
+    return one_to_one_mappings
 
 def reaction_with_reaction_side_parser(atom_mappings):
     """
@@ -71,7 +97,7 @@ def reaction_with_reaction_side_parser(atom_mappings):
         if line.startswith("#"):
             continue
         elif line.startswith("//"):
-            # reaction_dicts["ONE_TO_ONE_MAPPINGS"] = generate_one_to_one_mappings(current_reaction["FROM-SIDE"],current_reaction["TO-SIDE"], current_reaction["INDICES"])
+            reaction_dicts["ONE_TO_ONE_MAPPINGS"] = generate_one_to_one_mappings(current_reaction["FROM-SIDE"],current_reaction["TO-SIDE"], current_reaction["INDICES"])
             reaction_dicts[current_reaction['REACTION']] = copy.deepcopy(current_reaction)
             current_reaction = {}
         else:
@@ -150,7 +176,7 @@ def create_metacyc_compounds(compound_directory, aromatic_substructures, save_fi
     :return:
     """
     compound_files = glob.glob(compound_directory+"*")
-    compounds = []
+    compounds = {}
     for compound_file in compound_files:
         compound_name = Path(compound_file).stem
         with open(compound_file, 'r') as infile:
@@ -165,9 +191,58 @@ def create_metacyc_compounds(compound_directory, aromatic_substructures, save_fi
             # determine stereochemistry
             cpd.define_bond_stereochemistry()
             # return the compound.
-            compounds.append(cpd)
+            compounds[compound_name] = cpd
+    tools.save_to_jsonpickle(compounds, save_file)
     return compounds
 
-def create_metacyc_reactions():
+def create_metacyc_reactions(reaction_file, atom_mapping_file, compounds, save_file):
+    """
+    To create MetaCyc reaction entities.
+    :param reaction_file:
+    :param atom_mapping_file:
+    :param compounds:
+    :param save_file:
+    :return:
+    """
+    reaction_dict = reaction_parser(tools.open_text(reaction_file).split("\n"))
+    atom_mappings = reaction_with_reaction_side_parser(tools.open_text(atom_mapping_file).split("\n"))
+    reactions = []
+    for reaction_name in reaction_dict:
+        this_reaction = reaction_dict[reaction_name]
+        coefficient_list = collections.deque(this_reaction["^COEFFICIENT"])
+        coefficients = {}
+        one_side_compounds = []
+        if "LEFT" in this_reaction:
+            for cpd_name in this_reaction["LEFT"]:
+                cpd_coefficient = coefficient_list.popleft()
+                one_side_compounds.append(compounds[cpd_name])
+                coefficients[cpd_name] = int(cpd_coefficient) if cpd_coefficient != " " else 1
+        the_other_side_compounds = []
+        if "RIGHT" in this_reaction:
+            for cpd_name in this_reaction["RIGHT"]:
+                cpd_coefficient = coefficient_list.popleft()
+                the_other_side_compounds.append(compounds[cpd_name])
+                coefficients[cpd_name] = int(cpd_coefficient) if cpd_coefficient != " " else 1
+        ecs = []
+        if "EC-NUMBER" in this_reaction:
+            for ec in this_reaction["EC-NUMBER"]:
+                if "|" not in ec:
+                    ecs.append(ec[3:])
+                else:
+                    ecs.append(ec[4:-1])
+        reactions.append(reaction.Reaction(reaction_name, one_side_compounds, the_other_side_compounds, ecs,
+                                           atom_mappings[reaction_name]["ONE_TO_ONE_MAPPINGS"], coefficients))
+    tools.save_to_jsonpickle(reactions, save_file)
+    return reactions
+
+
+
+
+
+
+
+
+
+
 
 

@@ -8,8 +8,9 @@ from pathlib import Path
 import ctfile
 import openbabel
 import aromatize
+import re
 
-def kegg_data_parser(reaction):
+def kegg_data_parser(data):
     """
     This is to parse KEGG data (reaction, rclass, compound) file to a dictionary.
 
@@ -40,12 +41,12 @@ def kegg_data_parser(reaction):
     DBLINKS     RHEA: 24295
     ///
 
-    :param str reaction: the KEGG reaction description.
+    :param str data: the KEGG reaction description.
     :return: the dictionary of the parsed KEGG reaction.
     """
     reaction_dict = collections.defaultdict(list)
     key = ""
-    for line in reaction:
+    for line in data:
         if line.startswith("  "):
             reaction_dict[key].append(line[12:].rstrip())
         elif line.startswith("///"):
@@ -291,7 +292,19 @@ class RpairParser:
                                     (len(optimal_atom_mappings) == len(this_mapping) and minimum_miss_count > miss_count):
                                 minimum_miss_count = miss_count
                                 optimal_atom_mappings = this_mapping
-        return optimal_atom_mappings
+        return self.generate_one_to_one_mappings(optimal_atom_mappings)
+
+    def generate_one_to_one_mappings(self, atom_mappings):
+        """
+
+        :param atom_mappings:
+        :return:
+        """
+        one_to_one_mappings = []
+        for from_idx in atom_mappings:
+            to_idx = atom_mappings[from_idx]
+            one_to_one_mappings.append(((self.one_compound.compound_name, from_idx), (self.the_other_compound.compound_name, to_idx)))
+        return one_to_one_mappings
 
     @staticmethod
     def detect_separate_components(compound, removed_bonds, center_atom_index):
@@ -505,7 +518,7 @@ def create_compounds_mofile(molfile_directory, kcf_compounds, aromatic_substruct
     :return:
     """
     molfiles = glob.glob(molfile_directory + "*")
-    compounds = []
+    compounds = {}
     for molfile in molfiles:
         compound_name = Path(molfile).stem
         with open(molfile, 'r') as infile:
@@ -528,17 +541,52 @@ def create_compounds_mofile(molfile_directory, kcf_compounds, aromatic_substruct
             # determine stereochemistry
             cpd.define_bond_stereochemistry()
             # return the compound.
-            compounds.append(cpd)
+            compounds[compound_name] = cpd
     tools.save_to_jsonpickle(compounds, save_file)
     return compounds
 
 # when we create the kegg reaction, we need to parse the atom mappings based on rclass!
-def create_reactions(reaction_directory, compounds, rclass):
+# To avoid parsing the same rclass repeatedly, let's parse the rclass first, and look it up when we need.
+def create_reactions(reaction_directory, compounds, atom_mappings):
 
     # here we compounds, rlcass descriptions, and reactions.
     reaction_files = glob.glob(reaction_directory+"*")
     reactions = []
     for reaction_file in reaction_files:
+        this_reaction = kegg_data_parser(tools.open_text(reaction_file).split("\n"))
+
+
+def create_atom_mappings(rclass_directory, compounds):
+    """
+
+    :param rclass_directory:
+    :param compounds:
+    :return:
+    """
+    rclass_files = glob.glob(rclass_directory + "*")
+    atom_mappings = collections.defaultdict(dict)
+    for rclass_file in rclass_files:
+        this_rclass = kegg_data_parser(tools.open_text(rclass_file).split("\n"))
+        rclass_definitions = this_rclass["DEFINITION"]
+        rclass_name = this_rclass["ENTRY"][0].split()[0]
+        for line in this_rclass["RPAIR"]:
+            tokens = line.split()
+            for token in tokens:
+                one_compound_name, the_other_compound_name = token.split("_")
+                one_compound, the_other_compound = compounds[one_compound_name], compounds[the_other_compound_name]
+                one_mappings = RpairParser(rclass_name, rclass_definitions, one_compound, the_other_compound).map_center_atoms()
+                the_other_mappings = RpairParser(rclass_name, rclass_definitions, the_other_compound, one_compound).map_center_atoms()
+                atom_mappings[rclass_name][token] = one_mappings if len(one_mappings) > len(the_other_mappings) else the_other_mappings
+    return atom_mappings
+
+
+
+
+
+
+
+
+
 
 
 

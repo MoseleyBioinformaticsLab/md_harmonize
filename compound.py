@@ -11,7 +11,6 @@ and the :class:`~MDH.compound.Compound` class to construct compound entity.
 """
 
 import collections
-from math import atan, sin, cos
 import itertools
 import numpy
 import BASS_Cc_3 as BASS_1
@@ -166,6 +165,15 @@ class Atom:
                 return True
         return False
 
+    def update_kat(self, kat):
+        """
+        Update the atom kegg atom type.
+        :param kat:
+        :return:
+        """
+        self.kat = kat
+        return self.kat
+
 
 class Bond:
 
@@ -238,8 +246,24 @@ class Compound:
                 second_atom.neighbors.append(bond.first_atom_number)
                 second_atom.bond_counts += int(bond.bond_type)     
         
-        self.find_cycles()
+        self.cycles = self.find_cycles()
         self.calculate_distance_to_r_groups()
+
+    @staticmethod
+    def create(ct_object, compound_name):
+        """
+        Create the compound entity based on the molfile representation.
+        :param compound_name:
+        :param molfile:
+        :return:
+        """
+        atoms = [ Atom(atom.atom_symbol, i, atom['x'], atom['y'], atom['z'],  atom['mass_difference'], atom.charge,
+                       atom['atom_stereo_parity'], atom['hydrogen_count'], atom['stereo_care_box'], atom['valence'],
+                       atom['h0designator'], atom['atom_atom_mapping_number'], atom['inversion_retention_flag'],
+                       atom['exact_change_flag']) for i, atom in enumerate(ct_object.atoms) ]
+        bonds = [ Bond(bond['first_atom_number'], bond['second_atom_number'], bond['bond_type'], bond['bond_stereo'],
+                       bond['bond_topology'], bond['reacting_center_status']) for bond in ct_object.bonds ]
+        return Compound(compound_name, atoms, bonds)
 
     @property
     def formula(self):
@@ -257,7 +281,15 @@ class Compound:
             else:
                 counter[atom.default_symbol] += 1
         return "".join([ char + str(counter[char]) for char in sorted(counter.keys()) ])
-    
+
+    @property
+    def composition(self):
+        """
+        To get the atom symbols and bond types in the compound.
+        :return:
+        """
+        return set([atom.default_symbol for atom in self.atoms] + [bond.bond_type for bond in self.bonds])
+
     @property
     def r_groups(self):
         """
@@ -311,7 +343,6 @@ class Compound:
         :param self:
         :return: the list of heavy atoms in the compound.
         """
-
         return [atom for atom in self.atoms if atom.default_symbol != "H"]
 
     @property
@@ -539,6 +570,8 @@ class Compound:
         
         if all_cycles:
             self.has_cycle = True
+
+        return [list(x) for x in set(tuple(x) for x in [sorted(i[:-1]) for l in all_cycles for i in l])]
 
     @property
     def resonance_targeted_structure_matrix(self):

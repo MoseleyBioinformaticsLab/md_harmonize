@@ -6,14 +6,14 @@ import json
 class ReactionCompoundEdge:
 
 
-    def __init__(self, one_compound, one_atom_idx, the_other_compound, the_other_atom_idx):
+    def __init__(self, one_compound, one_atom_index, the_other_compound, the_other_atom_index):
         """
 
         """
         self.one_compound = one_compound
-        self.one_atom_idx = one_atom_idx
+        self.one_atom_index = one_atom_index
         self.the_other_compound = the_other_compound
-        self.the_other_atom_idx
+        self.the_other_atom_index = the_other_atom_index
 
 
 class Reaction:
@@ -35,7 +35,5 @@ class Reaction:
 
     
     def find_reaction_pair(self, the_other):
-        """
-    
-        """
+
         

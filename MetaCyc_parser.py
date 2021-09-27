@@ -7,6 +7,11 @@ Note: All MetaCyc reactions atom_mappings are stored in a single text file.
 
 import collections
 import copy
+import glob
+from pathlib import Path
+import compound
+import ctfile
+import aromatize
 
 def reaction_side_parser(reaction_side):
     """
@@ -42,8 +47,6 @@ def reaction_side_parser(reaction_side):
     return compounds
 
 # def generate_one_to_one_mappings(from_side, to_side, indices):
-
-
 
 def reaction_with_reaction_side_parser(atom_mappings):
     """
@@ -107,7 +110,6 @@ def reaction_parser(reaction_text):
     ^COMPARTMENT - CCO-IN
     STD-REDUCTION-POTENTIAL - 0.1    
     //
-
     """
     reaction_dicts = {}
     current_reaction = collections.defaultdict(list)
@@ -139,5 +141,33 @@ def reaction_parser(reaction_text):
     return reaction_dicts
 
 
+# Here, we also need to use openbabel to add H.
+def create_metacyc_compounds(compound_directory, aromatic_substructures, save_file):
+    """
+
+    :param compound_directory:
+    :param aromatic_substructures:
+    :return:
+    """
+    compound_files = glob.glob(compound_directory+"*")
+    compounds = []
+    for compound_file in compound_files:
+        compound_name = Path(compound_file).stem
+        with open(compound_file, 'r') as infile:
+            ct_object = ctfile.load(infile)
+            # standardized the molfile representation and dump it into the openbabel to add H.
+            standardized_molfile =
+            # create the compound based on the ct_object.
+            cpd = compound.Compound.create(ct_object, compound_name)
+            # detect aromatic substructure and change aromatic bonds.
+            aromatic_cycles = aromatize.detect_aromatic_substructures(cpd, aromatic_substructures)
+            cpd.update_aromatic_bond_type(aromatic_cycles)
+            # determine stereochemistry
+            cpd.define_bond_stereochemistry()
+            # return the compound.
+            compounds.append(cpd)
+    return compounds
+
+def create_metacyc_reactions():
 
 

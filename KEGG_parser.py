@@ -2,6 +2,12 @@
 
 import collections
 import compound
+import glob
+import tools
+from pathlib import Path
+import ctfile
+import openbabel
+import aromatize
 
 def kegg_data_parser(reaction):
     """
@@ -459,6 +465,80 @@ class RpairParser:
                 continue
             count += 1
         return count
+
+def create_compounds_kcf(kcf_directory):
+    """
+    Create compound identities based on the KEGG kcf file.
+    :param kcf_directory:
+    :return:
+    """
+    # To put all the compounds into dictionary.
+    kcf_files = glob.glob(kcf_directory + "*")
+    kcf_compounds = {}
+    for kcf_file in kcf_files:
+        kcf_dict = kegg_kcf_parser(tools.open_text(kcf_file).split("\n"))
+        atoms = [compound.Atom(atom["atom_symbol"], atom["atom_number"], x=atom["x"], y=atom["y"], kat=atom["kat"]) for
+                 atom in kcf_dict["atoms"]]
+        bonds = [compound.Bond(bond["first_atom_number"], bond["second_atom_number"], bond["bond_type"]) for bond in kcf_dict["bonds"]]
+        kcf_compounds[kcf_dict["compound_name"]] = compound.Compound(kcf_dict["compound_name"], atoms, bonds)
+    return kcf_compounds
+
+# steps, we need to first construct KEGG kcf compounds, and use them to construct aromatic substructure set.
+# then, when we construct KEGG compounds, we need to do the following steps:
+# 1) check if the atom orders in the KEGG molfile and kcf are the same. and add the kat
+    # we ways we can use to add the kat.
+    # 1) we make use of the x, y coordinates of the atom to map between molfile and kcf.
+    # 2) we use the atom coloring identifier. Here, we don't need to worry about the stereochemistry and symmetric atoms.
+    # Symmetric atoms should share the same kat. In other words, atom coloring identifier is more strict than kat.
+    # here I decide to use atom coloring identifier. It's safer since kegg can update the compound structure inconsistently.
+# 2) add H using openbabel, the molfile should be  (for detecting bond stereochemisty)
+# 2) detect aromatic substructures in the compound and update bond type.
+# 3) detect the bond stereochemisty of the double bonds in the compound.
+# 4) we can do the coloring or not
+# 5) return the compound entity.
+def create_compounds_mofile(molfile_directory, kcf_compounds, aromatic_substructures, save_file):
+    """
+
+    :param molfile_directory:
+    :param kcf_compounds:
+    :param aromatic_substructures:
+    :return:
+    """
+    molfiles = glob.glob(molfile_directory + "*")
+    compounds = []
+    for molfile in molfiles:
+        compound_name = Path(molfile).stem
+        with open(molfile, 'r') as infile:
+            ct_object = ctfile.load(infile)
+            # standardized the molfile representation and dump it into the openbabel to add H.
+            standardized_molfile =
+            # create the compound based on the ct_object.
+            cpd = compound.Compound.create(ct_object, compound_name)
+            # add KEGG atom type to each atom.
+            cpd.color_compound()
+            kcf_compound = kcf_compounds[compound_name]
+            kcf_compound.color_compound()
+            atom_kat = {atom.color: atom.kat for atom in kcf_compound.atoms}
+            for atom in cpd.atoms:
+                if atom.default_symbol != "H":
+                    atom.update_kat(atom_kat[atom.color])
+            # detect aromatic substructure and change aromatic bonds.
+            aromatic_cycles = aromatize.detect_aromatic_substructures(cpd, aromatic_substructures)
+            cpd.update_aromatic_bond_type(aromatic_cycles)
+            # determine stereochemistry
+            cpd.define_bond_stereochemistry()
+            # return the compound.
+            compounds.append(cpd)
+    tools.save_to_jsonpickle(compounds, save_file)
+    return compounds
+
+# when we create the kegg reaction, we need to parse the atom mappings based on rclass!
+def create_reactions(reaction_directory, compounds, rclass):
+
+    # here we compounds, rlcass descriptions, and reactions.
+    reaction_files = glob.glob(reaction_directory+"*")
+    reactions = []
+    for reaction_file in reaction_files:
 
 
 

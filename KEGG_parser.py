@@ -66,26 +66,19 @@ def parse_equation(equation):
     :param equation: the equation string.
     :return:
     """
-
-    one_side, the_other_side = equation.split("<=>")
     compound_pattern = "C....."
     one_side_coefficients = {}
-    last_compound = ""
-    for token in one_side.split():
-        if re.search(compound_pattern, token):
-            last_compound = token
-            one_side_coefficients[last_compound] = 1
-        elif token.isdigit():
-            one_side_coefficients[last_compound] = int(token)
     the_other_side_coefficients = {}
+    current_side = one_side_coefficients
     last_compound = ""
-    for token in the_other_side.split():
+    for token in equation.split():
         if re.search(compound_pattern, token):
             last_compound = token
-            the_other_side_coefficients[last_compound] = 1
+            current_side[last_compound] = 1
         elif token.isdigit():
-            the_other_side_coefficients[last_compound] = int(token)
-
+            current_side[last_compound] = int(token)
+        elif token == "<=>":
+            current_side = the_other_side_coefficients
     return one_side_coefficients, the_other_side_coefficients
 
 def kegg_kcf_parser(kcf):
@@ -471,7 +464,7 @@ class RpairParser:
             groups[len(atom_mapping)].append(i)
         for g in groups:
             if len(groups[g]) == 1:
-                collective_mappings.update(atom_mappings[idx])
+                collective_mappings.update(atom_mappings[groups[g][0]])
             else:
                 orders = groups[g]
                 orders.sort(key=lambda x: self.count_different_atom_identifiers(atom_mappings[x]))
@@ -579,18 +572,24 @@ def create_compounds_mofile(molfile_directory, kcf_compounds, aromatic_substruct
 
 # when we create the kegg reaction, we need to parse the atom mappings based on rclass!
 # To avoid parsing the same rclass repeatedly, let's parse the rclass first, and look it up when we need.
-def create_reactions(reaction_directory, compounds, atom_mappings):
+def create_reactions(reaction_directory, compounds, atom_mappings, save_file):
+    """
 
+    :param reaction_directory:
+    :param compounds:
+    :param atom_mappings:
+    :param save_file:
+    :return:
+    """
     # here we compounds, rlcass descriptions, and reactions.
     reaction_files = glob.glob(reaction_directory+"*")
     reactions = []
     for reaction_file in reaction_files:
-        this_atom_mappings = []
         this_reaction = kegg_data_parser(tools.open_text(reaction_file).split("\n"))
         reaction_name = this_reaction["ENTRY"][0].split()[0]
+
         raw_ecs = this_reaction["ENZYME"] if "ENZYME" in this_reaction else []
         ecs = []
-
         for line in raw_ecs:
             ec_numbers = line.split()
             for ec in ec_numbers:
@@ -614,11 +613,14 @@ def create_reactions(reaction_directory, compounds, atom_mappings):
         one_side_compounds = [compounds[compound_name] for compound_name in one_side_coefficients]
         the_other_side_compounds = [compounds[compound_name] for compound_name in the_other_side_coefficients]
         one_side_coefficients.update(the_other_side_coefficients)
+
+        this_atom_mappings = []
         for line in this_reaction["RCLASS"]:
             rclass, rpair = line.split()
             this_atom_mappings.extend(atom_mappings[rclass][rpair])
         reactions.append(reaction.Reaction(reaction_name, one_side_compounds, the_other_side_compounds, ecs,
                                            this_atom_mappings, one_side_coefficients))
+    tools.save_to_jsonpickle(reactions, save_file)
     return reactions
 
 def create_atom_mappings(rclass_directory, compounds):

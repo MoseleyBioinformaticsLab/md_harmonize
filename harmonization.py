@@ -22,7 +22,7 @@ class HarmonizedReactionEdge:
         self.relationship = relationship
 
 
-    # def check_atom_mappings(self):
+    def check_atom_mappings(self):
 
 
 def compound_harmonization(compound_list_1, compound_list_2, save_file):

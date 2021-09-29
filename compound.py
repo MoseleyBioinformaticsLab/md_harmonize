@@ -1267,3 +1267,16 @@ class Compound:
     	"""
         color_groups = self.color_groups(excluded=self.metal_index + self.h_index)
         return "".join(["({0})({1})".format(len(color_groups[key]), key) for key in sorted(color_groups)])
+
+    def pair_compound(self, the_other_compound):
+        """
+        To detect if this compound can be paired to the other compound.
+        Three cases: 1) Both compounds are specific compounds (no R groups);
+                     2) One compound contains R group(s);
+                     3) Both compounds contain R group(s).
+        If the two compounds can be paired, we need to determine their relationship by checking the chemical details (eg:
+        bond stereochemistry and atom stereochemistry.
+        relationship can be equivalent, generic-specific, loose
+        :param the_other_compound:
+        :return:
+        """

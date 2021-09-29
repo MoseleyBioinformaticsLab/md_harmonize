@@ -43,6 +43,7 @@ def update_entity(entries, sub_directory, directory=default_directory, suffix=""
     for entry in entries:
         data = requests.get("http://rest.kegg.jp/get/{0}/{1}".format(entry, suffix))
         tools.save_to_text(data.text, directory + sub_directory + entry)
+
        
 
 # def multiprocess(entry_list, function):

@@ -9,6 +9,7 @@ import ctfile
 import openbabel
 import aromatize
 import re
+import reaction
 
 def kegg_data_parser(data):
     """
@@ -55,6 +56,37 @@ def kegg_data_parser(data):
             key = line[:12].strip()
             reaction_dict[key].append(line[12:].rstrip())
     return reaction_dict
+
+def parse_equation(equation):
+    """
+    This is to parse the kegg reaction equation.
+
+    eg:
+    C00029 + C00001 + 2 C00003 <=> C00167 + 2 C00004 + 2 C00080
+    :param equation: the equation string.
+    :return:
+    """
+
+    one_side, the_other_side = equation.split("<=>")
+    compound_pattern = "C....."
+    one_side_coefficients = {}
+    last_compound = ""
+    for token in one_side.split():
+        if re.search(compound_pattern, token):
+            last_compound = token
+            one_side_coefficients[last_compound] = 1
+        elif token.isdigit():
+            one_side_coefficients[last_compound] = int(token)
+    the_other_side_coefficients = {}
+    last_compound = ""
+    for token in the_other_side.split():
+        if re.search(compound_pattern, token):
+            last_compound = token
+            the_other_side_coefficients[last_compound] = 1
+        elif token.isdigit():
+            the_other_side_coefficients[last_compound] = int(token)
+
+    return one_side_coefficients, the_other_side_coefficients
 
 def kegg_kcf_parser(kcf):
     """
@@ -439,14 +471,14 @@ class RpairParser:
             groups[len(atom_mapping)].append(i)
         for g in groups:
             if len(groups[g]) == 1:
-                collective_mappings |= atom_mappings[groups[g][0]]
+                collective_mappings.update(atom_mappings[idx])
             else:
                 orders = groups[g]
                 orders.sort(key=lambda x: self.count_different_atom_identifiers(atom_mappings[x]))
                 for idx in orders:
                     if all(atom_index not in collective_mappings for atom_index in atom_mappings[idx]) and \
                             all(atom_index not in collective_mappings.values() for atom_index in atom_mappings[idx].values()):
-                        collective_mappings |= atom_mappings[idx]
+                        collective_mappings.update(atom_mappings[idx])
         return collective_mappings
 
     @staticmethod
@@ -553,8 +585,41 @@ def create_reactions(reaction_directory, compounds, atom_mappings):
     reaction_files = glob.glob(reaction_directory+"*")
     reactions = []
     for reaction_file in reaction_files:
+        this_atom_mappings = []
         this_reaction = kegg_data_parser(tools.open_text(reaction_file).split("\n"))
+        reaction_name = this_reaction["ENTRY"][0].split()[0]
+        raw_ecs = this_reaction["ENZYME"] if "ENZYME" in this_reaction else []
+        ecs = []
 
+        for line in raw_ecs:
+            ec_numbers = line.split()
+            for ec in ec_numbers:
+                numbers = ec.split(".")
+                # some numbers in the ec are not specified. like "3.5.99.-"
+                while numbers and numbers[-1] == "-":
+                    numbers.pop()
+                ecs.append(".".join(numbers))
+        if not ecs:
+            # ORTHOLOGY can contain information of ecs. Please check the example of reaction.
+            for line in this_reaction["ORTHOLOGY"]:
+                ec_pattern = "\[EC:.*\]"
+                ec_numbers = re.findall(ec_pattern, line)[0][4:-1].split()
+                for ec in ec_numbers:
+                    numbers = ec.split(".")
+                    while numbers and numbers[-1] == "-":
+                        numbers.pop()
+                    ecs.append(".".join(numbers))
+
+        one_side_coefficients, the_other_side_coefficients = parse_equation(this_reaction["EQUATION"][0])
+        one_side_compounds = [compounds[compound_name] for compound_name in one_side_coefficients]
+        the_other_side_compounds = [compounds[compound_name] for compound_name in the_other_side_coefficients]
+        one_side_coefficients.update(the_other_side_coefficients)
+        for line in this_reaction["RCLASS"]:
+            rclass, rpair = line.split()
+            this_atom_mappings.extend(atom_mappings[rclass][rpair])
+        reactions.append(reaction.Reaction(reaction_name, one_side_compounds, the_other_side_compounds, ecs,
+                                           this_atom_mappings, one_side_coefficients))
+    return reactions
 
 def create_atom_mappings(rclass_directory, compounds):
     """

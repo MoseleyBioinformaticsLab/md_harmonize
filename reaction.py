@@ -27,10 +27,10 @@ class Reaction:
         self.atom_mappings = atom_mappings
         self.coefficients = coefficients
         
-    
-    def create_edge(self):
+    @property
+    def name(self):
+        return self.reaction_name
 
-    
-    def find_reaction_pair(self, the_other):
+    def detect_pair(self, the_other):
 
         

@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 import compound
+from abc import ABC
 
 class HarmonizedCompoundEdge:
 
     def __init__(self, one_compound, the_other_compound, relationship):
 
-        self.one_compound = one_compound
-        self.the_other_compound = the_other_compound
+        self.one_side = one_compound
+        self.the_other_side = the_other_compound
         self.relationship = relationship
 
     # @property
@@ -17,38 +18,53 @@ class HarmonizedReactionEdge:
 
     def __init__(self, one_reaction, the_other_reaction, relationship):
 
-        self.one_reaction = one_reaction
-        self.the_other_reaction = the_other_reaction
+        self.one_side = one_reaction
+        self.the_other_side = the_other_reaction
         self.relationship = relationship
 
 
-    def check_atom_mappings(self):
+    # def check_atom_mappings(self):
 
 
-def compound_harmonization(compound_list_1, compound_list_2, save_file):
-    """
+class HarmonizationManager:
 
-    :param compound_list_1:
-    :param compound_list_2:
-    :return:
-    """
-    harmonized_compound_edges = []
-    for cpd_name_1 in compound_list_1:
-        for cpd_name_2 in compound_list_2:
+    def __init__(self):
+
+        self.harmonized_edges = {}
+
+    @staticmethod
+    def create_key(name_1, name_2):
+        """
+        To create the edge key.
+        :param name_1:
+        :param name_2:
+        :return:
+        """
+        if name_1 > name_2:
+            return name_1 + "@" + name_2
+        else:
+            return name_2 + "@" + name_1
+
+    def add_edge(self, edge):
+
+        key = self.create_key(edge.one_side.name, edge.the_other_side.name)
+        if key not in self.harmonized_edges:
+            self.harmonized_edges[key] = edge
+
+    def remove_edge(self, edge):
+
+        key = self.create_key(edge.one_side.name, edge.the_other_side.name)
+        if key in self.harmonized_edges:
+            self.harmonized_edges.pop(key)
+
+    def search(self, name_1, name_2):
+
+        key = self.create_key(name_1, name_2)
+        if key in self.harmonized_edges:
+            return self.harmonized_edges[key]
+        return None
 
 
-    return harmonized_compound_edges
 
-def reaction_harmonization(reaction_list_1, reaction_list_2, save_file):
-    """
 
-    :param reaction_list_1:
-    :param reaction_list_2:
-    :return:
-    """
-    harmonized_reaction_edges = []
-    for reaction_1 in reaction_list_1:
-        for reaction_2 in reaction_list_2:
-
-    return harmonized_reaction_edges
 

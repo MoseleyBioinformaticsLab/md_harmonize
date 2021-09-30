@@ -13,7 +13,7 @@ and the :class:`~MDH.compound.Compound` class to construct compound entity.
 import collections
 import itertools
 import numpy
-import BASS_Cc_3 as BASS_1
+import BASS
 import heapq
 
 
@@ -248,6 +248,10 @@ class Compound:
         
         self.cycles = self.find_cycles()
         self.calculate_distance_to_r_groups()
+
+    @property
+    def name(self):
+        return self.compound_name
 
     @staticmethod
     def create(ct_object, compound_name):
@@ -573,26 +577,7 @@ class Compound:
 
         return [list(x) for x in set(tuple(x) for x in [sorted(i[:-1]) for l in all_cycles for i in l])]
 
-    @property
-    def resonance_targeted_structure_matrix(self):
-        """
-        To construct graph structural matrix of this compound without distinguishing single and double bonds.
-        This is used to find compounds with different resonance structures.
-
-        :return: the matrix of this compound.
-    	"""
-        resonance_targeted_structure_matrix = numpy.zeros((len(self.heavy_atoms), len(self.heavy_atoms)), dtype=numpy.uint8)
-        for bond in self.bonds:
-            atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
-            if atom_1 in self.index_of_heavy_atoms and atom_2 in self.index_of_heavy_atoms:
-                resonance_targeted_structure_matrix[self.index_of_heavy_atoms[atom_1]][self.index_of_heavy_atoms[atom_2]] \
-                    = int(bond.bond_type) if int(bond.bond_type) != 2 else 1
-                resonance_targeted_structure_matrix[self.index_of_heavy_atoms[atom_2]][self.index_of_heavy_atoms[atom_1]] \
-                    = int(bond.bond_type) if int(bond.bond_type) != 2 else 1
-        return resonance_targeted_structure_matrix
-
-    @property
-    def structure_matrix(self):
+    def structure_matrix(self, resonance=False):
         """
         To construct graph structural matrix of this compound.
         matrix[i][j] = 0 suggests the two atoms are not connected directly.
@@ -603,8 +588,11 @@ class Compound:
         for bond in self.bonds:
             atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
             if atom_1 in self.index_of_heavy_atoms and atom_2 in self.index_of_heavy_atoms:
-                matrix[self.index_of_heavy_atoms[atom_1]][self.index_of_heavy_atoms[atom_2]] = int(bond.bond_type)
-                matrix[self.index_of_heavy_atoms[atom_2]][self.index_of_heavy_atoms[atom_1]] = int(bond.bond_type)
+                bond_type = int(bond.bond_type)
+                if resonance and bond_type == 2:
+                    bond_type = 1
+                matrix[self.index_of_heavy_atoms[atom_1]][self.index_of_heavy_atoms[atom_2]] = bond_type
+                matrix[self.index_of_heavy_atoms[atom_2]][self.index_of_heavy_atoms[atom_1]] = bond_type
         return matrix
 
     @property
@@ -668,15 +656,13 @@ class Compound:
 
         :return: the list of atom mappings in the heavy atom order.
     	"""
-        mappping_matrix = BASS_1.make_mapping_matrix_R if r_distance else BASS_1.make_mapping_matrix
-        find_mappings = BASS_1.find_mappings
         self.update_color_tuple(resonance=resonance)
         the_other.update_color_tuple(resonance=resonance)
         mappings = []
-        mmat = mappping_matrix(the_other, self, True, True)
+        mmat = BASS.make_mapping_matrix(the_other, self, True, True, r_distance)
         if mmat is not None:
-            mappings = find_mappings(the_other.structure_matrix, the_other.distance_matrix, 
-            	self.structure_matrix, self.distance_matrix, mmat)
+            mappings = BASS.find_mappings(the_other.structure_matrix(resonance=resonance), the_other.distance_matrix,
+            	self.structure_matrix(resonance=resonance), self.distance_matrix, mmat)
         return mappings
 
     def generate_one_to_one_mappings(self, the_other, mappings):
@@ -696,7 +682,7 @@ class Compound:
             one_to_one_mappings.append(cur_mappings)
         return one_to_one_mappings
 
-    def validate_resonance_mappings(self, the_other, r_distance=False):
+    def map_resonance(self, the_other, r_distance=False):
         """
         Check if the resonant mappings are valid between the two compound structures. If the mapped atoms don't share
         the same local coloring identifier, we check if the difference is caused by the position of double bonds.
@@ -784,8 +770,7 @@ class Compound:
                 return neighbor_index
         return -1
 
-
-    def detect_linear_circular_interchange(self, the_other):
+    def map_linear_circular_interchange(self, the_other):
         """
         Detect if the two compounds have linear and circular interchangeable representations. This mainly targets at sugar like structure.
         We check how many atoms don't share the same local (first layer) identifiers and then detect if the difference is caused by the
@@ -805,6 +790,10 @@ class Compound:
             if one_num_of_atoms_in_cycle != the_other_num_of_atoms_in_cycle:
                 return True
         return False
+
+    def map_with_r(self, the_other_compound):
+
+
 
     def define_bond_stereochemistry(self):
         """
@@ -1268,15 +1257,79 @@ class Compound:
         color_groups = self.color_groups(excluded=self.metal_index + self.h_index)
         return "".join(["({0})({1})".format(len(color_groups[key]), key) for key in sorted(color_groups)])
 
-    def pair_compound(self, the_other_compound):
+    # To detect if this compound can be paired to the other compound.
+    # Three cases: 1) Both compounds are specific compounds (no R groups); Just compare the coloring identifier.
+    #              2) One compound contains R group(s);
+    #              3) Both compounds contain R group(s).
+    # If the two compounds can be paired, we need to determine their relationship by checking the chemical details (eg:
+    # bond stereochemistry and atom stereochemistry.
+    # relationship can be equivalent, generic-specific, loose
+    # 0, -1, 1,
+
+    def determine_relationship(self, the_other_compound, type):
+
+        if type == "same":
+
+        elif type == "resonance":
+
+        elif type == "circular":
+
+        return
+
+
+
+    def get_chemical_details(self, excluded=None):
+
+        chemical_details = []
+        for atom in self.atoms:
+            if atom.atom_number not in excluded and atom.atom_stereo_parity != "0" and atom.atom_stereo_parity != "3":
+                chemical_details.append("{0}-{1}".format(atom.color, atom.atom_stereo_parity))
+        for bond in self.bonds:
+            if bond.first_atom_number not in excluded and bond.second_atom_number not in excluded and \
+                    bond.bond_stereo != "0" and bond.bond_stereo != "4":
+                names = [self.atoms[bond.first_atom_number].color, self.atoms[bond.second_atom_number].color]
+                names.sort()
+                chemical_details.append("{0}-{1}-{2}".format(names[0], names[1], bond.bond_stereo))
+        chemical_details.sort()
+        return chemical_details
+
+    @staticmethod
+    def compare_chemical_details(one_chemical_details, the_other_chemical_details):
         """
-        To detect if this compound can be paired to the other compound.
-        Three cases: 1) Both compounds are specific compounds (no R groups);
-                     2) One compound contains R group(s);
-                     3) Both compounds contain R group(s).
-        If the two compounds can be paired, we need to determine their relationship by checking the chemical details (eg:
-        bond stereochemistry and atom stereochemistry.
-        relationship can be equivalent, generic-specific, loose
-        :param the_other_compound:
+
+        :param one_chemical_details:
+        :param the_other_chemical_details:
         :return:
         """
+        # order is small to big
+        one_more = []
+        the_other_more = []
+        while one_chemical_details and the_other_chemical_details:
+            if one_chemical_details[-1] == the_other_chemical_details[-1]:
+                one_chemical_details.pop()
+                the_other_chemical_details.pop()
+            elif one_chemical_details[-1] > the_other_chemical_details[-1]:
+                one_more.append(one_chemical_details.pop())
+            else:
+                the_other_more.append(the_other_chemical_details.pop())
+        one_more.extend(one_chemical_details)
+        the_other_more.extend(the_other_chemical_details)
+        if not one_more and not the_other_more:
+            # equivalent
+        elif one_more and the_other_more:
+            # loose
+        elif one_more:
+            # one is more specific
+        elif the_other_more:
+            # the other is more specific.
+
+
+    def resonant_pair_relationship(self, the_other_compound):
+
+    def circular_pair_relationship(self, the_other_compound):
+
+    def with_r_pair_relationship(self, the_other_compound):
+
+
+
+

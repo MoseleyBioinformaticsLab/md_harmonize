@@ -11,7 +11,6 @@ import glob
 from pathlib import Path
 import compound
 import ctfile
-import aromatize
 import tools
 import reaction
 
@@ -166,13 +165,10 @@ def reaction_parser(reaction_text):
                 previous_key = key
     return reaction_dicts
 
-
-# Here, we also need to use openbabel to add H.
-def create_metacyc_compounds(compound_directory, aromatic_substructures, save_file):
+def create_metacyc_compounds(compound_directory):
     """
 
     :param compound_directory:
-    :param aromatic_substructures:
     :return:
     """
     compound_files = glob.glob(compound_directory+"*")
@@ -181,27 +177,15 @@ def create_metacyc_compounds(compound_directory, aromatic_substructures, save_fi
         compound_name = Path(compound_file).stem
         with open(compound_file, 'r') as infile:
             ct_object = ctfile.load(infile)
-            # standardized the molfile representation and dump it into the openbabel to add H.
-            standardized_molfile =
-            # create the compound based on the ct_object.
-            cpd = compound.Compound.create(ct_object, compound_name)
-            # detect aromatic substructure and change aromatic bonds.
-            aromatic_cycles = aromatize.detect_aromatic_substructures(cpd, aromatic_substructures)
-            cpd.update_aromatic_bond_type(aromatic_cycles)
-            # determine stereochemistry
-            cpd.define_bond_stereochemistry()
-            # return the compound.
-            compounds[compound_name] = cpd
-    tools.save_to_jsonpickle(compounds, save_file)
+            compounds[compound_name] = compound.Compound.create(ct_object, compound_name)
     return compounds
 
-def create_metacyc_reactions(reaction_file, atom_mapping_file, compounds, save_file):
+def create_metacyc_reactions(reaction_file, atom_mapping_file, compounds):
     """
     To create MetaCyc reaction entities.
     :param reaction_file:
     :param atom_mapping_file:
     :param compounds:
-    :param save_file:
     :return:
     """
     reaction_dict = reaction_parser(tools.open_text(reaction_file).split("\n"))
@@ -232,7 +216,6 @@ def create_metacyc_reactions(reaction_file, atom_mapping_file, compounds, save_f
                     ecs.append(ec[4:-1])
         reactions.append(reaction.Reaction(reaction_name, one_side_compounds, the_other_side_compounds, ecs,
                                            atom_mappings[reaction_name]["ONE_TO_ONE_MAPPINGS"], coefficients))
-    tools.save_to_jsonpickle(reactions, save_file)
     return reactions
 
 

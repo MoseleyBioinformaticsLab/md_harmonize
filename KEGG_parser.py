@@ -6,8 +6,6 @@ import glob
 import tools
 from pathlib import Path
 import ctfile
-import openbabel
-import aromatize
 import re
 import reaction
 
@@ -504,7 +502,7 @@ class RpairParser:
             count += 1
         return count
 
-def create_compounds_kcf(kcf_directory):
+def create_compound_kcf(kcf_directory):
     """
     Create compound identities based on the KEGG kcf file.
     :param kcf_directory:
@@ -534,7 +532,7 @@ def create_compounds_kcf(kcf_directory):
 # 3) detect the bond stereochemisty of the double bonds in the compound.
 # 4) we can do the coloring or not
 # 5) return the compound entity.
-def create_compounds_mofile(molfile_directory, kcf_compounds, aromatic_substructures, save_file):
+def create_compound_mofile(molfile_directory):
     """
 
     :param molfile_directory:
@@ -548,37 +546,20 @@ def create_compounds_mofile(molfile_directory, kcf_compounds, aromatic_substruct
         compound_name = Path(molfile).stem
         with open(molfile, 'r') as infile:
             ct_object = ctfile.load(infile)
-            # standardized the molfile representation and dump it into the openbabel to add H.
-            standardized_molfile =
-            # create the compound based on the ct_object.
-            cpd = compound.Compound.create(ct_object, compound_name)
-            # add KEGG atom type to each atom.
-            cpd.color_compound()
-            kcf_compound = kcf_compounds[compound_name]
-            kcf_compound.color_compound()
-            atom_kat = {atom.color: atom.kat for atom in kcf_compound.atoms}
-            for atom in cpd.atoms:
-                if atom.default_symbol != "H":
-                    atom.update_kat(atom_kat[atom.color])
-            # detect aromatic substructure and change aromatic bonds.
-            aromatic_cycles = aromatize.detect_aromatic_substructures(cpd, aromatic_substructures)
-            cpd.update_aromatic_bond_type(aromatic_cycles)
-            # determine stereochemistry
-            cpd.define_bond_stereochemistry()
-            # return the compound.
-            compounds[compound_name] = cpd
-    tools.save_to_jsonpickle(compounds, save_file)
+            compounds[compound_name] = compound.Compound.create(ct_object, compound_name)
     return compounds
+
+# def add_kat(compounds, compounds_kcf):
+
 
 # when we create the kegg reaction, we need to parse the atom mappings based on rclass!
 # To avoid parsing the same rclass repeatedly, let's parse the rclass first, and look it up when we need.
-def create_reactions(reaction_directory, compounds, atom_mappings, save_file):
+def create_reactions(reaction_directory, compounds, atom_mappings):
     """
 
     :param reaction_directory:
     :param compounds:
     :param atom_mappings:
-    :param save_file:
     :return:
     """
     # here we compounds, rlcass descriptions, and reactions.
@@ -620,12 +601,10 @@ def create_reactions(reaction_directory, compounds, atom_mappings, save_file):
             this_atom_mappings.extend(atom_mappings[rclass][rpair])
         reactions.append(reaction.Reaction(reaction_name, one_side_compounds, the_other_side_compounds, ecs,
                                            this_atom_mappings, one_side_coefficients))
-    tools.save_to_jsonpickle(reactions, save_file)
     return reactions
 
 def create_atom_mappings(rclass_directory, compounds):
     """
-
     :param rclass_directory:
     :param compounds:
     :return:

@@ -43,7 +43,7 @@ def update_entity(entries, sub_directory, directory, suffix=""):
         tools.save_to_text(data.text, directory + sub_directory + entry)
 
 
-def down(directory):
+def download(directory):
     """
     To down load all the KEGG required files.
     :param directory: the directory to store the data.

@@ -65,6 +65,25 @@ class HarmonizationManager:
         return None
 
 
+class ReactionHarmonizationManager(HarmonizationManager):
+
+    def __init__(self, compound_harmonization_manager):
+
+
+
+    @staticmethod
+    def compare_ecs(one_ecs, the_other_ecs):
+
+        if [ec for ec in one_ecs[4] if ec in the_other_ecs[4]]:
+            return 4
+        if [ec for ec in one_ecs[3] if ec in the_other_ecs[3]]:
+            return 3
+        return 0
+
+    @staticmethod
+    def harmonize(one_reaction, the_other_reaction):
+
+
 
 
 

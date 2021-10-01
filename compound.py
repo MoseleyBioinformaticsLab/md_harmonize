@@ -100,6 +100,8 @@ class Atom:
 
     def add_neighbors(self, neighbors):
         """
+
+
         To add neighbors to the atom.
         :param list neighbors: the index of neighbors that will be added to this atom.
 
@@ -358,6 +360,13 @@ class Compound:
     	"""
         return { atom.atom_number: i for i, atom in enumerate(self.heavy_atoms) }
 
+    def is_symmetric(self, atom_index):
+
+        for index in atom_index:
+            color = self.atoms[index].color
+            if len(self.color_compound()[color]) > 1:
+                return False
+        return True
        
     def color_groups(self, excluded=None):
         """
@@ -1324,7 +1333,11 @@ class Compound:
             # the other is more specific.
 
 
-    def resonant_pair_relationship(self, the_other_compound):
+    def resonant_pair_relationship(self, the_other_compound, atom_mappings):
+
+        one_stereo_counts, the_other_stereo_counts = 0, 0
+        one_consistent_atoms, the_other_consistent_atoms = set(), set()
+        for
 
     def circular_pair_relationship(self, the_other_compound):
 

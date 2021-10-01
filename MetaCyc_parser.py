@@ -207,13 +207,15 @@ def create_metacyc_reactions(reaction_file, atom_mapping_file, compounds):
                 cpd_coefficient = coefficient_list.popleft()
                 the_other_side_compounds.append(compounds[cpd_name])
                 coefficients[cpd_name] = int(cpd_coefficient) if cpd_coefficient != " " else 1
-        ecs = []
+        ecs = collections.defaultdict(list)
         if "EC-NUMBER" in this_reaction:
             for ec in this_reaction["EC-NUMBER"]:
                 if "|" not in ec:
-                    ecs.append(ec[3:])
+                    numbers = ec[3:].split(".")
+                    ecs[len(numbers)].append(ec[3:])
                 else:
-                    ecs.append(ec[4:-1])
+                    numbers = ec[4:-1].split(".")
+                    ecs[len(numbers)].append(ec[4:-1])
         reactions.append(reaction.Reaction(reaction_name, one_side_compounds, the_other_side_compounds, ecs,
                                            atom_mappings[reaction_name]["ONE_TO_ONE_MAPPINGS"], coefficients))
     return reactions

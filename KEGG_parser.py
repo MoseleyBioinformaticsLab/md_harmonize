@@ -570,7 +570,7 @@ def create_reactions(reaction_directory, compounds, atom_mappings):
         reaction_name = this_reaction["ENTRY"][0].split()[0]
 
         raw_ecs = this_reaction["ENZYME"] if "ENZYME" in this_reaction else []
-        ecs = []
+        ecs = collections.defaultdict(list)
         for line in raw_ecs:
             ec_numbers = line.split()
             for ec in ec_numbers:
@@ -578,7 +578,7 @@ def create_reactions(reaction_directory, compounds, atom_mappings):
                 # some numbers in the ec are not specified. like "3.5.99.-"
                 while numbers and numbers[-1] == "-":
                     numbers.pop()
-                ecs.append(".".join(numbers))
+                ecs[len(numbers)].append(".".join(numbers))
         if not ecs:
             # ORTHOLOGY can contain information of ecs. Please check the example of reaction.
             for line in this_reaction["ORTHOLOGY"]:
@@ -588,7 +588,7 @@ def create_reactions(reaction_directory, compounds, atom_mappings):
                     numbers = ec.split(".")
                     while numbers and numbers[-1] == "-":
                         numbers.pop()
-                    ecs.append(".".join(numbers))
+                    ecs[len(numbers)].append(".".join(numbers))
 
         one_side_coefficients, the_other_side_coefficients = parse_equation(this_reaction["EQUATION"][0])
         one_side_compounds = [compounds[compound_name] for compound_name in one_side_coefficients]

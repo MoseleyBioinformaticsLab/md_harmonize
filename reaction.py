@@ -31,6 +31,7 @@ class Reaction:
     def name(self):
         return self.reaction_name
 
-    def detect_pair(self, the_other):
+
+
 
         

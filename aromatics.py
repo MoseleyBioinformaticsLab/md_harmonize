@@ -2,12 +2,14 @@
 
 import compound
 import BASS
+from indigo import *
 
 class AromaticManager:
 
     def __init__(self):
 
         self.aromatic_substructures = []
+        self.indigo = Indigo()
 
     def add_aromatic_substructures(self, substructure):
 
@@ -21,6 +23,33 @@ class AromaticManager:
                         return
         self.aromatic_substructures.append(substructure)
         return
+
+    def kegg_aromatize(self, kcf_cpd):
+
+        cycles = self.extract_aromatic_substructures(kcf_cpd)
+        aromatic_substructures = self.construct_aromatic_entity(kcf_cpd, cycles)
+        for substructure in aromatic_substructures:
+            self.add_aromatic_substructures(substructure)
+
+    def indigo_aromatize(self, molfile):
+
+        cpd = compound.Compound.create(molfile)
+        aromatic_atoms = self.indigo_aromatic_atoms(molfile)
+        cycles = cpd.separate_connected_components(aromatic_atoms)
+        aromatic_substructures = self.construct_aromatic_entity(cpd, cycles)
+        for substructure in aromatic_substructures:
+            self.add_aromatic_substructures(substructure)
+
+    def indigo_aromatic_atoms(self, molfile):
+
+        cpd = self.indigo.loadMoleculeFromFile(molfile)
+        cpd.aromatize()
+        aromatic_atoms = set()
+        for bond in cpd.iterateBonds():
+            if bond.bondOrder() == 4:
+                aromatic_atoms.add(bond.source().index())
+                aromatic_atoms.add(bond.destination().index())
+        return aromatic_atoms
 
     @staticmethod
     def fuse_cycles(cycles):
@@ -54,7 +83,8 @@ class AromaticManager:
                 mmat = BASS.mappping_matrix(aromatic, cpd, True, False, False, True)
                 if mmat:
                     for
-        return self.fuse_cycles(aromatic_cycles)
+        aromatic_cycles = self.fuse_cycles(aromatic_cycles)
+        cpd.update_aromatic_bond_type(aromatic_cycles)
 
     @staticmethod
     def construct_aromatic_entity(cpd, aromatic_cycles):
@@ -85,8 +115,7 @@ class AromaticManager:
             count += 1
         return aromatic_substructures
 
-    @staticmethod
-    def extract_aromatic_substructures(cpd):
+    def extract_aromatic_substructures(self, cpd):
         """
         To detect the aromatic substructures in a compound based on the aromatic types. This is just for KEGG kcf file.
         :param cpd:

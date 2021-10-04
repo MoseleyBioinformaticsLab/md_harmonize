@@ -15,6 +15,8 @@ import itertools
 import numpy
 import BASS
 import heapq
+from pathlib import Path
+import ctfile
 
 
 class Atom:
@@ -256,13 +258,16 @@ class Compound:
         return self.compound_name
 
     @staticmethod
-    def create(ct_object, compound_name):
+    def create(molfile):
         """
         Create the compound entity based on the molfile representation.
         :param compound_name:
         :param molfile:
         :return:
         """
+        compound_name = Path(molfile).stem
+        with open(molfile, 'r') as infile:
+            ct_object = ctfile.load(infile)
         atoms = [ Atom(atom.atom_symbol, i, atom['x'], atom['y'], atom['z'],  atom['mass_difference'], atom.charge,
                        atom['atom_stereo_parity'], atom['hydrogen_count'], atom['stereo_care_box'], atom['valence'],
                        atom['h0designator'], atom['atom_atom_mapping_number'], atom['inversion_retention_flag'],
@@ -476,6 +481,33 @@ class Compound:
                 visited.add((pair[0], pair[1]))
                 visited.add((pair[1], pair[1]))
         return aromatic_bonds
+
+    def separate_connected_components(self, index):
+
+        parent_index = {i: i for i in index}
+
+        def find_parent(i):
+            if i != parent_index[i]:
+                parent_index[i] = find_parent(parent_index[i])
+            return parent_index[i]
+
+        def union(p_1, p_2):
+            parent_index[p_1] = p_2
+
+        for bond in self.bonds:
+            index_1 = bond.first_atom_number
+            index_2 = bond.second_atom_number
+            if index_1 in index and index_2 in index:
+                p_1 = find_parent(index_1)
+                p_2 = find_parent(index_2)
+                if p_1 != p_2:
+                    union(p_1, p_2)
+
+        groups = collections.defaultdict(list)
+        for i in index:
+            p_i = find_parent(i)
+            groups[p_i].append(i)
+        return [groups[key] for key in groups]
 
     def connected_components(self):
         """

@@ -7,10 +7,6 @@ Note: All MetaCyc reactions atom_mappings are stored in a single text file.
 
 import collections
 import copy
-import glob
-from pathlib import Path
-import compound
-import ctfile
 import tools
 import reaction
 
@@ -165,22 +161,7 @@ def reaction_parser(reaction_text):
                 previous_key = key
     return reaction_dicts
 
-def create_metacyc_compounds(compound_directory):
-    """
-
-    :param compound_directory:
-    :return:
-    """
-    compound_files = glob.glob(compound_directory+"*")
-    compounds = {}
-    for compound_file in compound_files:
-        compound_name = Path(compound_file).stem
-        with open(compound_file, 'r') as infile:
-            ct_object = ctfile.load(infile)
-            compounds[compound_name] = compound.Compound.create(ct_object, compound_name)
-    return compounds
-
-def create_metacyc_reactions(reaction_file, atom_mapping_file, compounds):
+def create_reactions(reaction_file, atom_mapping_file, compounds):
     """
     To create MetaCyc reaction entities.
     :param reaction_file:

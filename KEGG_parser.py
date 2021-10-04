@@ -4,8 +4,6 @@ import collections
 import compound
 import glob
 import tools
-from pathlib import Path
-import ctfile
 import re
 import reaction
 
@@ -502,22 +500,19 @@ class RpairParser:
             count += 1
         return count
 
-def create_compound_kcf(kcf_directory):
+def create_compound_kcf(kcf_file):
     """
     Create compound identities based on the KEGG kcf file.
     :param kcf_directory:
     :return:
     """
     # To put all the compounds into dictionary.
-    kcf_files = glob.glob(kcf_directory + "*")
-    kcf_compounds = {}
-    for kcf_file in kcf_files:
-        kcf_dict = kegg_kcf_parser(tools.open_text(kcf_file).split("\n"))
-        atoms = [compound.Atom(atom["atom_symbol"], atom["atom_number"], x=atom["x"], y=atom["y"], kat=atom["kat"]) for
-                 atom in kcf_dict["atoms"]]
-        bonds = [compound.Bond(bond["first_atom_number"], bond["second_atom_number"], bond["bond_type"]) for bond in kcf_dict["bonds"]]
-        kcf_compounds[kcf_dict["compound_name"]] = compound.Compound(kcf_dict["compound_name"], atoms, bonds)
-    return kcf_compounds
+
+    kcf_dict = kegg_kcf_parser(tools.open_text(kcf_file).split("\n"))
+    atoms = [compound.Atom(atom["atom_symbol"], atom["atom_number"], x=atom["x"], y=atom["y"], kat=atom["kat"]) for
+             atom in kcf_dict["atoms"]]
+    bonds = [compound.Bond(bond["first_atom_number"], bond["second_atom_number"], bond["bond_type"]) for bond in kcf_dict["bonds"]]
+    return compound.Compound(kcf_dict["compound_name"], atoms, bonds)
 
 # steps, we need to first construct KEGG kcf compounds, and use them to construct aromatic substructure set.
 # then, when we construct KEGG compounds, we need to do the following steps:
@@ -532,25 +527,15 @@ def create_compound_kcf(kcf_directory):
 # 3) detect the bond stereochemisty of the double bonds in the compound.
 # 4) we can do the coloring or not
 # 5) return the compound entity.
-def create_compound_mofile(molfile_directory):
-    """
 
-    :param molfile_directory:
-    :param kcf_compounds:
-    :param aromatic_substructures:
-    :return:
-    """
-    molfiles = glob.glob(molfile_directory + "*")
-    compounds = {}
-    for molfile in molfiles:
-        compound_name = Path(molfile).stem
-        with open(molfile, 'r') as infile:
-            ct_object = ctfile.load(infile)
-            compounds[compound_name] = compound.Compound.create(ct_object, compound_name)
-    return compounds
 
-# def add_kat(compounds, compounds_kcf):
-
+def add_kat(compound, kcf_compound):
+    compound.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False)
+    kcf_compound.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False)
+    color_kat = { atom.color: atom.kat for atom in kcf_compound.atoms if atom.default_symbol != "H" }
+    for atom in compound.atoms:
+        if atom.default_symbol != "H":
+            atom.kat = color_kat[atom.color]
 
 # when we create the kegg reaction, we need to parse the atom mappings based on rclass!
 # To avoid parsing the same rclass repeatedly, let's parse the rclass first, and look it up when we need.

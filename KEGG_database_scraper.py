@@ -7,12 +7,11 @@ update.py is used to download KEGG compound and reaction data from web.
 import requests
 import urllib
 import tools
+import os
 
 KEGG_compound_list_URL = "http://rest.kegg.jp/list/compound"
 KEGG_reaction_list_URL = "http://rest.kegg.jp/list/reaction"
 KEGG_rclass_list_URL = "http://rest.kegg.jp/list/rclass"
-
-
 
 def entry_list(target_url):
     """
@@ -38,9 +37,12 @@ def update_entity(entries, sub_directory, directory, suffix=""):
     :param suffix: the suffix needed for download, like the mol for compound molfile and kcf for compound kcf file.
     :return:
     """
+    path = os.path.join(directory, sub_directory)
+    if not os.path.exists(path):
+        os.mkdir(path)
     for entry in entries:
         data = requests.get("http://rest.kegg.jp/get/{0}/{1}".format(entry, suffix))
-        tools.save_to_text(data.text, directory + sub_directory + entry)
+        tools.save_to_text(data.text, path + "/" + entry)
 
 
 def download(directory):
@@ -49,10 +51,10 @@ def download(directory):
     :param directory: the directory to store the data.
     :return:
     """
-    update_entity(entry_list(KEGG_reaction_list_URL), "reaction/", directory)
-    update_entity(entry_list(KEGG_rclass_list_URL), "rclass/", directory)
-    update_entity(entry_list(KEGG_compound_list_URL), "compound_molfile/", directory, suffix="mol")
-    update_entity(entry_list(KEGG_compound_list_URL), "compound_kcf/", directory, suffix="kcf")
+    update_entity(entry_list(KEGG_reaction_list_URL), "reaction", directory)
+    update_entity(entry_list(KEGG_rclass_list_URL), "rclass", directory)
+    update_entity(entry_list(KEGG_compound_list_URL), "molfile", directory, suffix="mol")
+    update_entity(entry_list(KEGG_compound_list_URL), "kcf", directory, suffix="kcf")
 
 
 

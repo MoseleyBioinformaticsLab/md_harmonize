@@ -393,6 +393,7 @@ class RpairParser:
             if atom_1 in atom_index and atom_2 in atom_index and (atom_1, atom_2) not in removed_bonds and \
                     (atom_2, atom_1) not in removed_bonds:
                 bonds.append(bond)
+        # update the atom and bond atom index!!!!
         return compound.Compound("partial_compound", atoms, bonds)
 
     @staticmethod

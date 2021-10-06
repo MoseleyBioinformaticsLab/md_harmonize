@@ -111,6 +111,8 @@ class AromaticManager:
                             if neighbor_index not in seen_atoms:
                                 seen_atoms.add(neighbor_index)
                                 atoms.append(cpd.atoms[neighbor_index])
+
+                # here i need to update the atom index.
                 aromatic_substructures.append(compound.Compound(cpd.compound_name + str(count), atoms, bonds))
             count += 1
         return aromatic_substructures

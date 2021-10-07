@@ -11,25 +11,28 @@ class AromaticManager:
         self.aromatic_substructures = []
         self.indigo = Indigo()
 
-    def add_aromatic_substructures(self, substructure):
+    def add_aromatic_substructures(self, substructures):
 
-        for aromatic_substructure in self.aromatic_substructures:
-            if len(aromatic_substructure.atoms) == len(substructure.atoms) and len(aromatic_substructure.bonds) == len(substructure.bonds):
-                mapping_matrix = BASS.make_mapping_matrix(aromatic_substructure, substructure)
-                if mapping_matrix:
-                    isomorphs = BASS.find_mappings(aromatic_substructure.structure_matrix, aromatic_substructure.distance_matrix,
-                                                   substructure.structure_matrix, substructure.distance_matrix, mapping_matrix)
-                    if isomorphs != [] and isomorphs is not None:
-                        return
-        self.aromatic_substructures.append(substructure)
+        for substructure in substructures:
+            flag = False
+            for aromatic_substructure in self.aromatic_substructures:
+                if len(aromatic_substructure.atoms) == len(substructure.atoms) and len(aromatic_substructure.bonds) == len(substructure.bonds):
+                    mapping_matrix = BASS.make_mapping_matrix(aromatic_substructure, substructure)
+                    if mapping_matrix:
+                        isomorphs = BASS.find_mappings(aromatic_substructure.structure_matrix, aromatic_substructure.distance_matrix,
+                                                       substructure.structure_matrix, substructure.distance_matrix, mapping_matrix)
+                        if isomorphs != [] and isomorphs is not None:
+                            flag = True
+                            break
+            if not flag:
+                self.aromatic_substructures.append(substructure)
         return
 
     def kegg_aromatize(self, kcf_cpd):
 
         cycles = self.extract_aromatic_substructures(kcf_cpd)
         aromatic_substructures = self.construct_aromatic_entity(kcf_cpd, cycles)
-        for substructure in aromatic_substructures:
-            self.add_aromatic_substructures(substructure)
+        self.add_aromatic_substructures(aromatic_substructures)
 
     def indigo_aromatize(self, molfile):
 
@@ -37,8 +40,7 @@ class AromaticManager:
         aromatic_atoms = self.indigo_aromatic_atoms(molfile)
         cycles = cpd.separate_connected_components(aromatic_atoms)
         aromatic_substructures = self.construct_aromatic_entity(cpd, cycles)
-        for substructure in aromatic_substructures:
-            self.add_aromatic_substructures(substructure)
+        self.add_aromatic_substructures(aromatic_substructures)
 
     def indigo_aromatic_atoms(self, molfile):
 
@@ -97,23 +99,15 @@ class AromaticManager:
         count = 0
         aromatic_substructures = []
         for cycle in aromatic_cycles:
-            bonds = [bond for bond in cpd.bonds if bond.first_atom_number in cycle and bond.second_atom_number in cycle]
-            atoms = []
             seen_atoms = set(cycle)
             for atom_index in cycle:
                 atom = cpd.atoms[atom_index]
-                atoms.append(atom)
                 for neighbor_index in atom.neighbors:
                     connecting_bond = cpd.bond_lookup[ (atom_index, neighbor_index)]
                     if neighbor_index not in cycle:
-                        if connecting_bond.bond_type == "2":
-                            bonds.append(connecting_bond)
-                            if neighbor_index not in seen_atoms:
-                                seen_atoms.add(neighbor_index)
-                                atoms.append(cpd.atoms[neighbor_index])
-
-                # here i need to update the atom index.
-                aromatic_substructures.append(compound.Compound(cpd.compound_name + str(count), atoms, bonds))
+                        if connecting_bond.bond_type == "2" and neighbor_index not in seen_atoms:
+                            seen_atoms.add(neighbor_index)
+                aromatic_substructures.append(cpd.construct_partial_compound(seen_atoms, index=count))
             count += 1
         return aromatic_substructures
 

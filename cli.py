@@ -104,7 +104,7 @@ def cli(args):
                 kcf_files = glob.glob(working_directory + "/sources/KEGG/kcf/*")
                 for kcf_file in kcf_files:
                     kcf_compound = parser.create_compound_kcf(kcf_file)
-                    parser.add_kat(compound_list[kcf_compound.cpd.compound_name], kcf_compound)
+                    parser.add_kat(compound_list["cpd:" + kcf_compound.cpd.compound_name], kcf_compound)
             # update compound
             for cpd_name in compound_list:
                 cpd = compound_list[cpd_name]
@@ -157,6 +157,9 @@ def cli(args):
         # while we do reaction harmonization, we need to pay attention to compound harmonization without same structural representations.
         # this includes: R group, linear-circular-transformation, resonance.
         reaction_harmonization_manager = harmonization.harmonize_reaction_list(reaction_list, compound_harmonization_manager)
+        tools.save_to_jsonpickle(reaction_harmonization_manager, working_directory + "/harmonized/{0}.json".format("_".join(database_names)))
+
+
 
 
 

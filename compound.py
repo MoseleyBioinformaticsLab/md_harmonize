@@ -51,7 +51,7 @@ class Atom:
         self.atom_symbol = atom_symbol.strip()
         self.mass_difference = mass_difference.strip()
         self.charge = int(charge.strip())
-        self.atom_stereo_parity = atom_stereo_parity.strip()
+        self.atom_stereo_parity = atom_stereo_parity.strip() if atom_stereo_parity.strip() != "3" else "0"
         self.hydrogen_count = hydrogen_count.strip()
         self.stereo_care_box = stereo_care_box.strip()
         self.valence = valence.strip()
@@ -64,7 +64,7 @@ class Atom:
         self.color_0 = ""
         self.color = ""
         self.color_tuple = tuple()
-        self.color_layers = {}
+        self.color_layers = collections.defaultdict()
         self.in_cycle = False
         self.bond_counts = 0
         self.group_id = 0
@@ -81,6 +81,15 @@ class Atom:
     	"""
         self.atom_symbol = symbol
         return self.atom_symbol
+
+    def update_atom_number(self, index):
+        """
+        Update the
+        :param index:
+        :return:
+        """
+        self.atom_number = index
+        return self.atom_number
 
     @property
     def default_symbol(self):
@@ -178,9 +187,12 @@ class Atom:
         self.kat = kat
         return self.kat
 
-    def
-        # deep copy of the atom
-
+    def clone(self):
+        return Atom(self.atom_symbol, self.atom_number, x=str(self.x), y=str(self.y), z=str(self.z), mass_difference=self.mass_difference,
+                    charge=str(self.charge), atom_stereo_parity=self.atom_stereo_parity, hydrogen_count=self.hydrogen_count,
+                    stereo_care_box=self.stereo_care_box, valence=self.valence, h0designator=self.h0designator,
+                    atom_atom_mapping_number=self.atom_atom_mapping_number, inversion_retention_flag=self.inversion_retention_flag,
+                    exact_change_flag=self.exact_change_flag, kat=self.kat)
 
 class Bond:
 
@@ -201,7 +213,7 @@ class Bond:
         self.first_atom_number = int(first_atom_number) - 1
         self.second_atom_number = int(second_atom_number) - 1
         self.bond_type = bond_type.strip()
-        self.bond_stereo = bond_stereo.strip()
+        self.bond_stereo = bond_stereo.strip() if bond_stereo.strip() != "4" and bond_stereo.strip() != "8" else "0"
         self.bond_topology = bond_topology.strip()
         self.reacting_center_status = reacting_center_status.strip()
  
@@ -225,8 +237,27 @@ class Bond:
         self.bond_stereo = str(stereo)
         return self.bond_stereo
 
-    def
-        # deep copy of the bond
+    def update_first_atom(self, index):
+        """
+
+        :param index:
+        :return:
+        """
+        self.first_atom_number = index
+        return self.first_atom_number
+
+    def update_second_atom(self, index):
+        """
+
+        :param index:
+        :return:
+        """
+        self.second_atom_number = index
+        return self.second_atom_number
+
+    def clone(self):
+        return Bond(str(self.first_atom_number+1), str(self.second_atom_number+1), self.bond_type, bond_stereo=self.bond_stereo,
+                    bond_topology=self.bond_topology, reacting_center_status=self.reacting_center_status)
 
 
 class Compound:
@@ -277,11 +308,11 @@ class Compound:
                        atom['atom_stereo_parity'], atom['hydrogen_count'], atom['stereo_care_box'], atom['valence'],
                        atom['h0designator'], atom['atom_atom_mapping_number'], atom['inversion_retention_flag'],
                        atom['exact_change_flag']) for i, atom in enumerate(ct_object.atoms) ]
-        bonds = [ Bond(bond['first_atom_number']-1, bond['second_atom_number']-1, bond['bond_type'], bond['bond_stereo'],
+        bonds = [ Bond(bond['first_atom_number'], bond['second_atom_number'], bond['bond_type'], bond['bond_stereo'],
                        bond['bond_topology'], bond['reacting_center_status']) for bond in ct_object.bonds ]
         return Compound(compound_name, atoms, bonds)
 
-    def construct_partial_compound(self, atom_index, removed_bonds=None):
+    def construct_partial_compound(self, atom_index, removed_bonds=None, index=0):
         """
 
         :param atom_index:
@@ -289,17 +320,20 @@ class Compound:
         :return:
         """
         atoms = []
-        for atom in self.atoms:
-            if atom.atom_number in atom_index:
-                atoms.append(atoms)
+        for index in atom_index:
+            atoms.append(self.atoms[index].clone())
         idx_dict = {atom.atom_number: i for i, atom in enumerate(atoms)}
+        for i, atom in enumerate(atoms):
+            atom.update_atom_number(i)
         bonds = []
         for bond in self.bonds:
             atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
             if atom_1 in atom_index and atom_2 in atom_index and (atom_1, atom_2) not in removed_bonds and (atom_2, atom_1) not in removed_bonds:
-                bonds.append(bond)
-
-        # here i think we need to use deep copy of the atom and compound.
+                cloned_bond = bond.clone()
+                cloned_bond.update_first_atom(idx_dict[atom_1])
+                cloned_bond.update_second_atom(idx_dict[atom_2])
+                bonds.append(cloned_bond)
+        return Compound(self.compound_name+str(index), atoms, bonds)
 
     @property
     def formula(self):
@@ -764,7 +798,7 @@ class Compound:
 
 	    :return: the list of valid atom mappings between the two compound structures.
     	"""
-        mappings = self.find_mappings(self, the_other, resonance=True, r_distance=r_distance)
+        mappings = self.find_mappings(the_other, resonance=True, r_distance=r_distance)
         one_to_one_mappings = self.generate_one_to_one_mappings(the_other, mappings)
         valid_mappings = []
         for cur_mappings in one_to_one_mappings:
@@ -823,6 +857,54 @@ class Compound:
                 valid_mappings.append(cur_mappings)
         return valid_mappings
 
+    def optimal_resonant_mapping(self, the_other, mappings):
+
+        optimal_index = {"1": -1, "-1": -1, "2": -1}
+        min_count =  {"1": float("inf"), "-1": float("inf"), "2": float("inf")}
+        for i, mapping in enumerate(mappings):
+            one_stereo_counts, the_other_stereo_counts = 0, 0
+            one_consistent_atoms, the_other_consistent_atoms = set(), set()
+            # check the atom stereochemistry
+            for one_atom_index in mapping:
+                one_atom = self.atoms[one_atom_index]
+                the_other_atom = the_other.atoms[mapping[one_atom_index]]
+                if one_atom.color_layers[1] == the_other_atom.color_layers[1]:
+                    one_consistent_atoms.add(one_atom.atom_number)
+                    the_other_consistent_atoms.add(the_other_atom.atom_number)
+                    if one_atom.atom_stereo_parity == the_other_atom.atom_stereo_parity:
+                        continue
+                    if one_atom.atom_stereo_parity != "0":
+                        one_stereo_counts += 1
+                    if the_other_atom.atom_stereo_parity != "0":
+                        the_other_stereo_counts += 1
+            # check bond stereochemistry
+            for bond in self.bonds:
+                atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
+                if atom_1 in one_consistent_atoms and atom_2 in one_consistent_atoms:
+                    the_other_atom_1, the_other_atom_2 = mapping[atom_1], mapping[atom_2]
+                    the_other_bond = the_other.bond_lookup[(the_other_atom_1, the_other_atom_2)]
+                    if bond.bond_stereo == the_other_bond.bond_stereo:
+                        continue
+                    if bond.bond_stereo != "0":
+                        one_stereo_counts += 1
+                    if the_other_bond.bond_stereo != "0":
+                        the_other_stereo_counts += 1
+            if not one_stereo_counts and not the_other_stereo_counts:
+                return mapping, 0
+            if not one_stereo_counts:
+                if one_stereo_counts < min_count["1"]:
+                    optimal_index["1"] = i
+                    min_count["1"] = one_stereo_counts
+            elif not the_other_stereo_counts:
+                if the_other_stereo_counts < min_count["-1"]:
+                    optimal_index["-1"] = i
+                    min_count["-1"] = the_other_stereo_counts
+            else:
+                if one_stereo_counts + the_other_stereo_counts < min_count["2"]:
+                    min_count["2"] = one_stereo_counts + the_other_stereo_counts
+                    optimal_index["2"] = i
+            # determine which one is the best.
+
     def find_double_bond_linked_atom(self, index):
         """
         Find the index of the atom that is doubly linked to the target atom[i].
@@ -836,26 +918,26 @@ class Compound:
                 return neighbor_index
         return -1
 
-    def map_linear_circular_interchange(self, the_other):
-        """
-        Detect if the two compounds have linear and circular interchangeable representations. This mainly targets at sugar like structure.
-        We check how many atoms don't share the same local (first layer) identifiers and then detect if the difference is caused by the
-        ring structure.
-        :param the_other: the mappings compound entity.
-        :type the_other: :class:`~MDH.compound.Compound`
-
-        :return: boolean.
-    	"""
-        # 1 in color_layers indicate this atom is not H or metals.
-        one_atom_colors = [atom.color_layers[1] if 1 in atom.color_layers else atom.default_symbol for atom in self.heavy_atoms]
-        the_other_atom_colors = [atom.color_layers[1] if 1 in atom.color_layers else atom.default_symbol for atom in self.heavy_atoms]
-        atom_color_intersection = list((collections.Counter(one_atom_colors) & collections.Counter(the_other_atom_colors)).elements())
-        if 2 <= len(one_atom_colors) - len(atom_color_intersection) <= 3:
-            one_num_of_atoms_in_cycle = [ atom.in_cycle for atom in self.heavy_atoms].count(True)
-            the_other_num_of_atoms_in_cycle = [ atom.in_cycle for atom in the_other.heavy_atoms].count(True)
-            if one_num_of_atoms_in_cycle != the_other_num_of_atoms_in_cycle:
-                return True
-        return False
+    # def map_linear_circular_interchange(self, the_other):
+    #     """
+    #     Detect if the two compounds have linear and circular interchangeable representations. This mainly targets at sugar like structure.
+    #     We check how many atoms don't share the same local (first layer) identifiers and then detect if the difference is caused by the
+    #     ring structure.
+    #     :param the_other: the mappings compound entity.
+    #     :type the_other: :class:`~MDH.compound.Compound`
+    #
+    #     :return: boolean.
+    # 	"""
+    #     # 1 in color_layers indicate this atom is not H or metals.
+    #     one_atom_colors = [atom.color_layers[1] if 1 in atom.color_layers else atom.default_symbol for atom in self.heavy_atoms]
+    #     the_other_atom_colors = [atom.color_layers[1] if 1 in atom.color_layers else atom.default_symbol for atom in self.heavy_atoms]
+    #     atom_color_intersection = list((collections.Counter(one_atom_colors) & collections.Counter(the_other_atom_colors)).elements())
+    #     if 2 <= len(one_atom_colors) - len(atom_color_intersection) <= 3:
+    #         one_num_of_atoms_in_cycle = [ atom.in_cycle for atom in self.heavy_atoms].count(True)
+    #         the_other_num_of_atoms_in_cycle = [ atom.in_cycle for atom in the_other.heavy_atoms].count(True)
+    #         if one_num_of_atoms_in_cycle != the_other_num_of_atoms_in_cycle:
+    #             return True
+    #     return False
 
     def map_with_r(self, the_other_compound):
 
@@ -878,12 +960,12 @@ class Compound:
         are not the same, we can them heavy side and light side (heavy side containing atoms with heavier atomic weights).
         We determine the bond stereochemisty by checking if the two heavy sides lie on the same part of the divided plane.
 
-           H     L     H     H
-            \___/	    \___/
-             ___         ___
-            /	\       /   \
-           L 	 H     L     L
-            trans        cis
+            H   L   H   H
+            \___/   \___/
+             ___     ___
+            /   \   /   \
+            L   H   L   L
+            trans   cis
         :param bond: the bond entity.
         :type bond: :class:`~MDH.compound.Bond`
 
@@ -1046,8 +1128,6 @@ class Compound:
         :type isotope_resolved: :py:obj:`True` or :py:obj:`False`.
         :param charge: If true, add charge information when constructing colors.
         :type charge: :py:obj:`True` or :py:obj:`False`.
-        :param R: If true, add R group information when constructing colors.
-        :type R: :py:obj:`True` or :py:obj:`False`.
         :param atom_stereo: If true, add atom stereochemistry information when constructing colors.
         :type atom_stereo: :py:obj:`True` or :py:obj:`False`.
 
@@ -1064,8 +1144,10 @@ class Compound:
         Basic color formula: atom.color + [neighbor.color + bond.bond_type]
         :param list atom_index: the list of atom index to color.
         :param list excluded: the list of atom index will be excluded from coloring.
-        :param zero_layer: If ture, we use the atom.color_0 else atom.color.
-        :type zero_layer: :py:obj:`True` or :py:obj:`False`.
+        :param zero_core_color: If ture, we use the atom.color_0 else atom.color for the core atom.
+        :type zero_core_color: :py:obj:`True` or :py:obj:`False`.
+        :param zero_neighbor_color: If ture, we use the atom.color_0 else atom.color for the neighbor atoms.
+        :type zero_neighbor_color: :py:obj:`True` or :py:obj:`False`.
         :param resonance: If true, detect resonant compound pairs without distinguish between double bonds and single bonds.
         :type resonance: :py:obj:`True` or :py:obj:`False`.
         :param bond_stereo:  If true, add stereo information to bonds when constructing colors.
@@ -1100,23 +1182,15 @@ class Compound:
         To do the first round of coloring this compound. We add neighbors' information layer by layer to the atom color
         identifier until it has a unique identifier or all the atoms in the compound have been used for naming.
         (based on the breadth first search algorithm)
-    
-        :param isotope_resolved: If true, add isotope information when constructing colors.
-        :type isotope_resolved: :py:obj:`True` or :py:obj:`False`.
-        :param bond_stereo:  If true, add stereo information to bonds when constructing colors.
+        :param atoms_to_color:
+        :param excluded_index:
+        :param bond_stereo: If true, add stereo information to bonds when constructing colors.
         :type bond_stereo: :py:obj:`True` or :py:obj:`False`.
-        :param charge: If true, add charge information when constructing colors.
-        :type charge: :py:obj:`True` or :py:obj:`False`.
-        :param r_groups: If true, add R group information when constructing colors.
-        :type r_groups: :py:obj:`True` or :py:obj:`False`.
-        :param atom_stereo: If true, add atom stereochemistry information when constructing colors.
-        :type atom_stereo: :py:obj:`True` or :py:obj:`False`.
         :param resonance: If true, detect resonant compound pairs without distinguish between double bonds and single bonds.
         :type resonance: :py:obj:`True` or :py:obj:`False`.
-        :param int depth: the max depth of coloring.
-
+        :param depth: the max depth of coloring.
         :return:
-    	"""
+        """
         atom_color_with_neighbors = self.generate_atom_color_with_neighbors(atoms_to_color, excluded=excluded_index,
                                                                             zero_core_color=True, zero_neighbor_color=True,
                                                                             resonance=resonance, bond_stereo=bond_stereo)
@@ -1158,10 +1232,12 @@ class Compound:
     def invalid_symmetric_atoms(self, atoms_to_color, excluded_index=None, bond_stereo=False, resonance=True):
         """
         Check if the atoms with the same color identifier are symmetric.
-
-        :return: the dictionary of atom color identifier with the corresponding invalid symmetric atom index.
-    	"""
-
+        :param atoms_to_color:
+        :param excluded_index:
+        :param bond_stereo:
+        :param resonance:
+        :return:
+        """
         atom_color_with_neighbors = self.generate_atom_color_with_neighbors(atoms_to_color, excluded=excluded_index,
                                                                             zero_core_color=False, zero_neighbor_color=False,
                                                                             resonance=resonance, bond_stereo=bond_stereo)
@@ -1216,10 +1292,12 @@ class Compound:
         Curate the atom color identifier of invalid symmetric atom.
         We recolor those invalid atoms with the full color identifiers of its neighbors layer by layer until where the
         difference can be captured.
-
+        :param atoms_to_color:
+        :param excluded_index:
+        :param bond_stereo:
+        :param resonance:
         :return:
-    	"""
-
+        """
         not_valid = self.invalid_symmetric_atoms(atoms_to_color, excluded_index, bond_stereo=bond_stereo, resonance=resonance)
         while not_valid:
             atom_color_with_neighbors = self.generate_atom_color_with_neighbors(atoms_to_color, zero_core_color=False,
@@ -1245,13 +1323,8 @@ class Compound:
     def color_metal(self, bond_stereo=False, resonance=True):
         """
         To color the metals in the compound. Here we just incorporate information of directly connected atoms.
-        :param list atom_index: the list of atom index that needs coloring.
         :param bond_stereo:  If true, add stereo information to bonds when constructing colors.
         :type bond_stereo: :py:obj:`True` or :py:obj:`False`.
-        :param charge: If true, add charge information when constructing colors.
-        :type charge: :py:obj:`True` or :py:obj:`False`.
-        :param isotope_resolved: If true, add isotope information when constructing colors.
-        :type isotope_resolved: :py:obj:`True` or :py:obj:`False`.
         :param resonance: If true, detect resonant compound pairs without distinguish between double bonds and single bonds.
         :type resonance: :py:obj:`True` or :py:obj:`False`.
 
@@ -1265,13 +1338,8 @@ class Compound:
       
     def color_h(self, bond_stereo=False, resonance=True):
         """To color the metals in the compound. Here we just incorporate information of directly connected atoms.
-        :param list atom_index: the list of atom index that needs coloring.
         :param bond_stereo:  If true, add stereo information to bonds when constructing colors.
         :type bond_stereo: :py:obj:`True` or :py:obj:`False`.
-        :param charge: If true, add charge information when constructing colors.
-        :type charge: :py:obj:`True` or :py:obj:`False`.
-        :param isotope_resolved: If true, add isotope information when constructing colors.
-        :type isotope_resolved: :py:obj:`True` or :py:obj:`False`.
         :param resonance: If true, detect resonant compound pairs without distinguish between double bonds and single bonds.
         :type resonance: :py:obj:`True` or :py:obj:`False`.
 
@@ -1311,7 +1379,6 @@ class Compound:
             color_counter = collections.Counter([self.atoms[index].color_0 for index in self.h_index])
         return "".join(["({0})({1})".format(color_counter[key], key) for key in sorted(color_counter)])
 
-    @property
     def backbone_color_identifier(self, r_groups=False):
         """
         To generate the backbone color identifier for this compound. Exclude Hs and metals.
@@ -1332,16 +1399,15 @@ class Compound:
     # bond stereochemistry and atom stereochemistry.
     # relationship can be equivalent, generic-specific, loose
     # 0, -1, 1, 2
-
     def get_chemical_details(self, excluded=None):
 
         chemical_details = []
         for atom in self.atoms:
-            if atom.atom_number not in excluded and atom.atom_stereo_parity != "0" and atom.atom_stereo_parity != "3":
+            if atom.atom_number not in excluded and atom.atom_stereo_parity != "0":
                 chemical_details.append("{0}-{1}".format(atom.color, atom.atom_stereo_parity))
         for bond in self.bonds:
             if bond.first_atom_number not in excluded and bond.second_atom_number not in excluded and \
-                    bond.bond_stereo != "0" and bond.bond_stereo != "4":
+                    bond.bond_stereo != "0":
                 names = [self.atoms[bond.first_atom_number].color, self.atoms[bond.second_atom_number].color]
                 names.sort()
                 chemical_details.append("{0}-{1}-{2}".format(names[0], names[1], bond.bond_stereo))
@@ -1351,7 +1417,7 @@ class Compound:
     @staticmethod
     def compare_chemical_details(one_chemical_details, the_other_chemical_details):
         """
-
+        To compare the chemical details of the two structures.
         :param one_chemical_details:
         :param the_other_chemical_details:
         :return:
@@ -1370,24 +1436,91 @@ class Compound:
         one_more.extend(one_chemical_details)
         the_other_more.extend(the_other_chemical_details)
         if not one_more and not the_other_more:
-            # equivalent
+           return 0
         elif one_more and the_other_more:
-            # loose
+            return 2
         elif one_more:
-            # one is more specific
+            return 1 # one_compound is more specific than the_other_compound
         elif the_other_more:
-            # the other is more specific.
+            return -1 # the_other_compound is more specific than one_compound
 
     def same_structure_relationship(self, the_other_compound):
 
+        return self.compare_chemical_details(self.get_chemical_details(), the_other_compound.get_chemical_details())
 
-    def resonant_pair_relationship(self, the_other_compound, atom_mappings):
+    @staticmethod
+    def determine_relationship(relationships):
 
-        one_stereo_counts, the_other_stereo_counts = 0, 0
-        one_consistent_atoms, the_other_consistent_atoms = set(), set()
-
+        if relationships[0] > 0:
+            return 0
+        if relationships[1] > 0 and relationships[-1] > 0:
+            return 0
+        if relationships[1] > 0:
+            return 1
+        if relationships[-1] > 0:
+            return -1
+        return 2
 
     def circular_pair_relationship(self, the_other_compound):
+        # default one compound should have a cycle.
+        relationships = collections.Counter()
+        critical_atom_list = self.find_critical_atom_in_cycle()
+        the_other_color = the_other_compound.backbone_color_identifier(r_groups=False) + the_other_compound.metal_color_identifier(details=False)
+        for critical_atoms in critical_atom_list:
+            self.remove_cycle(critical_atoms)
+            this_color = self.backbone_color_identifier(r_groups=False) + self.metal_color_identifier(details=False)
+            if this_color == the_other_color:
+                excluded_atoms_the_other = the_other_compound.exclude_atoms([self.atoms[i].color for i in critical_atoms])
+                one_chemical_details = self.get_chemical_details(critical_atoms)
+                the_other_chemical_details = the_other_compound.get_chemical_details(excluded_atoms_the_other)
+                relationships[self.compare_chemical_details(one_chemical_details, the_other_chemical_details)] += 1
+            self.restore_cycle(critical_atoms)
+        if not relationships:
+            # cannot be paired
+            return float("inf")
+        return self.determine_relationship(relationships)
+
+    def exclude_atoms(self, colors):
+
+        excluded_index = []
+        for i, atom in enumerate(self.atoms):
+            if atom.color in colors:
+                excluded_index.append(i)
+        return excluded_index
+
+    def remove_cycle(self, critical_atoms):
+
+        atom_O, atom_C, atom_OO = critical_atoms
+        # break the cycle
+        self.atoms[atom_O].remove_neighbors([atom_C])
+        self.atoms[atom_C].remove_neighbors([atom_O])
+        # update the single bond to double bond,
+        self.bond_lookup[(atom_C, atom_OO)].update_bond_type("2")
+        self.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False, isotope_resolved=False,
+                            charge=False)
+
+    def restore_cycle(self, critical_atoms):
+
+        atom_O, atom_C, atom_OO = critical_atoms
+        self.atoms[atom_O].add_neighbors([atom_C])
+        self.atoms[atom_C].add_neighbors([atom_O])
+        self.bond_lookup[(atom_C, atom_OO)].update_bond_type("1")
+        self.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False,
+                            isotope_resolved=False,
+                            charge=False)
+
+    def find_critical_atom_in_cycle(self):
+
+        critical_atoms =[]
+        for atom in self.atoms:
+            if atom.in_cycle and atom.default_symbol == "O":
+                for neighbor_index in atom.neighbors:
+                    neighbor = self.atoms[neighbor_index]
+                    for next_neighbor_index in neighbor.neighbors:
+                        if next_neighbor_index != atom.atom_number and self.atoms[next_neighbor_index].default_symbol == "O" \
+                                and self.bond_lookup[(next_neighbor_index, neighbor_index)].bond_type == "1":
+                            critical_atoms.append([atom.atom_number, neighbor_index, next_neighbor_index])
+        return critical_atoms
 
     def with_r_pair_relationship(self, the_other_compound):
 

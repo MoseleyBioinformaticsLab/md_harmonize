@@ -377,24 +377,24 @@ class RpairParser:
                     component_pairs.append((left_component, right_component))
         return component_pairs
 
-    @staticmethod
-    def construct_partial_compound(cpd, atom_index, removed_bonds):
-        """
-        To construct a partial compound based on the atom index and the removed bonds.
-        :param cpd:
-        :param atom_index:
-        :param removed_bonds:
-        :return:
-        """
-        atoms = [cpd.atoms[idx] for idx in atom_index]
-        bonds = []
-        for bond in cpd.bonds:
-            atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
-            if atom_1 in atom_index and atom_2 in atom_index and (atom_1, atom_2) not in removed_bonds and \
-                    (atom_2, atom_1) not in removed_bonds:
-                bonds.append(bond)
-        # update the atom and bond atom index!!!!
-        return compound.Compound("partial_compound", atoms, bonds)
+    # @staticmethod
+    # def construct_partial_compound(cpd, atom_index, removed_bonds):
+    #     """
+    #     To construct a partial compound based on the atom index and the removed bonds.
+    #     :param cpd:
+    #     :param atom_index:
+    #     :param removed_bonds:
+    #     :return:
+    #     """
+    #     atoms = [cpd.atoms[idx] for idx in atom_index]
+    #     bonds = []
+    #     for bond in cpd.bonds:
+    #         atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
+    #         if atom_1 in atom_index and atom_2 in atom_index and (atom_1, atom_2) not in removed_bonds and \
+    #                 (atom_2, atom_1) not in removed_bonds:
+    #             bonds.append(bond)
+    #     # update the atom and bond atom index!!!!
+    #     return compound.Compound("partial_compound", atoms, bonds)
 
     @staticmethod
     def preliminary_atom_mappings_check(left_partial_compound, right_partial_compound):
@@ -428,8 +428,8 @@ class RpairParser:
         component_pairs = self.get_component_pairs(left_components, right_components)
         atom_mappings = []
         for left_component, right_component in component_pairs:
-            left_partial_compound = self.construct_partial_compound(self.one_compound, left_component, left_removed_bonds)
-            right_partial_compound = self.construct_partial_compound(self.the_other_compound, right_component, right_removed_bonds)
+            left_partial_compound = self.one_compound(left_component, removed_bonds=left_removed_bonds)
+            right_partial_compound = self.the_other_compound(right_component, removed_bonds=right_removed_bonds)
             if not self.preliminary_atom_mappings_check(left_partial_compound, right_partial_compound):
                 continue
             mappings = left_partial_compound.find_mappings(right_partial_compound, resonance=True, r_distance=False)
@@ -577,8 +577,8 @@ def create_reactions(reaction_directory, compounds, atom_mappings):
                     ecs[len(numbers)].append(".".join(numbers))
 
         one_side_coefficients, the_other_side_coefficients = parse_equation(this_reaction["EQUATION"][0])
-        one_side_compounds = [compounds[compound_name] for compound_name in one_side_coefficients]
-        the_other_side_compounds = [compounds[compound_name] for compound_name in the_other_side_coefficients]
+        one_side_compounds = [compounds["cpd:" + compound_name] for compound_name in one_side_coefficients]
+        the_other_side_compounds = [compounds["cpd:" + compound_name] for compound_name in the_other_side_coefficients]
         one_side_coefficients.update(the_other_side_coefficients)
 
         this_atom_mappings = []
@@ -605,7 +605,7 @@ def create_atom_mappings(rclass_directory, compounds):
             tokens = line.split()
             for token in tokens:
                 one_compound_name, the_other_compound_name = token.split("_")
-                one_compound, the_other_compound = compounds[one_compound_name], compounds[the_other_compound_name]
+                one_compound, the_other_compound = compounds["cpd:" + one_compound_name], compounds["cpd:"+the_other_compound_name]
                 one_mappings = RpairParser(rclass_name, rclass_definitions, one_compound, the_other_compound).map_center_atoms()
                 the_other_mappings = RpairParser(rclass_name, rclass_definitions, the_other_compound, one_compound).map_center_atoms()
                 atom_mappings[rclass_name][token] = one_mappings if len(one_mappings) > len(the_other_mappings) else the_other_mappings

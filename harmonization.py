@@ -6,6 +6,13 @@ from abc import ABC
 class HarmonizedCompoundEdge:
 
     def __init__(self, one_compound, the_other_compound, relationship, type):
+        """
+        The harmonized compound pair representation.
+        :param one_compound:
+        :param the_other_compound:
+        :param relationship: generic-specific, equivalent, loose
+        :param type: same structure, linear-circular interchange, resonance, with r group
+        """
 
         self.one_side = one_compound
         self.the_other_side = the_other_compound
@@ -18,14 +25,23 @@ class HarmonizedCompoundEdge:
 
 class HarmonizedReactionEdge:
 
-    def __init__(self, one_reaction, the_other_reaction, relationship):
+    def __init__(self, one_reaction, the_other_reaction, relationship, type):
+        """
 
+        :param one_reaction:
+        :param the_other_reaction:
+        :param relationship:
+        :param type:
+        """
         self.one_side = one_reaction
         self.the_other_side = the_other_reaction
         self.relationship = relationship
+        self.type = type
 
 
     # def check_atom_mappings(self):
+
+
 
 
 class HarmonizationManager:
@@ -71,8 +87,8 @@ class ReactionHarmonizationManager(HarmonizationManager):
 
     def __init__(self, compound_harmonization_manager):
 
+        super(HarmonizationManager, self).__init__()
         self.compound_harmonization_manager = compound_harmonization_manager
-
 
     @staticmethod
     def compare_ecs(one_ecs, the_other_ecs):
@@ -83,8 +99,28 @@ class ReactionHarmonizationManager(HarmonizationManager):
             return 3
         return 0
 
-    @staticmethod
-    def harmonize_reaction(one_reaction, the_other_reaction):
+    def harmonize_reaction(self, one_reaction, the_other_reaction):
+
+        ec_comparison = self.compare_ecs(one_reaction.ecs, the_other_reaction.ecs)
+        if not ec_comparison:
+            # Don't share the same ec, skip it.
+            return
+
+    def jaccard(self, one_compounds, the_other_compounds):
+
+        eq = 0
+        for one_compound in one_compounds:
+            for the_other_compound in the_other_compounds:
+                if self.compound_harmonization_manager.search()
+
+
+
+
+
+
+
+
+
 
 
 def harmonize_compound_list(compound_list):

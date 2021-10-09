@@ -99,15 +99,26 @@ class AromaticManager:
         count = 0
         aromatic_substructures = []
         for cycle in aromatic_cycles:
+            bonds = [bond.clone() for bond in cpd.bonds if bond.first_atom_number in cycle and bond.second_atom_number in cycle]
             seen_atoms = set(cycle)
             for atom_index in cycle:
                 atom = cpd.atoms[atom_index]
                 for neighbor_index in atom.neighbors:
                     connecting_bond = cpd.bond_lookup[ (atom_index, neighbor_index)]
                     if neighbor_index not in cycle:
-                        if connecting_bond.bond_type == "2" and neighbor_index not in seen_atoms:
-                            seen_atoms.add(neighbor_index)
-                aromatic_substructures.append(cpd.construct_partial_compound(seen_atoms, index=count))
+                        if connecting_bond.bond_type == "2":
+                            bonds.append(connecting_bond.clone())
+                            if neighbor_index not in seen_atoms:
+                                seen_atoms.add(neighbor_index)
+            atoms = [cpd.atoms[idx].clone() for idx in seen_atoms]
+            idx_dict = {int(atom.atom_number): i for i, atom in enumerate(atoms)}
+            for i, atom in enumerate(atoms):
+                atom.update_atom_number(i)
+            for bond in bonds:
+                atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
+                bond.update_first_atom(idx_dict[atom_1])
+                bond.update_second_atom(idx_dict[atom_2])
+            aromatic_substructures.append(compound.Compound(cpd.compound_name + str(count), atoms, bonds))
             count += 1
         return aromatic_substructures
 

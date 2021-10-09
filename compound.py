@@ -312,28 +312,28 @@ class Compound:
                        bond['bond_topology'], bond['reacting_center_status']) for bond in ct_object.bonds ]
         return Compound(compound_name, atoms, bonds)
 
-    def construct_partial_compound(self, atom_index, removed_bonds=None, index=0):
-        """
-
-        :param atom_index:
-        :param removed_bonds:
-        :return:
-        """
-        atoms = []
-        for index in atom_index:
-            atoms.append(self.atoms[index].clone())
-        idx_dict = {atom.atom_number: i for i, atom in enumerate(atoms)}
-        for i, atom in enumerate(atoms):
-            atom.update_atom_number(i)
-        bonds = []
-        for bond in self.bonds:
-            atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
-            if atom_1 in atom_index and atom_2 in atom_index and (atom_1, atom_2) not in removed_bonds and (atom_2, atom_1) not in removed_bonds:
-                cloned_bond = bond.clone()
-                cloned_bond.update_first_atom(idx_dict[atom_1])
-                cloned_bond.update_second_atom(idx_dict[atom_2])
-                bonds.append(cloned_bond)
-        return Compound(self.compound_name+str(index), atoms, bonds)
+    # def construct_partial_compound(self, atom_index, removed_bonds=None, index=0):
+    #     """
+    #
+    #     :param atom_index:
+    #     :param removed_bonds:
+    #     :return:
+    #     """
+    #     atoms = []
+    #     for index in atom_index:
+    #         atoms.append(self.atoms[index].clone())
+    #     idx_dict = {atom.atom_number: i for i, atom in enumerate(atoms)}
+    #     for i, atom in enumerate(atoms):
+    #         atom.update_atom_number(i)
+    #     bonds = []
+    #     for bond in self.bonds:
+    #         atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
+    #         if atom_1 in atom_index and atom_2 in atom_index and (atom_1, atom_2) not in removed_bonds and (atom_2, atom_1) not in removed_bonds:
+    #             cloned_bond = bond.clone()
+    #             cloned_bond.update_first_atom(idx_dict[atom_1])
+    #             cloned_bond.update_second_atom(idx_dict[atom_2])
+    #             bonds.append(cloned_bond)
+    #     return Compound(self.compound_name+str(index), atoms, bonds)
 
     @property
     def formula(self):
@@ -788,7 +788,7 @@ class Compound:
         the same local coloring identifier, we check if the difference is caused by the position of double bonds.
         Find the three atoms involved in the resonant structure and check if one of the atom is not C.
                 N (a)            N (a)
-		        / \\             // \
+                / \\             // \
             (b) C   N (c)    (b) C   N (c)
 
         :param the_other: the mappings compound entity.
@@ -939,7 +939,10 @@ class Compound:
     #             return True
     #     return False
 
+    # here we suppose self contains R
     def map_with_r(self, the_other_compound):
+
+
 
 
 
@@ -1490,21 +1493,21 @@ class Compound:
 
     def remove_cycle(self, critical_atoms):
 
-        atom_O, atom_C, atom_OO = critical_atoms
+        atom_o, atom_c, atom_oo = critical_atoms
         # break the cycle
-        self.atoms[atom_O].remove_neighbors([atom_C])
-        self.atoms[atom_C].remove_neighbors([atom_O])
+        self.atoms[atom_o].remove_neighbors([atom_c])
+        self.atoms[atom_c].remove_neighbors([atom_o])
         # update the single bond to double bond,
-        self.bond_lookup[(atom_C, atom_OO)].update_bond_type("2")
+        self.bond_lookup[(atom_c, atom_oo)].update_bond_type("2")
         self.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False, isotope_resolved=False,
                             charge=False)
 
     def restore_cycle(self, critical_atoms):
 
-        atom_O, atom_C, atom_OO = critical_atoms
-        self.atoms[atom_O].add_neighbors([atom_C])
-        self.atoms[atom_C].add_neighbors([atom_O])
-        self.bond_lookup[(atom_C, atom_OO)].update_bond_type("1")
+        atom_o, atom_c, atom_oo = critical_atoms
+        self.atoms[atom_o].add_neighbors([atom_c])
+        self.atoms[atom_c].add_neighbors([atom_o])
+        self.bond_lookup[(atom_c, atom_oo)].update_bond_type("1")
         self.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False,
                             isotope_resolved=False,
                             charge=False)

@@ -377,24 +377,29 @@ class RpairParser:
                     component_pairs.append((left_component, right_component))
         return component_pairs
 
-    # @staticmethod
-    # def construct_partial_compound(cpd, atom_index, removed_bonds):
-    #     """
-    #     To construct a partial compound based on the atom index and the removed bonds.
-    #     :param cpd:
-    #     :param atom_index:
-    #     :param removed_bonds:
-    #     :return:
-    #     """
-    #     atoms = [cpd.atoms[idx] for idx in atom_index]
-    #     bonds = []
-    #     for bond in cpd.bonds:
-    #         atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
-    #         if atom_1 in atom_index and atom_2 in atom_index and (atom_1, atom_2) not in removed_bonds and \
-    #                 (atom_2, atom_1) not in removed_bonds:
-    #             bonds.append(bond)
-    #     # update the atom and bond atom index!!!!
-    #     return compound.Compound("partial_compound", atoms, bonds)
+    @staticmethod
+    def construct_partial_compound(cpd, atom_index, removed_bonds):
+        """
+        To construct a partial compound based on the atom index and the removed bonds.
+        :param cpd:
+        :param atom_index:
+        :param removed_bonds:
+        :return:
+        """
+        atoms = [cpd.atoms[idx].clone() for idx in atom_index]
+        idx_dict = {int(atom.atom_number): i for i, atom in enumerate(atoms)}
+        for i, atom in enumerate(atoms):
+            atom.update_atom_number(i)
+        bonds = []
+        for bond in cpd.bonds:
+            atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
+            if atom_1 in atom_index and atom_2 in atom_index and (atom_1, atom_2) not in removed_bonds and \
+                    (atom_2, atom_1) not in removed_bonds:
+                cloned_bond = bond.clone()
+                cloned_bond.update_first_atom(idx_dict[atom_1])
+                cloned_bond.update_second_atom(idx_dict[atom_2])
+                bonds.append(cloned_bond)
+        return compound.Compound("partial_compound", atoms, bonds)
 
     @staticmethod
     def preliminary_atom_mappings_check(left_partial_compound, right_partial_compound):
@@ -428,8 +433,8 @@ class RpairParser:
         component_pairs = self.get_component_pairs(left_components, right_components)
         atom_mappings = []
         for left_component, right_component in component_pairs:
-            left_partial_compound = self.one_compound(left_component, removed_bonds=left_removed_bonds)
-            right_partial_compound = self.the_other_compound(right_component, removed_bonds=right_removed_bonds)
+            left_partial_compound = self.construct_partial_compound(self.one_compound, left_component, left_removed_bonds)
+            right_partial_compound = self.construct_partial_compound(self.the_other_compound, right_component, right_removed_bonds)
             if not self.preliminary_atom_mappings_check(left_partial_compound, right_partial_compound):
                 continue
             mappings = left_partial_compound.find_mappings(right_partial_compound, resonance=True, r_distance=False)

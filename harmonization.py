@@ -2,46 +2,40 @@
 
 import compound
 from abc import ABC
+import collections
 
-class HarmonizedCompoundEdge:
+class HarmonizedEdge:
 
-    def __init__(self, one_compound, the_other_compound, relationship, type):
+    def __init__(self, one_side, the_other_side, relationship, type, mappings):
         """
-        The harmonized compound pair representation.
-        :param one_compound:
-        :param the_other_compound:
-        :param relationship: generic-specific, equivalent, loose
-        :param type: same structure, linear-circular interchange, resonance, with r group
+        
+        :param one_side: 
+        :param the_other_side:
+        :param relationship: equivalent, generic-specific, or loose.
+        :param type: for compound edge, this represents resonance, linear-circular, r group, same structure;
+        for reaction edge: this represents 3 level match or 4 level match.
         """
-
-        self.one_side = one_compound
-        self.the_other_side = the_other_compound
+        self.one_side = one_side
+        self.the_other_side = the_other_side
         self.relationship = relationship
         self.type = type
+        self.mappings = mappings
+
+
+class HarmonizedCompoundEdge(HarmonizedEdge):
+
+    def __init__(self, one_compound, the_other_compound, relationship, type, atom_mappings):
+        super().__init__(one_compound, the_other_compound, relationship, type, atom_mappings)
+
 
     # @property
     # def atom_mappings(self):
     #
 
-class HarmonizedReactionEdge:
+class HarmonizedReactionEdge(HarmonizedEdge):
 
-    def __init__(self, one_reaction, the_other_reaction, relationship, type):
-        """
-
-        :param one_reaction:
-        :param the_other_reaction:
-        :param relationship:
-        :param type:
-        """
-        self.one_side = one_reaction
-        self.the_other_side = the_other_reaction
-        self.relationship = relationship
-        self.type = type
-
-
-    # def check_atom_mappings(self):
-
-
+    def __init__(self, one_reaction, the_other_reaction, relationship, type, compound_mappings):
+        super().__init__(one_reaction, the_other_reaction, relationship, type, compound_mappings)
 
 
 class HarmonizationManager:
@@ -83,11 +77,27 @@ class HarmonizationManager:
         return None
 
 
+class CompoundHarmonizationManager(HarmonizationManager):
+
+    def __init__(self):
+        super().__init__()
+        self.compound_in_edges = collections.Counter()
+
+    def add_edge(self, edge):
+        super().add_edge(edge)
+        self.compound_in_edges[edge.one_side.name] += 1
+        self.compound_in_edges[edge.the_other_side.name] += 1
+
+    def remove_edge(self, edge):
+        super().remove_edge(edge)
+        self.compound_in_edges[edge.one_side.name] -= 1
+        self.compound_in_edges[edge.the_other_side.name] -= 1
+
+
 class ReactionHarmonizationManager(HarmonizationManager):
 
     def __init__(self, compound_harmonization_manager):
-
-        super(HarmonizationManager, self).__init__()
+        super().__init__()
         self.compound_harmonization_manager = compound_harmonization_manager
 
     @staticmethod
@@ -105,27 +115,97 @@ class ReactionHarmonizationManager(HarmonizationManager):
         if not ec_comparison:
             # Don't share the same ec, skip it.
             return
+        else:
+            ordered_one_side_mappings = self.compound_mappings(one_reaction.one_side, the_other_reaction.one_side)
+            ordered_the_other_side_mappings = self.compound_mappings(one_reaction.the_other_side, the_other_reaction.the_other_side)
+            ordered_jaccard = self.jaccard(one_reaction.one_side, the_other_reaction.one_side, ordered_one_side_mappings) * \
+                              self.jaccard(one_reaction.the_other_side, the_other_reaction.the_other_side, ordered_the_other_side_mappings)
 
-    def jaccard(self, one_compounds, the_other_compounds):
+            reversed_one_side_mappings = self.compound_mappings(one_reaction.one_side, the_other_reaction.the_other_side)
+            reversed_the_other_side_mappings = self.compound_mappings(one_reaction.the_other_side, the_other_reaction.one_side)
+            reversed_jaccard = self.jaccard(one_reaction.one_side, the_other_reaction.the_other_side, reversed_one_side_mappings) * \
+                               self.jaccard(one_reaction.the_other_side, the_other_reaction.one_side, reversed_the_other_side_mappings)
 
-        eq = 0
+            max_score = max(ordered_jaccard, reversed_jaccard)
+            if ordered_jaccard > reversed_jaccard:
+                one_side_pairs = [one_reaction.one_side, the_other_reaction.one_side]
+                the_other_side_pairs = [one_reaction.the_other_side, the_other_reaction.the_other_side]
+                mappings = [ordered_one_side_mappings, ordered_the_other_side_mappings]
+            else:
+                one_side_pairs = [one_reaction.one_side, the_other_reaction.the_other_side]
+                the_other_side_pairs = [one_reaction.the_other_side, the_other_reaction.one_side]
+                mappings = [reversed_one_side_mappings, reversed_the_other_side_mappings]
+
+            if  max_score == 1:
+            # we need to add reaction harmonized edge, at the same time, find the compound mappings and determine the order.
+
+
+            elif max_score >= 0.3:
+            # determine if there is missed compound harmonized edge.
+                one_unmapped_compounds = self.unmapped_compounds(one_side_pairs[0], one_side_pairs[1], mappings[0])
+                self.match_unmapped_compounds(one_unmapped_compounds[0], one_side_pairs[1])
+                the_other_unmapped_compounds = self.unmapped_compounds(the_other_side_pairs[0],
+                                                                       the_other_side_pairs[1], mappings[1])
+                self.match_unmapped_compounds(the_other_unmapped_compounds[0], the_other_unmapped_compounds[1])
+
+    def
+
+    def unmapped_compounds(self, one_compounds, the_other_compounds, mappings):
+
+        one_side_left = [cpd for cpd in one_compounds if cpd.name not in mappings.keys()]
+        used_the_other = set()
+        for one_cpd in mappings:
+            used_the_other |= set(mappings[one_cpd])
+        the_other_side_left = [cpd for cpd in the_other_compounds if cpd.name not in used_the_other]
+        return one_side_left, the_other_side_left
+
+    def match_unmapped_compounds(self, one_side_left, the_other_side_left):
+
+        for one_cpd in one_side_left:
+            for the_other_cpd in the_other_side_left:
+                if one_cpd.formula == the_other_cpd.formula:
+                    #
+                    if :
+                        # here both atom_mappings and relationship should be returned.
+                        harmonized_compound_edge = HarmonizedCompoundEdge(one_cpd, the_other_cpd, relationship, "resonance",
+                                                                          atom_mappings)
+                        self.compound_harmonization_manager.add_edge(harmonized_compound_edge)
+                        # check if they are resonant
+                    elif:
+                        # check if they have circular and linear interchangeable formats.
+                        harmonized_compound_edge = HarmonizedCompoundEdge(one_cpd, the_other_cpd, relationship,
+                                                                          "cicular", atom_mappings)
+                        self.compound_harmonization_manager.add_edge(harmonized_compound_edge)
+                    continue
+                if one_cpd.contains_r_groups():
+                    # check if one cpd is more generic
+
+                if the_other_cpd.contains_r_groups():
+                    # check if the other cpd is more generic.
+
+    def jaccard(self, one_compounds, the_other_compounds, mappings):
+
+        one_in_reactions = [self.compound_harmonization_manager.compound_in_edges[cpd.name] > 0 for cpd in one_compounds].count(True)
+        the_other_in_reactions = [self.compound_harmonization_manager.compound_in_edges[cpd.name] > 0 for cpd in the_other_compounds].count(True)
+        denominator = one_in_reactions + the_other_in_reactions - len(mappings)
+        if denominator > 0:
+            return len(mappings) / denominator
+        return 0
+
+    def compound_mappings(self, one_compounds, the_other_compounds):
+
+        mappings = collections.defaultdict(dict)
         for one_compound in one_compounds:
             for the_other_compound in the_other_compounds:
-                if self.compound_harmonization_manager.search()
-
-
-
-
-
-
-
-
-
+                harmonized_edge = self.compound_harmonization_manager.search(one_compound, the_other_compound)
+                if harmonized_edge:
+                    mappings[one_compound.name][the_other_compound.name] = harmonized_edge.relationship
+        return mappings
 
 
 def harmonize_compound_list(compound_list):
 
-    compound_harmonization_manager = HarmonizationManager()
+    compound_harmonization_manager = CompoundHarmonizationManager()
     # here, we need to color the compound for harmonization, do it the same time to avoid redundant coloring.
     # we first just harmonize compounds with the same coloring identifiers.
     # color the compounds
@@ -145,8 +225,11 @@ def harmonize_compound_list(compound_list):
                                 compounds_two[cpd_name_two].metal_color_identifier(details=False)
                     if color_one == color_two:
                         relationship = compounds_one[cpd_name_one].same_structure_relationship(compounds_two[cpd_name_two])
+                        # find atom mappings here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        atom_mappings = None
                         harmonized_compound_edge = HarmonizedCompoundEdge(compounds_one[cpd_name_one],
-                                                                          compounds_two[cpd_name_two], relationship, "same_structure")
+                                                                          compounds_two[cpd_name_two], relationship,
+                                                                          "same_structure", atom_mappings)
                         compound_harmonization_manager.add_edge(harmonized_compound_edge)
     return compound_harmonization_manager
 
@@ -154,12 +237,17 @@ def harmonize_reaction_list(reaction_list, compound_harmonization_manager):
 
     reaction_harmonized_manager = ReactionHarmonizationManager(compound_harmonization_manager)
     k = len(reaction_list)
-    for i in range(k):
-        for j in range(i+1, k):
-            reactions_one, reactions_two = reaction_list[i], reaction_list[j]
-            for reaction_one in reactions_one:
-                for reaction_two in reactions_two:
-                    reaction_harmonized_manager.harmonize_reaction(reaction_one, reaction_two)
+    last_edges = 0
+
+    while len(compound_harmonization_manager.harmonized_edges) != last_edges:
+        last_edges = len(compound_harmonization_manager.harmonized_edges)
+        for i in range(k):
+            for j in range(i+1, k):
+                reactions_one, reactions_two = reaction_list[i], reaction_list[j]
+                for reaction_one in reactions_one:
+                    for reaction_two in reactions_two:
+                        reaction_harmonized_manager.harmonize_reaction(reaction_one, reaction_two)
+
     return reaction_harmonized_manager
 
 

@@ -1091,7 +1091,7 @@ class Compound:
                     visited.add(next_neighbor)
         return next_layer_neighbors
 
-    def color_compound(self, r_groups=True, bond_stereo=True, atom_stereo=True, resonance=False, isotope_resolved=False,
+    def color_compound(self, r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False, isotope_resolved=False,
                        charge=False):
         """
         Color the compound.
@@ -1103,6 +1103,10 @@ class Compound:
         :type atom_stereo: :py:obj:`True` or :py:obj:`False`.
         :param resonance: If true, detect resonant compound pairs without distinguish between double bonds and single bonds.
         :type resonance: :py:obj:`True` or :py:obj:`False`.
+        :param isotope_resolved:
+        :type isotope_resolved:
+        :param charge:
+        :type charge:
 
         :return:
     	"""
@@ -1525,7 +1529,54 @@ class Compound:
                             critical_atoms.append([atom.atom_number, neighbor_index, next_neighbor_index])
         return critical_atoms
 
+    def update_atom_symbol(self, index, updated_symbol):
+
+        for i in index:
+            self.atoms[i].update_symbol(updated_symbol)
+
+    def valid_mapping_with_r(self, the_other_compound, one_rs, the_other_rs, mapping):
+
+        # self is the subset.
+        reverse_index = { mapping[key]: key for key in mapping }
+        one_r_linkages = []
+        for idx in one_rs:
+            r_atom = self.atoms[idx]
+            for neighbor_index in r_atom.neighbors:
+                bond = self.bond_lookup[(idx, neighbor_index)]
+                one_r_linkages.append("{0}-{1}".format(reverse_index[neighbor_index], bond.bond_type))
+
+        the_other_r_linkages = []
+        for idx in the_other_rs:
+            r_atom = the_other_compound.atoms[idx]
+            for neighbor_index in r_atom.neighbors:
+                if neighbor_index in mapping:
+                    bond = the_other_compound.bond_lookup[(idx, neighbor_index)]
+                    the_other_r_linkages.append("{0}-{1}".format(neighbor_index, bond.bond_type))
+
+
+    def
+
+
+
+
     def with_r_pair_relationship(self, the_other_compound):
+        # self is the substructure
+        one_rs = list(self.r_groups)
+        the_other_rs = list(the_other_compound.r_groups)
+        self.update_atom_symbol(one_rs, "H")
+        the_other_compound.update_atom_symbol(the_other_rs, "H")
+        self.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
+        the_other_compound.color(r_groups=True, atom_stereo=False, bond_stereo=False)
+        mapping_matrix = the_other_compound.find_mappings(self, resonance=False, r_distance=True)
+        find = False
+        for mm in mapping_matrix:
+            if self.valid_mapping_with_r(the_other_compound, one_rs, the_other_rs, mm):
+                if
+
+
+
+
+
 
 
 

@@ -857,53 +857,6 @@ class Compound:
                 valid_mappings.append(cur_mappings)
         return valid_mappings
 
-    def optimal_resonant_mapping(self, the_other, mappings):
-
-        optimal_index = {"1": -1, "-1": -1, "2": -1}
-        min_count =  {"1": float("inf"), "-1": float("inf"), "2": float("inf")}
-        for i, mapping in enumerate(mappings):
-            one_stereo_counts, the_other_stereo_counts = 0, 0
-            one_consistent_atoms, the_other_consistent_atoms = set(), set()
-            # check the atom stereochemistry
-            for one_atom_index in mapping:
-                one_atom = self.atoms[one_atom_index]
-                the_other_atom = the_other.atoms[mapping[one_atom_index]]
-                if one_atom.color_layers[1] == the_other_atom.color_layers[1]:
-                    one_consistent_atoms.add(one_atom.atom_number)
-                    the_other_consistent_atoms.add(the_other_atom.atom_number)
-                    if one_atom.atom_stereo_parity == the_other_atom.atom_stereo_parity:
-                        continue
-                    if one_atom.atom_stereo_parity != "0":
-                        one_stereo_counts += 1
-                    if the_other_atom.atom_stereo_parity != "0":
-                        the_other_stereo_counts += 1
-            # check bond stereochemistry
-            for bond in self.bonds:
-                atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
-                if atom_1 in one_consistent_atoms and atom_2 in one_consistent_atoms:
-                    the_other_atom_1, the_other_atom_2 = mapping[atom_1], mapping[atom_2]
-                    the_other_bond = the_other.bond_lookup[(the_other_atom_1, the_other_atom_2)]
-                    if bond.bond_stereo == the_other_bond.bond_stereo:
-                        continue
-                    if bond.bond_stereo != "0":
-                        one_stereo_counts += 1
-                    if the_other_bond.bond_stereo != "0":
-                        the_other_stereo_counts += 1
-            if not one_stereo_counts and not the_other_stereo_counts:
-                return mapping, 0
-            if not one_stereo_counts:
-                if one_stereo_counts < min_count["1"]:
-                    optimal_index["1"] = i
-                    min_count["1"] = one_stereo_counts
-            elif not the_other_stereo_counts:
-                if the_other_stereo_counts < min_count["-1"]:
-                    optimal_index["-1"] = i
-                    min_count["-1"] = the_other_stereo_counts
-            else:
-                if one_stereo_counts + the_other_stereo_counts < min_count["2"]:
-                    min_count["2"] = one_stereo_counts + the_other_stereo_counts
-                    optimal_index["2"] = i
-            # determine which one is the best.
 
     def find_double_bond_linked_atom(self, index):
         """
@@ -938,10 +891,6 @@ class Compound:
     #         if one_num_of_atoms_in_cycle != the_other_num_of_atoms_in_cycle:
     #             return True
     #     return False
-
-    # here we suppose self contains R
-    def map_with_r(self, the_other_compound):
-
 
 
 
@@ -1455,6 +1404,29 @@ class Compound:
 
         return self.compare_chemical_details(self.get_chemical_details(), the_other_compound.get_chemical_details())
 
+    def optimal_resonant_mapping(self, the_other_compound, mappings):
+
+        optimal_index = {"1": -1, "-1": -1, "2": -1}
+        min_count =  {"1": float("inf"), "-1": float("inf"), "2": float("inf")}
+        for i, mapping in enumerate(mappings):
+            one_stereo_counts, the_other_stereo_counts = self.compare_chemical_details_with_mapping(the_other_compound, mapping)
+            if not one_stereo_counts and not the_other_stereo_counts:
+                return mapping, 0
+            if not one_stereo_counts:
+                if one_stereo_counts < min_count["1"]:
+                    optimal_index["1"] = i
+                    min_count["1"] = one_stereo_counts
+            elif not the_other_stereo_counts:
+                if the_other_stereo_counts < min_count["-1"]:
+                    optimal_index["-1"] = i
+                    min_count["-1"] = the_other_stereo_counts
+            else:
+                if one_stereo_counts + the_other_stereo_counts < min_count["2"]:
+                    min_count["2"] = one_stereo_counts + the_other_stereo_counts
+                    optimal_index["2"] = i
+            # determine which one is the best.
+
+
     @staticmethod
     def determine_relationship(relationships):
 
@@ -1536,6 +1508,8 @@ class Compound:
 
     def valid_mapping_with_r(self, the_other_compound, one_rs, the_other_rs, mapping):
 
+        # this is to compare the R GROUPS.
+        # self is the more generic one, which suggests it should have more linkages.
         # self is the subset.
         reverse_index = { mapping[key]: key for key in mapping }
         one_r_linkages = []
@@ -1553,11 +1527,49 @@ class Compound:
                     bond = the_other_compound.bond_lookup[(idx, neighbor_index)]
                     the_other_r_linkages.append("{0}-{1}".format(neighbor_index, bond.bond_type))
 
+        for idx, atom in enumerate(the_other_compound.atoms):
+            if idx in mapping:
+                for neighbor_index in atom.neighbors:
+                    if the_other_compound.atoms[neighbor_index].default_symbol != "H" and neighbor_index not in mapping:
+                        bond = the_other_compound.bond_lookup[(idx, neighbor_index)]
+                        the_other_r_linkages.append("{0}-{1}".format(idx, bond.bond_type))
 
-    def
+        if all(x in the_other_r_linkages for x in one_r_linkages):
+            return True
+
+        return False
 
 
+    def compare_chemical_details_with_mapping(self, the_other_compound, mapping):
 
+        one_stereo_counts, the_other_stereo_counts = 0, 0
+        one_consistent_atoms, the_other_consistent_atoms = set(), set()
+        # check the atom stereochemistry
+        for one_atom_index in mapping:
+            one_atom = self.atoms[one_atom_index]
+            the_other_atom = the_other_compound.atoms[mapping[one_atom_index]]
+            if one_atom.color_layers[1] == the_other_atom.color_layers[1]:
+                one_consistent_atoms.add(one_atom.atom_number)
+                the_other_consistent_atoms.add(the_other_atom.atom_number)
+                if one_atom.atom_stereo_parity == the_other_atom.atom_stereo_parity:
+                    continue
+                if one_atom.atom_stereo_parity != "0":
+                    one_stereo_counts += 1
+                if the_other_atom.atom_stereo_parity != "0":
+                    the_other_stereo_counts += 1
+        # check bond stereochemistry
+        for bond in self.bonds:
+            atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
+            if atom_1 in one_consistent_atoms and atom_2 in one_consistent_atoms:
+                the_other_atom_1, the_other_atom_2 = mapping[atom_1], mapping[atom_2]
+                the_other_bond = the_other_compound.bond_lookup[(the_other_atom_1, the_other_atom_2)]
+                if bond.bond_stereo == the_other_bond.bond_stereo:
+                    continue
+                if bond.bond_stereo != "0":
+                    one_stereo_counts += 1
+                if the_other_bond.bond_stereo != "0":
+                    the_other_stereo_counts += 1
+        return one_stereo_counts, the_other_stereo_counts
 
     def with_r_pair_relationship(self, the_other_compound):
         # self is the substructure
@@ -1571,7 +1583,7 @@ class Compound:
         find = False
         for mm in mapping_matrix:
             if self.valid_mapping_with_r(the_other_compound, one_rs, the_other_rs, mm):
-                if
+                if self.
 
 
 

@@ -1402,6 +1402,7 @@ class Compound:
 
     def same_structure_relationship(self, the_other_compound):
 
+        # return relationship and atom mappings.
         return self.compare_chemical_details(self.get_chemical_details(), the_other_compound.get_chemical_details())
 
     def optimal_resonant_mapping(self, the_other_compound, mappings):
@@ -1580,10 +1581,20 @@ class Compound:
         self.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
         the_other_compound.color(r_groups=True, atom_stereo=False, bond_stereo=False)
         mapping_matrix = the_other_compound.find_mappings(self, resonance=False, r_distance=True)
-        find = False
+
         for mm in mapping_matrix:
             if self.valid_mapping_with_r(the_other_compound, one_rs, the_other_rs, mm):
-                if self.
+                one_to_one_mappings = self.generate_one_to_one_mappings(the_other_compound, mm)
+                one_stereo_counts, the_other_stereo_counts = self.compare_chemical_details_with_mapping(the_other_compound,
+                                                                                                        one_to_one_mappings)
+                if one_stereo_counts == 0 and the_other_stereo_counts < optimal_count:
+                    optimal_count = the_other_stereo_counts
+                    optimal_mapping = one_to_one_mappings
+                else:
+
+        if
+        # match loosely.
+
 
 
 

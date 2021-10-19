@@ -17,7 +17,10 @@ import BASS
 import heapq
 from pathlib import Path
 import ctfile
-
+from .conf import not_r_groups
+from .conf import standard_bond_counts
+from .conf import atomic_weights
+from .conf import metal_symbols
 
 class Atom:
 
@@ -311,29 +314,6 @@ class Compound:
         bonds = [ Bond(bond['first_atom_number'], bond['second_atom_number'], bond['bond_type'], bond['bond_stereo'],
                        bond['bond_topology'], bond['reacting_center_status']) for bond in ct_object.bonds ]
         return Compound(compound_name, atoms, bonds)
-
-    # def construct_partial_compound(self, atom_index, removed_bonds=None, index=0):
-    #     """
-    #
-    #     :param atom_index:
-    #     :param removed_bonds:
-    #     :return:
-    #     """
-    #     atoms = []
-    #     for index in atom_index:
-    #         atoms.append(self.atoms[index].clone())
-    #     idx_dict = {atom.atom_number: i for i, atom in enumerate(atoms)}
-    #     for i, atom in enumerate(atoms):
-    #         atom.update_atom_number(i)
-    #     bonds = []
-    #     for bond in self.bonds:
-    #         atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
-    #         if atom_1 in atom_index and atom_2 in atom_index and (atom_1, atom_2) not in removed_bonds and (atom_2, atom_1) not in removed_bonds:
-    #             cloned_bond = bond.clone()
-    #             cloned_bond.update_first_atom(idx_dict[atom_1])
-    #             cloned_bond.update_second_atom(idx_dict[atom_2])
-    #             bonds.append(cloned_bond)
-    #     return Compound(self.compound_name+str(index), atoms, bonds)
 
     @property
     def formula(self):
@@ -689,8 +669,8 @@ class Compound:
             atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
             if atom_1 in self.index_of_heavy_atoms and atom_2 in self.index_of_heavy_atoms:
                 bond_type = int(bond.bond_type)
-                if resonance and bond_type == 2:
-                    bond_type = 1
+                if resonance and bond_type == "2":
+                    bond_type = "1"
                 matrix[self.index_of_heavy_atoms[atom_1]][self.index_of_heavy_atoms[atom_2]] = bond_type
                 matrix[self.index_of_heavy_atoms[atom_2]][self.index_of_heavy_atoms[atom_1]] = bond_type
         return matrix
@@ -759,10 +739,11 @@ class Compound:
         self.update_color_tuple(resonance=resonance)
         the_other.update_color_tuple(resonance=resonance)
         mappings = []
-        mmat = BASS.make_mapping_matrix(the_other, self, True, True, r_distance)
-        if mmat is not None:
+        mapping_matrix = BASS.make_mapping_matrix(the_other, self, True, True, r_distance)
+        if mapping_matrix is not None:
             mappings = BASS.find_mappings(the_other.structure_matrix(resonance=resonance), the_other.distance_matrix,
-            	self.structure_matrix(resonance=resonance), self.distance_matrix, mmat)
+            	self.structure_matrix(resonance=resonance), self.distance_matrix, mapping_matrix)
+        # for the mappings, the from_idx, to_idx in enumerate(mapping), from_idx is in the_other_compound, to_idx is in the self.
         return mappings
 
     def generate_one_to_one_mappings(self, the_other, mappings):
@@ -870,30 +851,6 @@ class Compound:
             if neighbor_index in self.index_of_heavy_atoms and self.bond_lookup[(index, neighbor_index)].bond_type == "2":
                 return neighbor_index
         return -1
-
-    # def map_linear_circular_interchange(self, the_other):
-    #     """
-    #     Detect if the two compounds have linear and circular interchangeable representations. This mainly targets at sugar like structure.
-    #     We check how many atoms don't share the same local (first layer) identifiers and then detect if the difference is caused by the
-    #     ring structure.
-    #     :param the_other: the mappings compound entity.
-    #     :type the_other: :class:`~MDH.compound.Compound`
-    #
-    #     :return: boolean.
-    # 	"""
-    #     # 1 in color_layers indicate this atom is not H or metals.
-    #     one_atom_colors = [atom.color_layers[1] if 1 in atom.color_layers else atom.default_symbol for atom in self.heavy_atoms]
-    #     the_other_atom_colors = [atom.color_layers[1] if 1 in atom.color_layers else atom.default_symbol for atom in self.heavy_atoms]
-    #     atom_color_intersection = list((collections.Counter(one_atom_colors) & collections.Counter(the_other_atom_colors)).elements())
-    #     if 2 <= len(one_atom_colors) - len(atom_color_intersection) <= 3:
-    #         one_num_of_atoms_in_cycle = [ atom.in_cycle for atom in self.heavy_atoms].count(True)
-    #         the_other_num_of_atoms_in_cycle = [ atom.in_cycle for atom in the_other.heavy_atoms].count(True)
-    #         if one_num_of_atoms_in_cycle != the_other_num_of_atoms_in_cycle:
-    #             return True
-    #     return False
-
-
-
 
     def define_bond_stereochemistry(self):
         """
@@ -1270,11 +1227,13 @@ class Compound:
                             color_elements[atom_color_with_neighbors[neighbor_index]] += 1
                         added = ""
                         for name in sorted(color_elements):
-                            added += "({0}_{1})".format(color_elements[name], name) if color_elements[name] > 1 else "({0})".format(name)
+                            added += "({0}_{1})".format(color_elements[name], name) if color_elements[name] > 1 else \
+                                "({0})".format(name)
                         atom_color += added
                         current_layer_neighbors = self.get_next_layer_neighbors(current_layer_neighbors, visited)
                     self.atoms[atom_index].color = atom_color
-            not_valid = self.invalid_symmetric_atoms(atoms_to_color, excluded_index, bond_stereo=bond_stereo, resonance=resonance)
+            not_valid = self.invalid_symmetric_atoms(atoms_to_color, excluded_index, bond_stereo=bond_stereo,
+                                                     resonance=resonance)
 
     def color_metal(self, bond_stereo=False, resonance=True):
         """
@@ -1355,6 +1314,7 @@ class Compound:
     # bond stereochemistry and atom stereochemistry.
     # relationship can be equivalent, generic-specific, loose
     # 0, -1, 1, 2
+
     def get_chemical_details(self, excluded=None):
 
         chemical_details = []
@@ -1392,58 +1352,76 @@ class Compound:
         one_more.extend(one_chemical_details)
         the_other_more.extend(the_other_chemical_details)
         if not one_more and not the_other_more:
-           return 0
+           return 0, 0
         elif one_more and the_other_more:
-            return 2
+            return 2, one_more + the_other_more
         elif one_more:
-            return 1 # one_compound is more specific than the_other_compound
+            return 1, one_more# one_compound is more specific than the_other_compound
         elif the_other_more:
-            return -1 # the_other_compound is more specific than one_compound
+            return -1, the_other_more # the_other_compound is more specific than one_compound
 
     def same_structure_relationship(self, the_other_compound):
 
+        relationship, mis_count = self.compare_chemical_details(self.get_chemical_details(),
+                                                                the_other_compound.get_chemical_details())
         # return relationship and atom mappings.
-        return self.compare_chemical_details(self.get_chemical_details(), the_other_compound.get_chemical_details())
+        return
+
+    def generate_atom_mapping_by_colors(self, the_other_compound):
+
+        one_to_one_mappings = collections.defaultdict(list)
+        for idx, atom in enumerate(self.atoms):
+            for the_other_idx, the_other_atom in enumerate(the_other_compound):
+
+
 
     def optimal_resonant_mapping(self, the_other_compound, mappings):
 
-        optimal_index = {"1": -1, "-1": -1, "2": -1}
-        min_count =  {"1": float("inf"), "-1": float("inf"), "2": float("inf")}
+        optimal_index = {1: -1, -1: -1, 2: -1, 0: -1}
+        min_count =  {1: float("inf"), -1: float("inf"), 2: float("inf"), 0: float("inf")}
         for i, mapping in enumerate(mappings):
             one_stereo_counts, the_other_stereo_counts = self.compare_chemical_details_with_mapping(the_other_compound, mapping)
             if not one_stereo_counts and not the_other_stereo_counts:
-                return mapping, 0
+                optimal_index[0] = i
+                min_count[0] = 0
             if not one_stereo_counts:
-                if one_stereo_counts < min_count["1"]:
-                    optimal_index["1"] = i
-                    min_count["1"] = one_stereo_counts
+                if one_stereo_counts < min_count[1]:
+                    optimal_index[1] = i
+                    min_count[1] = one_stereo_counts
             elif not the_other_stereo_counts:
-                if the_other_stereo_counts < min_count["-1"]:
-                    optimal_index["-1"] = i
-                    min_count["-1"] = the_other_stereo_counts
+                if the_other_stereo_counts < min_count[-1]:
+                    optimal_index[-1] = i
+                    min_count[-1] = the_other_stereo_counts
             else:
-                if one_stereo_counts + the_other_stereo_counts < min_count["2"]:
-                    min_count["2"] = one_stereo_counts + the_other_stereo_counts
-                    optimal_index["2"] = i
+                if one_stereo_counts + the_other_stereo_counts < min_count[2]:
+                    min_count[2] = one_stereo_counts + the_other_stereo_counts
+                    optimal_index[2] = i
             # determine which one is the best.
-
+        if min(min_count.values()) < float("inf"):
+            relationship = self.determine_relationship(min_count)
+            # return relationship and atom mappings
+            return relationship, mappings[optimal_index[relationship]]
+        return None, None
 
     @staticmethod
-    def determine_relationship(relationships):
+    def determine_relationship(min_count):
 
-        if relationships[0] > 0:
+        if min_count[0] == 0:
+            # equivalent mapping.
             return 0
-        if relationships[1] > 0 and relationships[-1] > 0:
-            return 0
-        if relationships[1] > 0:
-            return 1
-        if relationships[-1] > 0:
+        if min_count[-1] < min_count[1]:
             return -1
+        elif min_count[-1] > min_count[1]:
+            return -1
+        elif min_count[-1] == min_count[1] and min_count[-1] != float("inf"):
+            return 1
         return 2
 
     def circular_pair_relationship(self, the_other_compound):
         # default one compound should have a cycle.
-        relationships = collections.Counter()
+        optimal_mappings = {1: None, -1: None, 2: None, 0: None}
+        min_count = {1: float("inf"), -1: float("inf"), 2: float("inf"), 0: float("inf")}
+        atom_mappings = []
         critical_atom_list = self.find_critical_atom_in_cycle()
         the_other_color = the_other_compound.backbone_color_identifier(r_groups=False) + the_other_compound.metal_color_identifier(details=False)
         for critical_atoms in critical_atom_list:
@@ -1453,7 +1431,10 @@ class Compound:
                 excluded_atoms_the_other = the_other_compound.exclude_atoms([self.atoms[i].color for i in critical_atoms])
                 one_chemical_details = self.get_chemical_details(critical_atoms)
                 the_other_chemical_details = the_other_compound.get_chemical_details(excluded_atoms_the_other)
-                relationships[self.compare_chemical_details(one_chemical_details, the_other_chemical_details)] += 1
+                relationship, mis_count = self.compare_chemical_details(one_chemical_details, the_other_chemical_details)
+                if mis_count < min_count[relationship]:
+
+
             self.restore_cycle(critical_atoms)
         if not relationships:
             # cannot be paired
@@ -1507,39 +1488,31 @@ class Compound:
         for i in index:
             self.atoms[i].update_symbol(updated_symbol)
 
-    def valid_mapping_with_r(self, the_other_compound, one_rs, the_other_rs, mapping):
+    def valid_mapping_with_r(self, the_other_compound, one_rs, mapping):
 
         # this is to compare the R GROUPS.
         # self is the more generic one, which suggests it should have more linkages.
         # self is the subset.
         reverse_index = { mapping[key]: key for key in mapping }
-        one_r_linkages = []
+        one_r_linkages = collections.Counter()
         for idx in one_rs:
             r_atom = self.atoms[idx]
             for neighbor_index in r_atom.neighbors:
                 bond = self.bond_lookup[(idx, neighbor_index)]
-                one_r_linkages.append("{0}-{1}".format(reverse_index[neighbor_index], bond.bond_type))
+                # find the R group bonded atom.
+                one_r_linkages["{0}-{1}".format(reverse_index[neighbor_index], bond.bond_type)] += 1
 
-        the_other_r_linkages = []
-        for idx in the_other_rs:
-            r_atom = the_other_compound.atoms[idx]
-            for neighbor_index in r_atom.neighbors:
-                if neighbor_index in mapping:
-                    bond = the_other_compound.bond_lookup[(idx, neighbor_index)]
-                    the_other_r_linkages.append("{0}-{1}".format(neighbor_index, bond.bond_type))
-
+        the_other_r_linkages = collections.Counter()
         for idx, atom in enumerate(the_other_compound.atoms):
-            if idx in mapping:
+            if idx in mapping.values():
                 for neighbor_index in atom.neighbors:
-                    if the_other_compound.atoms[neighbor_index].default_symbol != "H" and neighbor_index not in mapping:
+                    if the_other_compound.atoms[neighbor_index].default_symbol != "H" and neighbor_index not in mapping.values():
                         bond = the_other_compound.bond_lookup[(idx, neighbor_index)]
-                        the_other_r_linkages.append("{0}-{1}".format(idx, bond.bond_type))
+                        the_other_r_linkages["{0}-{1}".format(idx, bond.bond_type)] += 1
 
-        if all(x in the_other_r_linkages for x in one_r_linkages):
+        if all(one_r_linkages[x] >= the_other_r_linkages[x] for x in the_other_r_linkages):
             return True
-
         return False
-
 
     def compare_chemical_details_with_mapping(self, the_other_compound, mapping):
 
@@ -1572,28 +1545,60 @@ class Compound:
                     the_other_stereo_counts += 1
         return one_stereo_counts, the_other_stereo_counts
 
+    def optimal_mapping_with_r(self, the_other_compound, one_rs, mappings):
+
+        optimal_index = {1: -1, -1: -1, 2: -1, 0: -1}
+        min_count = {1: float("inf"), -1: float("inf"), 2: float("inf"), 0: float("inf")}
+        for i, mm in enumerate(mappings):
+            if self.valid_mapping_with_r(the_other_compound, one_rs, mm):
+                one_stereo_counts, the_other_stereo_counts = self.compare_chemical_details_with_mapping(
+                    the_other_compound, mm)
+                if one_stereo_counts == 0 and the_other_stereo_counts < min_count[-1]:
+                    min_count[-1] = the_other_stereo_counts
+                    optimal_index[-1] = i
+                elif one_stereo_counts != 0 and one_stereo_counts + the_other_stereo_counts < min_count[2]:
+                    min_count[2] = one_stereo_counts + the_other_stereo_counts
+                    optimal_index[2] = i
+        if min(min_count.values()) < float("inf"):
+            relationship = self.determine_relationship(min_count)
+            return relationship, mappings[optimal_index[relationship]]
+        else:
+            return None, None
+
     def with_r_pair_relationship(self, the_other_compound):
-        # self is the substructure
+        # self is the substructure, more generic, contain less chemical details.
         one_rs = list(self.r_groups)
         the_other_rs = list(the_other_compound.r_groups)
         self.update_atom_symbol(one_rs, "H")
         the_other_compound.update_atom_symbol(the_other_rs, "H")
         self.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
         the_other_compound.color(r_groups=True, atom_stereo=False, bond_stereo=False)
-        mapping_matrix = the_other_compound.find_mappings(self, resonance=False, r_distance=True)
+        mapping_matrix = self.find_mappings(the_other_compound, resonance=False, r_distance=True)
+        # here we need to consider the r_distance atom color identifier, so we need to color compounds.
+        one_to_one_mappings = self.generate_one_to_one_mappings(the_other_compound, mapping_matrix)
+        relationship, optimal_mappings = self.optimal_mapping_with_r(the_other_compound, one_rs, one_to_one_mappings)
+        if optimal_mappings:
+            return relationship, optimal_mappings
 
-        for mm in mapping_matrix:
-            if self.valid_mapping_with_r(the_other_compound, one_rs, the_other_rs, mm):
-                one_to_one_mappings = self.generate_one_to_one_mappings(the_other_compound, mm)
-                one_stereo_counts, the_other_stereo_counts = self.compare_chemical_details_with_mapping(the_other_compound,
-                                                                                                        one_to_one_mappings)
-                if one_stereo_counts == 0 and the_other_stereo_counts < optimal_count:
-                    optimal_count = the_other_stereo_counts
-                    optimal_mapping = one_to_one_mappings
-                else:
-
-        if
         # match loosely.
+        self.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=True)
+        the_other_compound.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=True)
+        mapping_matrix = self.find_mappings(the_other_compound, resonance=True, r_distance=True)
+        # I am not sure if it is correct here,
+        one_to_one_mappings = self.generate_one_to_one_mappings(the_other_compound, mapping_matrix)
+        return self.optimal_mapping_with_r(the_other_compound, one_rs, one_to_one_mappings)
+
+    def map_r_correspondents(self, the_other_compound, mappings):
+
+
+
+
+
+
+
+
+
+
 
 
 

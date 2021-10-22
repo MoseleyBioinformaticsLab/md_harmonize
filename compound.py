@@ -114,8 +114,6 @@ class Atom:
 
     def add_neighbors(self, neighbors):
         """
-
-
         To add neighbors to the atom.
         :param list neighbors: the index of neighbors that will be added to this atom.
 
@@ -191,6 +189,10 @@ class Atom:
         return self.kat
 
     def clone(self):
+        """
+
+        :return:
+        """
         return Atom(self.atom_symbol, self.atom_number, x=str(self.x), y=str(self.y), z=str(self.z), mass_difference=self.mass_difference,
                     charge=str(self.charge), atom_stereo_parity=self.atom_stereo_parity, hydrogen_count=self.hydrogen_count,
                     stereo_care_box=self.stereo_care_box, valence=self.valence, h0designator=self.h0designator,
@@ -259,6 +261,10 @@ class Bond:
         return self.second_atom_number
 
     def clone(self):
+        """
+
+        :return:
+        """
         return Bond(str(self.first_atom_number+1), str(self.second_atom_number+1), self.bond_type, bond_stereo=self.bond_stereo,
                     bond_topology=self.bond_topology, reacting_center_status=self.reacting_center_status)
 
@@ -718,8 +724,8 @@ class Compound:
                     bond = self.bond_lookup[(atom.atom_number, neighbor_index)]
                     bond_types[bond.bond_type] += 1
             if resonance:
-                atom.color_tuple = (elements["C"], elements["N"], elements["S"], elements["O"], bond_types["1"] + bond_types["2"],
-                                    bond_types["4"])
+                atom.color_tuple = (elements["C"], elements["N"], elements["S"], elements["O"], bond_types["1"] +
+                                    bond_types["2"], bond_types["4"])
             else:
                 atom.color_tuple = (elements["C"], elements["N"], elements["S"], elements["O"], bond_types["1"],
                                     bond_types["2"], bond_types["4"])
@@ -837,7 +843,6 @@ class Compound:
             if flag:
                 valid_mappings.append(cur_mappings)
         return valid_mappings
-
 
     def find_double_bond_linked_atom(self, index):
         """
@@ -1022,7 +1027,8 @@ class Compound:
         self.reset_color()
         self.generate_atom_zero_layer_color(isotope_resolved=isotope_resolved, charge=charge, atom_stereo=atom_stereo)
         self.first_round_color( atoms_to_color, excluded_index=excluded_index, bond_stereo=bond_stereo, resonance=resonance)
-        self.curate_invalid_symmetric_atoms(atoms_to_color, excluded_index=excluded_index, bond_stereo=bond_stereo, resonance=resonance)
+        self.curate_invalid_symmetric_atoms(atoms_to_color, excluded_index=excluded_index, bond_stereo=bond_stereo,
+                                            resonance=resonance)
         self.color_metal(bond_stereo=bond_stereo, resonance=resonance)
     
     def reset_color(self):
@@ -1052,7 +1058,8 @@ class Compound:
     def generate_atom_color_with_neighbors(self, atom_index, excluded=None, zero_core_color=True, zero_neighbor_color=True,
                                            resonance=False, bond_stereo=False):
         """
-        To generate the atom color with its neighbors. We add this color name when we try to incorporate neighbors' information in naming.
+        To generate the atom color with its neighbors. We add this color name when we try to incorporate neighbors'
+        information in naming.
         Here, we don't need to care about the atom stereo. It has been taken care of in generating color_0.
         Basic color formula: atom.color + [neighbor.color + bond.bond_type]
         :param list atom_index: the list of atom index to color.
@@ -1365,15 +1372,16 @@ class Compound:
         relationship, mis_count = self.compare_chemical_details(self.get_chemical_details(),
                                                                 the_other_compound.get_chemical_details())
         # return relationship and atom mappings.
-        return
+        return relationship, self.generate_atom_mapping_by_atom_color(the_other_compound)
 
-    def generate_atom_mapping_by_colors(self, the_other_compound):
+    def generate_atom_mapping_by_atom_color(self, the_other_compound):
 
         one_to_one_mappings = collections.defaultdict(list)
         for idx, atom in enumerate(self.atoms):
             for the_other_idx, the_other_atom in enumerate(the_other_compound):
-
-
+                if atom.color == the_other_atom.color:
+                    one_to_one_mappings[idx].append(the_other_idx)
+        return one_to_one_mappings
 
     def optimal_resonant_mapping(self, the_other_compound, mappings):
 
@@ -1421,25 +1429,26 @@ class Compound:
         # default one compound should have a cycle.
         optimal_mappings = {1: None, -1: None, 2: None, 0: None}
         min_count = {1: float("inf"), -1: float("inf"), 2: float("inf"), 0: float("inf")}
-        atom_mappings = []
         critical_atom_list = self.find_critical_atom_in_cycle()
-        the_other_color = the_other_compound.backbone_color_identifier(r_groups=False) + the_other_compound.metal_color_identifier(details=False)
+        the_other_color = the_other_compound.backbone_color_identifier(r_groups=True) + \
+                          the_other_compound.metal_color_identifier(details=False)
         for critical_atoms in critical_atom_list:
             self.remove_cycle(critical_atoms)
-            this_color = self.backbone_color_identifier(r_groups=False) + self.metal_color_identifier(details=False)
+            this_color = self.backbone_color_identifier(r_groups=True) + self.metal_color_identifier(details=False)
             if this_color == the_other_color:
                 excluded_atoms_the_other = the_other_compound.exclude_atoms([self.atoms[i].color for i in critical_atoms])
                 one_chemical_details = self.get_chemical_details(critical_atoms)
                 the_other_chemical_details = the_other_compound.get_chemical_details(excluded_atoms_the_other)
                 relationship, mis_count = self.compare_chemical_details(one_chemical_details, the_other_chemical_details)
                 if mis_count < min_count[relationship]:
-
-
+                    min_count[relationship] = mis_count
+                    optimal_mappings[relationship] = self.generate_atom_mapping_by_atom_color(the_other_compound)
             self.restore_cycle(critical_atoms)
-        if not relationships:
-            # cannot be paired
-            return float("inf")
-        return self.determine_relationship(relationships)
+        if min(min_count.values()) < float("inf"):
+            relationship = self.determine_relationship(min_count)
+            return relationship, optimal_mappings[relationship]
+        else:
+            return None, None
 
     def exclude_atoms(self, colors):
 
@@ -1588,7 +1597,28 @@ class Compound:
         one_to_one_mappings = self.generate_one_to_one_mappings(the_other_compound, mapping_matrix)
         return self.optimal_mapping_with_r(the_other_compound, one_rs, one_to_one_mappings)
 
-    def map_r_correspondents(self, the_other_compound, mappings):
+    def map_r_correspondents(self, one_rs, the_other_compound, mappings):
+        # again, the self compound is substructure, we need to figure out the R group atom in self compound and its
+        # corresponding atoms in the other compound.
+
+        added_mappings = collections.defaultdict(list)
+        for idx in one_rs:
+            r_atom = self.atoms[idx]
+            visited = set(mappings[neighbor_index] for neighbor_index in r_atom.neighbors)
+            r_correspondents = [neighbor_index for index in visited for neighbor_index in the_other_compound.atoms[index].neighbors if neighbor_index not in mappings.values()]
+            visited |= set(r_correspondents)
+            while r_correspondents:
+                added_mappings[idx].extend(r_correspondents)
+                r_correspondents = the_other_compound.get_next_layer_neighbors(r_correspondents, visited)
+        return added_mappings
+
+
+
+
+
+
+
+
 
 
 

@@ -21,6 +21,30 @@ class HarmonizedEdge:
         self.type = type
         self.mappings = mappings
 
+    @property
+    def reversed_relationship(self):
+        if self.relationship == 2 or self.relationship == 0:
+            return self.relationship
+        return -self.relationship
+
+
+class HarmonizedCompoundEdge(HarmonizedEdge):
+
+    def __init__(self, one_compound, the_other_compound, relationship, type, atom_mappings):
+        super().__init__(one_compound, the_other_compound, relationship, type, atom_mappings)
+
+    @property
+    def reversed_mappings(self):
+        """
+        To get the atom mappings from the_other_compound to
+        :return:
+        """
+        atom_mappings = collections.defaultdict(list)
+        for from_atom in self.mappings:
+            for to_atom in self.mappings[from_atom]:
+                atom_mappings[to_atom].append(from_atom)
+        return atom_mappings
+
 
 class HarmonizedReactionEdge(HarmonizedEdge):
 
@@ -160,18 +184,24 @@ class ReactionHarmonizationManager(HarmonizationManager):
         for one_cpd in one_side_left:
             for the_other_cpd in the_other_side_left:
                 if one_cpd.formula == the_other_cpd.formula:
-                    #
-                    if :
+                    resonant_mappings = one_cpd.map_resonance(the_other_cpd, r_distance=False)
+                    if resonant_mappings:
                         # here both atom_mappings and relationship should be returned.
-                        harmonized_compound_edge = HarmonizedEdge(one_cpd, the_other_cpd, relationship, "resonance",
-                                                                          atom_mappings)
+                        relationship, atom_mappings = one_cpd.optimal_resonant_mapping(the_other_cpd, resonant_mappings)
+                        harmonized_compound_edge = HarmonizedEdge(one_cpd, the_other_cpd, relationship, "resonance", atom_mappings)
                         self.compound_harmonization_manager.add_edge(harmonized_compound_edge)
                         # check if they are resonant
-                    elif:
+                    else:
                         # check if they have circular and linear interchangeable formats.
-                        harmonized_compound_edge = HarmonizedEdge(one_cpd, the_other_cpd, relationship,
-                                                                          "cicular", atom_mappings)
-                        self.compound_harmonization_manager.add_edge(harmonized_compound_edge)
+                        relationship, atom_mappings = one_cpd.circular_pair_relationship(the_other_cpd)
+                        if atom_mappings:
+                            harmonized_compound_edge = HarmonizedEdge(one_cpd, the_other_cpd, relationship,"circular", atom_mappings)
+                            self.compound_harmonization_manager.add_edge(harmonized_compound_edge)
+                        else:
+                            relationship, atom_mappings = the_other_cpd.circular_pair_relationship(one_cpd)
+                            if atom_mappings:
+                                harmonized_compound_edge = HarmonizedEdge(the_other_cpd, one_cpd, relationship, "circular", atom_mappings)
+                                self.compound_harmonization_manager.add_edge(harmonized_compound_edge)
                     continue
                 if one_cpd.contains_r_groups():
                     # check if one cpd is more generic
@@ -205,6 +235,26 @@ class ReactionHarmonizationManager(HarmonizationManager):
         return
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def harmonize_compound_list(compound_list):
 
     compound_harmonization_manager = CompoundHarmonizationManager()
@@ -226,9 +276,7 @@ def harmonize_compound_list(compound_list):
                     color_two = compounds_two[cpd_name_two].backbone_color_identifier(r_groups=True) + \
                                 compounds_two[cpd_name_two].metal_color_identifier(details=False)
                     if color_one == color_two:
-                        relationship = compounds_one[cpd_name_one].same_structure_relationship(compounds_two[cpd_name_two])
-                        # find atom mappings here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                        atom_mappings = None
+                        relationship, atom_mappings = compounds_one[cpd_name_one].same_structure_relationship(compounds_two[cpd_name_two])
                         harmonized_compound_edge = HarmonizedEdge(compounds_one[cpd_name_one],
                                                                           compounds_two[cpd_name_two], relationship,
                                                                           "same_structure", atom_mappings)

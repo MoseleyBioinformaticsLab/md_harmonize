@@ -82,9 +82,15 @@ class AromaticManager:
         aromatic_cycles = []
         for aromatic in self.aromatic_substructures:
             if aromatic.composition.issubset(cpd.composition):
-                mmat = BASS.mappping_matrix(aromatic, cpd, True, False, False, True)
-                if mmat:
-                    for
+                mapping_matrix = BASS.mappping_matrix(aromatic, cpd, True, False, False, True)
+                if mapping_matrix:
+                    for assignment in BASS.find_mappings(aromatic.structure_matrix(resonance=False), aromatic.distance_matrix,
+                                                         cpd.structure_matrix(resonance=False), cpd.distance_matrix, mapping_matrix):
+                        aromatic_cycle = []
+                        for idx, atom in enumerate(aromatic.atoms):
+                            aromatic_cycle.append(cpd.heavy_atoms[assignment[idx]].atom_number)
+                        aromatic_cycles.append(aromatic_cycle)
+
         aromatic_cycles = self.fuse_cycles(aromatic_cycles)
         cpd.update_aromatic_bond_type(aromatic_cycles)
 

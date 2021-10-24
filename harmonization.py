@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-import compound
-from abc import ABC
 import collections
 
 class HarmonizedEdge:
@@ -205,9 +203,19 @@ class ReactionHarmonizationManager(HarmonizationManager):
                     continue
                 if one_cpd.contains_r_groups():
                     # check if one cpd is more generic
+                    relationship, atom_mappings = one_cpd.with_r_pair_relationship(the_other_cpd)
+                    if atom_mappings:
+                        harmonized_compound_edge = HarmonizedEdge(the_other_cpd, one_cpd, relationship, "r_group",
+                                                                  atom_mappings)
+                        self.compound_harmonization_manager.add_edge(harmonized_compound_edge)
 
                 if the_other_cpd.contains_r_groups():
                     # check if the other cpd is more generic.
+                    relationship, atom_mappings = the_other_cpd.circular_pair_relationship(one_cpd)
+                    if atom_mappings:
+                        harmonized_compound_edge = HarmonizedEdge(the_other_cpd, one_cpd, relationship, "r_group",
+                                                                  atom_mappings)
+                        self.compound_harmonization_manager.add_edge(harmonized_compound_edge)
 
     def jaccard(self, one_compounds, the_other_compounds, mappings):
 
@@ -233,22 +241,6 @@ class ReactionHarmonizationManager(HarmonizationManager):
 
 
         return
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

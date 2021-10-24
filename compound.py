@@ -1408,7 +1408,8 @@ class Compound:
         if min(min_count.values()) < float("inf"):
             relationship = self.determine_relationship(min_count)
             # return relationship and atom mappings
-            return relationship, mappings[optimal_index[relationship]]
+            final_mappings = mappings[optimal_index[relationship]]
+            return relationship, { key: [final_mappings[key]] for key in final_mappings }
         return None, None
 
     @staticmethod
@@ -1587,30 +1588,38 @@ class Compound:
         one_to_one_mappings = self.generate_one_to_one_mappings(the_other_compound, mapping_matrix)
         relationship, optimal_mappings = self.optimal_mapping_with_r(the_other_compound, one_rs, one_to_one_mappings)
         if optimal_mappings:
-            return relationship, optimal_mappings
+            self.update_atom_symbol(one_rs, "R")
+            the_other_compound.update_atom_symbol(the_other_rs, "R")
+            return relationship, self.map_r_correspondents(one_rs, the_other_compound, optimal_mappings)
 
         # match loosely.
         self.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=True)
         the_other_compound.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=True)
         mapping_matrix = self.find_mappings(the_other_compound, resonance=True, r_distance=True)
-        # I am not sure if it is correct here,
         one_to_one_mappings = self.generate_one_to_one_mappings(the_other_compound, mapping_matrix)
-        return self.optimal_mapping_with_r(the_other_compound, one_rs, one_to_one_mappings)
+        relationship, optimal_mappings = self.optimal_mapping_with_r(the_other_compound, one_rs, one_to_one_mappings)
+        self.update_atom_symbol(one_rs, "R")
+        the_other_compound.update_atom_symbol(the_other_rs, "R")
+        if optimal_mappings:
+            return relationship, self.map_r_correspondents(one_rs, the_other_compound, optimal_mappings)
+        return None, None
 
     def map_r_correspondents(self, one_rs, the_other_compound, mappings):
         # again, the self compound is substructure, we need to figure out the R group atom in self compound and its
         # corresponding atoms in the other compound.
 
-        added_mappings = collections.defaultdict(list)
+        full_mappings = collections.defaultdict(list)
         for idx in one_rs:
             r_atom = self.atoms[idx]
             visited = set(mappings[neighbor_index] for neighbor_index in r_atom.neighbors)
             r_correspondents = [neighbor_index for index in visited for neighbor_index in the_other_compound.atoms[index].neighbors if neighbor_index not in mappings.values()]
             visited |= set(r_correspondents)
             while r_correspondents:
-                added_mappings[idx].extend(r_correspondents)
+                full_mappings[idx].extend(r_correspondents)
                 r_correspondents = the_other_compound.get_next_layer_neighbors(r_correspondents, visited)
-        return added_mappings
+        for idx in mappings:
+            full_mappings[idx].append(mappings[idx])
+        return full_mappings
 
 
 

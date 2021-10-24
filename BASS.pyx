@@ -67,7 +67,7 @@ def make_mapping_matrix(compound_1, compound_2, bint cyclic=False,  bint color_t
         for i, atom_1 in enumerate(atoms1):
             at_least_one = False
             for j, atom_2 in enumerate(atoms2):
-                mappable = compare(atom_1.atom_symbol, atom_2.atom_symbol)
+                mappable = compare(atom_1.default_symbol, atom_2.default_symbol)
                 if cyclic and atom_1.in_cycle:
                     mappable = mappable and (atom_1.in_cycle == atom_2.in_cycle)
                 if color_tuple:

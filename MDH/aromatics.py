@@ -1,15 +1,25 @@
 #!/usr/bin/python3
 
-import compound
-import BASS
+from . import compound
+from . import BASS
 from indigo import *
 
 class AromaticManager:
 
-    def __init__(self):
+    def __init__(self, aromatic_substructures=None):
 
-        self.aromatic_substructures = []
+        self.aromatic_substructures = aromatic_substructures if aromatic_substructures else []
         self.indigo = Indigo()
+
+
+    def encode(self):
+
+        return [cpd.encode() for cpd in self.aromatic_substructures]
+
+    @staticmethod
+    def decode(aromatic_structures):
+
+        return AromaticManager([compound.Compound(sub[0], sub[1], sub[2]) for sub in aromatic_structures])
 
     def add_aromatic_substructures(self, substructures):
 
@@ -18,13 +28,15 @@ class AromaticManager:
             for aromatic_substructure in self.aromatic_substructures:
                 if len(aromatic_substructure.atoms) == len(substructure.atoms) and len(aromatic_substructure.bonds) == len(substructure.bonds):
                     mapping_matrix = BASS.make_mapping_matrix(aromatic_substructure, substructure)
-                    if mapping_matrix:
-                        isomorphs = BASS.find_mappings(aromatic_substructure.structure_matrix, aromatic_substructure.distance_matrix,
-                                                       substructure.structure_matrix, substructure.distance_matrix, mapping_matrix)
+                    if mapping_matrix is not None:
+                        isomorphs = BASS.find_mappings(aromatic_substructure.structure_matrix(resonance=False),
+                                                       aromatic_substructure.distance_matrix, substructure.structure_matrix(resonance=False),
+                                                       substructure.distance_matrix, mapping_matrix)
                         if isomorphs != [] and isomorphs is not None:
                             flag = True
                             break
             if not flag:
+                print(substructure.compound_name, len(substructure.atoms))
                 self.aromatic_substructures.append(substructure)
         return
 
@@ -37,21 +49,25 @@ class AromaticManager:
     def indigo_aromatize(self, molfile):
 
         cpd = compound.Compound.create(molfile)
-        aromatic_atoms = self.indigo_aromatic_atoms(molfile)
-        cycles = cpd.separate_connected_components(aromatic_atoms)
-        aromatic_substructures = self.construct_aromatic_entity(cpd, cycles)
-        self.add_aromatic_substructures(aromatic_substructures)
+        if cpd:
+            aromatic_bonds = self.indigo_aromatic_bonds(molfile)
+            cycles = cpd.separate_connected_components(aromatic_bonds)
+            aromatic_substructures = self.construct_aromatic_entity(cpd, cycles)
+            self.add_aromatic_substructures(aromatic_substructures)
 
-    def indigo_aromatic_atoms(self, molfile):
+    def indigo_aromatic_bonds(self, molfile):
 
-        cpd = self.indigo.loadMoleculeFromFile(molfile)
-        cpd.aromatize()
-        aromatic_atoms = set()
-        for bond in cpd.iterateBonds():
-            if bond.bondOrder() == 4:
-                aromatic_atoms.add(bond.source().index())
-                aromatic_atoms.add(bond.destination().index())
-        return aromatic_atoms
+        aromatic_bonds = set()
+        try:
+            cpd = self.indigo.loadMoleculeFromFile(molfile)
+            cpd.aromatize()
+            for bond in cpd.iterateBonds():
+                if bond.bondOrder() == 4:
+                    aromatic_bonds.add((bond.source().index(), bond.destination().index()))
+        except:
+            print("indigo does not work for this compound")
+            pass
+        return aromatic_bonds
 
     @staticmethod
     def fuse_cycles(cycles):
@@ -79,20 +95,23 @@ class AromaticManager:
         :return:
         """
 
-        aromatic_cycles = []
+        aromatic_bonds = set()
+        aromatic_atoms = set()
         for aromatic in self.aromatic_substructures:
             if aromatic.composition.issubset(cpd.composition):
                 mapping_matrix = BASS.mappping_matrix(aromatic, cpd, True, False, False, True)
                 if mapping_matrix:
                     for assignment in BASS.find_mappings(aromatic.structure_matrix(resonance=False), aromatic.distance_matrix,
                                                          cpd.structure_matrix(resonance=False), cpd.distance_matrix, mapping_matrix):
-                        aromatic_cycle = []
-                        for idx, atom in enumerate(aromatic.atoms):
-                            aromatic_cycle.append(cpd.heavy_atoms[assignment[idx]].atom_number)
-                        aromatic_cycles.append(aromatic_cycle)
-
-        aromatic_cycles = self.fuse_cycles(aromatic_cycles)
-        cpd.update_aromatic_bond_type(aromatic_cycles)
+                        for bond in aromatic.bonds:
+                            if aromatic.atoms[bond.first_atom_number].in_cycle and aromatic.atoms[bond.second_atom_number].in_cycle:
+                                first_atom_number = cpd.heavy_atoms[assignment[bond.first_atom_number]].atom_number
+                                second_atom_number = cpd.heavy_atoms[assignment[bond.second_atom_number]].atom_number
+                                bond_index = (min(first_atom_number, second_atom_number), max(first_atom_number, second_atom_number))
+                                aromatic_bonds.add(bond_index)
+                                aromatic_atoms.add(first_atom_number)
+                                aromatic_bonds.add(second_atom_number)
+        cpd.update_aromatic_bond(aromatic_bonds, aromatic_atoms)
 
     @staticmethod
     def construct_aromatic_entity(cpd, aromatic_cycles):
@@ -124,7 +143,7 @@ class AromaticManager:
                 atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
                 bond.update_first_atom(idx_dict[atom_1])
                 bond.update_second_atom(idx_dict[atom_2])
-            aromatic_substructures.append(compound.Compound(cpd.compound_name + str(count), atoms, bonds))
+            aromatic_substructures.append(compound.Compound(cpd.compound_name + "_" + str(count), atoms, bonds))
             count += 1
         return aromatic_substructures
 
@@ -146,11 +165,4 @@ class AromaticManager:
                 continue
             aromatic_cycles.append(cycle)
         return self.fuse_cycles(aromatic_cycles)
-
-
-
-
-
-
-
 

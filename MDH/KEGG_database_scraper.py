@@ -6,8 +6,9 @@ update.py is used to download KEGG compound and reaction data from web.
 
 import requests
 import urllib
-import tools
 import os
+
+from . import tools
 
 KEGG_compound_list_URL = "http://rest.kegg.jp/list/compound"
 KEGG_reaction_list_URL = "http://rest.kegg.jp/list/reaction"

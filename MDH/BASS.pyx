@@ -36,8 +36,7 @@ np.ndarray[np.uint8_t, ndim=2] structure_matrix_2, np.ndarray[np.uint16_t, ndim=
                 for j in range(row+1):
                     # the two atoms are connected and connected the same way in two substructures.
                     # Or the check the shortest distance between the two atoms in the more complex structure is shorter or equal than the simpler structure
-                    if (structure_matrix_1[row, j] != 0 and structure_matrix_1[row, j] != structure_matrix_2[mapping[row], mapping[j]])
-                    or (distance_matrix_1[row, j] < distance_matrix_2[mapping[row], mapping[j]]) :
+                    if (structure_matrix_1[row, j] != 0 and structure_matrix_1[row, j] != structure_matrix_2[mapping[row], mapping[j]]) or (distance_matrix_1[row, j] < distance_matrix_2[mapping[row], mapping[j]]) :
                         equal = False
                         break
                 if row == num_rows and equal:

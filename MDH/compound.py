@@ -13,20 +13,20 @@ and the :class:`~MDH.compound.Compound` class to construct compound entity.
 import collections
 import itertools
 import numpy
-import BASS
 import heapq
 from pathlib import Path
 import ctfile
-from .conf import not_r_groups
-from .conf import standard_bond_counts
-from .conf import atomic_weights
-from .conf import metal_symbols
+from . import BASS
+from .supplement import not_r_groups
+from .supplement import standard_bond_counts
+from .supplement import atomic_weights
+from .supplement import metal_symbols
 
 class Atom:
 
     """ Atom class describes the :class:`~MDH.compound.Atom` entity in the compound. """
 
-    def __init__(self, atom_symbol, atom_number, x=0, y=0, z=0, mass_difference="0", charge=0, atom_stereo_parity="0",
+    def __init__(self, atom_symbol, atom_number, x="0", y="0", z="0", mass_difference="0", charge="0", atom_stereo_parity="0",
                  hydrogen_count="0", stereo_care_box="0", valence="0", h0designator="0", atom_atom_mapping_number="0",
                  inversion_retention_flag="0", exact_change_flag="0", kat=""):
         """Atom initializer.
@@ -97,7 +97,7 @@ class Atom:
     @property
     def default_symbol(self):
 
-        if self.is_r():
+        if self.is_r:
             return "R"
         return self.atom_symbol
 
@@ -168,14 +168,15 @@ class Atom:
         self.color = ""
         self.color_layers = {}
     
+    @property
     def is_r(self):
         """
         To determine if the atom is an R group.
 
         :return: boolean.
         """
-        if "A" in self.default_symbol or "R" in self.default_symbol or "*" in self.default_symbol:
-            if self.default_symbol not in not_r_groups:
+        if "A" in self.atom_symbol or "R" in self.atom_symbol or "*" in self.atom_symbol:
+            if self.atom_symbol not in not_r_groups:
                 return True
         return False
 
@@ -295,9 +296,11 @@ class Compound:
                 first_atom.bond_counts += int(bond.bond_type)
                 second_atom.neighbors.append(bond.first_atom_number)
                 second_atom.bond_counts += int(bond.bond_type)     
-        
         self.cycles = self.find_cycles()
         self.calculate_distance_to_r_groups()
+
+    def encode(self):
+        return self.compound_name, [atom.clone() for atom in self.atoms], [bond.clone() for bond in self.bonds]
 
     @property
     def name(self):
@@ -311,15 +314,20 @@ class Compound:
         :return:
         """
         compound_name = Path(molfile).stem
-        with open(molfile, 'r') as infile:
-            ct_object = ctfile.load(infile)
-        atoms = [ Atom(atom.atom_symbol, i, atom['x'], atom['y'], atom['z'],  atom['mass_difference'], atom.charge,
-                       atom['atom_stereo_parity'], atom['hydrogen_count'], atom['stereo_care_box'], atom['valence'],
-                       atom['h0designator'], atom['atom_atom_mapping_number'], atom['inversion_retention_flag'],
-                       atom['exact_change_flag']) for i, atom in enumerate(ct_object.atoms) ]
-        bonds = [ Bond(bond['first_atom_number'], bond['second_atom_number'], bond['bond_type'], bond['bond_stereo'],
-                       bond['bond_topology'], bond['reacting_center_status']) for bond in ct_object.bonds ]
-        return Compound(compound_name, atoms, bonds)
+        print(compound_name)
+        try:
+            with open(molfile, 'r') as infile:
+                ct_object = ctfile.load(infile)
+            atoms = [ Atom(atom.atom_symbol, i, atom['x'], atom['y'], atom['z'],  atom['mass_difference'], atom.charge,
+                           atom['atom_stereo_parity'], atom['hydrogen_count'], atom['stereo_care_box'], atom['valence'],
+                           atom['h0designator'], atom['atom_atom_mapping_number'], atom['inversion_retention_flag'],
+                           atom['exact_change_flag']) for i, atom in enumerate(ct_object.atoms) ]
+            bonds = [ Bond(bond['first_atom_number'], bond['second_atom_number'], bond['bond_type'], bond['bond_stereo'],
+                           bond['bond_topology'], bond['reacting_center_status']) for bond in ct_object.bonds ]
+            return Compound(compound_name, atoms, bonds)
+        except:
+            print(compound_name + "cannot not be converted to ctifle object")
+            return None
 
     @property
     def formula(self):
@@ -332,7 +340,7 @@ class Compound:
         for atom in self.atoms:
             if atom.default_symbol == "H":
                 continue
-            elif atom.is_r():
+            elif atom.is_r:
                 counter["R"] += 1
             else:
                 counter[atom.default_symbol] += 1
@@ -353,7 +361,7 @@ class Compound:
 
         :return: the list of index of all the R groups.
     	"""
-        return [index for index, atom in enumerate(self.atoms) if atom.is_r()]
+        return [index for index, atom in enumerate(self.atoms) if atom.is_r]
 
     def contains_r_groups(self):
         """
@@ -399,6 +407,7 @@ class Compound:
         :param self:
         :return: the list of heavy atoms in the compound.
         """
+
         return [atom for atom in self.atoms if atom.default_symbol != "H"]
 
     @property
@@ -476,21 +485,29 @@ class Compound:
                 metals[atom.default_symbol].append(index)
         return metals
 
-    def update_aromatic_bond_type(self, cycles):
-        """
-        Update the aromatic bond types.
-        Two cases: 1) change the bond in the aromatic ring to aromatic bond (bond type = 4)
-               2) change the double bond connecting to the aromatic ring to single bond.
-        :param list cycles: the list of cycles of aromatic atom index.
+    # def update_aromatic_bond_type(self, cycles):
+    #     """
+    #     Update the aromatic bond types.
+    #     Two cases: 1) change the bond in the aromatic ring to aromatic bond (bond type = 4)
+    #            2) change the double bond connecting to the aromatic ring to single bond.
+    #     :param list cycles: the list of cycles of aromatic atom index.
+    #
+    #     :return:
+    #     """
+    #     atom_in_cycle = [atom for cycle in cycles for atom in cycle]
+    #     for cycle in cycles:
+    #         aromatic_bonds = self.extract_aromatic_bonds(cycle)
+    #         for bond in aromatic_bonds:
+    #             bond.update_bond_type("4")
+    #     bond_out_of_cycle = self.extract_double_bond_connecting_cycle(atom_in_cycle)
+    #     for bond in bond_out_of_cycle:
+    #         bond.update_bond_type("1")
 
-        :return:
-        """
-        atom_in_cycle = [atom for cycle in cycles for atom in cycle]
-        for cycle in cycles:
-            aromatic_bonds = self.extract_aromatic_bonds(cycle)
-            for bond in aromatic_bonds:
-                bond.update_bond_type("4")
-        bond_out_of_cycle = self.extract_double_bond_connecting_cycle(atom_in_cycle)
+    def update_aromatic_bond(self, aromatic_bonds, aromatic_atoms):
+
+        for atom_i, atom_j in aromatic_bonds:
+            self.bond_lookup[(atom_i, atom_j)].update_bond_type("4")
+        bond_out_of_cycle = self.extract_double_bond_connecting_cycle(aromatic_atoms)
         for bond in bond_out_of_cycle:
             bond.update_bond_type("1")
 
@@ -505,31 +522,35 @@ class Compound:
         for atom_index in atom_in_cycle:
             if self.atoms[atom_index].default_symbol == "C":
                 for neighbor_index in self.atoms[atom_index].neighbors:
-                    if neighbor_index not in atom_in_cycle:
-                        if self.bond_lookup[(atom_index, neighbor_index)].bond_type == "2":
-                            double_bond_connecting_cycle.append(self.bond_lookup[(atom_index, neighbor_index)])
+                    if neighbor_index not in atom_in_cycle and self.bond_lookup[(atom_index, neighbor_index)].bond_type == "2":
+                        double_bond_connecting_cycle.append(self.bond_lookup[(atom_index, neighbor_index)])
         return double_bond_connecting_cycle
 
-    def extract_aromatic_bonds(self, cycle):
-        """
-        Extract the aromatic bonds based on the atom indexes in the cycle.
-        :param list cycle: the
+    # def extract_aromatic_bonds(self, cycle):
+    #     """
+    #     Extract the aromatic bonds based on the atom indexes in the cycle.
+    #     :param list cycle: the
+    #
+    #     :return: the list of aromatic bond.
+    # 	"""
+    #     aromatic_bonds = []
+    #     all_pairs = list(itertools.combinations(cycle, 2))
+    #     visited = set()
+    #     for pair in all_pairs:
+    #         if (pair[0], pair[1]) not in visited and (pair[0], pair[1]) in self.bond_lookup:
+    #             aromatic_bonds.append(self.bond_lookup[(pair[0], pair[1])])
+    #             visited.add((pair[0], pair[1]))
+    #             visited.add((pair[1], pair[1]))
+    #     return aromatic_bonds
 
-        :return: the list of aromatic bond.
-    	"""
-        aromatic_bonds = []
-        all_pairs = list(itertools.combinations(cycle, 2))
-        visited = set()
-        for pair in all_pairs:
-            if (pair[0], pair[1]) not in visited and (pair[0], pair[1]) in self.bond_lookup:
-                aromatic_bonds.append(self.bond_lookup[(pair[0], pair[1])])
-                visited.add((pair[0], pair[1]))
-                visited.add((pair[1], pair[1]))
-        return aromatic_bonds
+    def separate_connected_components(self, bonds):
 
-    def separate_connected_components(self, index):
+        atoms = set()
+        for atom_i, atom_j in bonds:
+            atoms.add(atom_i)
+            atoms.add(atom_j)
 
-        parent_index = {i: i for i in index}
+        parent_index = {i: i for i in atoms}
 
         def find_parent(i):
             if i != parent_index[i]:
@@ -539,17 +560,14 @@ class Compound:
         def union(p_1, p_2):
             parent_index[p_1] = p_2
 
-        for bond in self.bonds:
-            index_1 = bond.first_atom_number
-            index_2 = bond.second_atom_number
-            if index_1 in index and index_2 in index:
-                p_1 = find_parent(index_1)
-                p_2 = find_parent(index_2)
-                if p_1 != p_2:
-                    union(p_1, p_2)
+        for atom_i, atom_j in bonds:
+            p_1 = find_parent(atom_i)
+            p_2 = find_parent(atom_j)
+            if p_1 != p_2:
+                union(p_1, p_2)
 
         groups = collections.defaultdict(list)
-        for i in index:
+        for i in atoms:
             p_i = find_parent(i)
             groups[p_i].append(i)
         return [groups[key] for key in groups]
@@ -660,7 +678,6 @@ class Compound:
         
         if all_cycles:
             self.has_cycle = True
-
         return [list(x) for x in set(tuple(x) for x in [sorted(i[:-1]) for l in all_cycles for i in l])]
 
     def structure_matrix(self, resonance=False):
@@ -1620,31 +1637,4 @@ class Compound:
         for idx in mappings:
             full_mappings[idx].append(mappings[idx])
         return full_mappings
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

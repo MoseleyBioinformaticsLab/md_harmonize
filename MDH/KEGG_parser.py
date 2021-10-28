@@ -1,11 +1,12 @@
-#!/usr/bin/python3
+#!/usr/bin/python3i
 
 import collections
-import compound
 import glob
-import tools
 import re
-import reaction
+
+from . import compound
+from . import reaction
+from . import tools
 
 def kegg_data_parser(data):
     """
@@ -108,6 +109,7 @@ def kegg_kcf_parser(kcf):
     :return: the dictionary of parsed kcf file.
     """
     compound_name, atom_count, atoms, bond_count, bonds = "", 0, [], 0, []
+
     for line in kcf:
         tokens = [item for item in line.split(' ') if item != '']
         if tokens[0] == "ENTRY":
@@ -121,7 +123,7 @@ def kegg_kcf_parser(kcf):
         else:
             if len(atoms) < atom_count:
                 atoms.append({"atom_symbol": tokens[2], "atom_number": int(tokens[0])-1, "x": tokens[3], "y": tokens[4], "kat": tokens[1]})
-            else:
+            elif len(bonds) < bond_count:
                 bonds.append({"first_atom_number":tokens[1], "second_atom_number": tokens[2], "bond_type": tokens[3]})
     return {"compound_name": compound_name, "atoms": atoms, "bonds": bonds}
 
@@ -541,7 +543,11 @@ def add_kat(compound, kcf_compound):
     color_kat = { atom.color: atom.kat for atom in kcf_compound.atoms if atom.default_symbol != "H" }
     for atom in compound.atoms:
         if atom.default_symbol != "H":
-            atom.kat = color_kat[atom.color]
+            if atom.color in color_kat:
+                atom.kat = color_kat[atom.color]
+            else:
+                print(compound.compound_name)
+                break
 
 # when we create the kegg reaction, we need to parse the atom mappings based on rclass!
 # To avoid parsing the same rclass repeatedly, let's parse the rclass first, and look it up when we need.

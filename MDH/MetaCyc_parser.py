@@ -7,8 +7,9 @@ Note: All MetaCyc reactions atom_mappings are stored in a single text file.
 
 import collections
 import copy
-import tools
-import reaction
+
+from . import tools
+from . import reaction
 
 def reaction_side_parser(reaction_side):
     """

@@ -4,6 +4,8 @@
 import json
 import jsonpickle
 
+jsonpickle.set_encoder_options('json', sort_keys=True, indent=4)
+
 def save_to_text(data, filename):
     """
     To save the data in a text file.

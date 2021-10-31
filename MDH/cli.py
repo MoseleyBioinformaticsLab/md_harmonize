@@ -11,6 +11,7 @@ Usage:
     MDH initialize <database_names> <working_directory> <aromatic_manager_file>
     MDH harmonize <database_names> <working_directory>
     MDH test
+    MDH test1
 
 Options:
     -h, --help          Show this screen.
@@ -43,10 +44,10 @@ def construct_kcf(file):
         return parser_dict['KEGG'].create_compound_kcf(file)
     return None
 
-def function_multiprocess(files, function):
+def function_multiprocess(entities, function):
 
     with multiprocessing.Pool() as pool:
-        results = pool.map(function, files)
+        results = pool.map(function, entities)
     return {cpd.compound_name: cpd for cpd in results if cpd}
 
 
@@ -131,12 +132,6 @@ def cli(args):
                         kcf_compound = parser.create_compound_kcf(kcf_file)
                         if "cpd:" + kcf_compound.cpd.compound_name in compound_dict:
                             parser.add_kat(compound_dict["cpd:" + kcf_compound.cpd.compound_name], kcf_compound)
-            # update compound
-            for cpd_name in compound_dict:
-                cpd = compound_dict[cpd_name]
-                aromatic_manager.detect_aromatic_substructures(cpd)
-                cpd.define_bond_stereochemistry()
-                cpd.curate_invalid_n()
 
             reaction_list = []
             # construct reactions
@@ -158,6 +153,13 @@ def cli(args):
                 if not os.path.exists(atom_mapping_file):
                     raise OSError("The file {0} does not exist.".format(atom_mapping_file))
                 reaction_list = parser.create_reactions(reaction_file, atom_mapping_file, compound_dict)
+
+                # update compound
+            for cpd_name in compound_dict:
+                cpd = compound_dict[cpd_name]
+                aromatic_manager.detect_aromatic_substructures(cpd)
+                cpd.define_bond_stereochemistry()
+                cpd.curate_invalid_n()
 
             save_directory = to_directory + "/{0}".format(database_name)
             os.makedirs(save_directory, exist_ok=True)
@@ -186,40 +188,76 @@ def cli(args):
         reaction_harmonization_manager = harmonization.harmonize_reaction_list(reaction_list, compound_harmonization_manager)
         tools.save_to_jsonpickle(reaction_harmonization_manager, working_directory + "/harmonized/{0}.json".format("_".join(database_names)))
 
+    elif args['test1']:
+
+        aromatic_manager = aromatics.AromaticManager.decode(
+            tools.open_jsonpickle("/mlab/data/hji236/projects/MDH_test/aromatic_manager.json"))
+        kegg_cpd_path = "/mlab/data/hji236/projects/MDH_test/standardized/KEGG/molfile_test"
+        meta_cpd_path = "/mlab/data/hji236/projects/MDH_test/standardized/MetaCyc/molfile_test"
+        to_file = "/mlab/data/hji236/projects/MDH_test/harmonized_edge_list.json"
+        kegg_molfiles = glob.glob(kegg_cpd_path + "/*")
+        meta_molfiles = glob.glob(meta_cpd_path + "/*")
+        kegg_dict = function_multiprocess(kegg_molfiles, construct_cpd)
+        meta_dict = function_multiprocess(meta_molfiles, construct_cpd)
+        for cpd_name in kegg_dict:
+            cpd = kegg_dict[cpd_name]
+            aromatic_manager.detect_aromatic_substructures(cpd)
+            cpd.define_bond_stereochemistry()
+            cpd.curate_invalid_n()
+        for cpd_name in meta_dict:
+            cpd = meta_dict[cpd_name]
+            aromatic_manager.detect_aromatic_substructures(cpd)
+            cpd.define_bond_stereochemistry()
+            cpd.curate_invalid_n()
+        compound_harmonization_manager = harmonization.harmonize_compound_list([kegg_dict, meta_dict])
+        edge_list = compound_harmonization_manager.get_edge_list()
+        tools.save_to_json(edge_list, to_file)
+
+
     elif args['test']:
 
         aromatic_manager = aromatics.AromaticManager.decode(tools.open_jsonpickle("/mlab/data/hji236/projects/MDH_test/aromatic_manager.json"))
-        cpd_path = "/mlab/data/hji236/projects/MDH_test/standardized/KEGG/molfile_test"
-        kcf_path = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf_test"
+        cpd_path = "/mlab/data/hji236/projects/MDH_test/standardized/KEGG/molfile"
+        kcf_path = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf"
         rclass_path = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/rclass/"
         to_file = "/mlab/data/hji236/projects/MDH_test/kegg_atom_mappings.json"
         parser = parser_dict['KEGG']
-
+        
         molfiles = glob.glob(cpd_path + "/*")
         compound_dict = function_multiprocess(molfiles, construct_cpd)
 
+        print("mofile construct")
 
         kcf_files = glob.glob(kcf_path + "/*")
         compound_dict_kcf = function_multiprocess(kcf_files, construct_kcf)
+        print("kcf construct")
 
         for cpd in compound_dict:
             if cpd[4:] in compound_dict_kcf:
-                parser.add_kat(compound_dict[cpd], compound_dict_kcf[cpd[4:]])
-        #
+                try:
+                    parser.add_kat(compound_dict[cpd], compound_dict_kcf[cpd[4:]])
+                except Exception as e:
+                    print(e)
+                    print("modified molfile, ", cpd)
+                    pass
+
+                
+        #       
         # for kcf_file in kcf_files:
         #     if os.path.getsize(kcf_file) != 0:
         #         kcf_compound = parser.create_compound_kcf(kcf_file)
         #         if "cpd:" + kcf_compound.cpd.compound_name in compound_dict:
         #             parser.add_kat(compound_dict["cpd:" + kcf_compound.cpd.compound_name], kcf_compound)
 
+        atom_mappings = parser.create_atom_mappings(rclass_path, compound_dict)
+        tools.save_to_json(atom_mappings, to_file)
+
         for cpd_name in compound_dict:
             cpd = compound_dict[cpd_name]
-            aromatic_manager.detect_aromatic_substructures(cpd)
+            #aromatic_manager.detect_aromatic_substructures(cpd)
             cpd.define_bond_stereochemistry()
             cpd.curate_invalid_n()
 
-        # atom_mappings = parser.create_atom_mappings(rclass_path, compound_dict)
-        # tools.save_to_jsonpickle(atom_mappings, to_file)
 
 
         # file1 = "/mlab/data/hji236/projects/MDH_test/KEGG_kcf_aromatics.json"

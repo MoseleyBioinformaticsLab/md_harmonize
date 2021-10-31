@@ -3,6 +3,8 @@
 import collections
 import glob
 import re
+import multiprocessing
+import timeout_decorator
 
 from . import compound
 from . import reaction
@@ -39,8 +41,10 @@ def kegg_data_parser(data):
     DBLINKS     RHEA: 24295
     ///
 
-    :param str data: the KEGG reaction description.
-    :return: the dictionary of the parsed KEGG reaction.
+    :param data: the KEGG reaction description.
+    :type data: :py:obj:`str`.
+    :return: the dictionary of parsed KEGG data.
+    :rtype: :py:obj:`dict`.
     """
     reaction_dict = collections.defaultdict(list)
     key = ""
@@ -60,8 +64,11 @@ def parse_equation(equation):
 
     eg:
     C00029 + C00001 + 2 C00003 <=> C00167 + 2 C00004 + 2 C00080
+
     :param equation: the equation string.
-    :return:
+    :type equation: :py:obj:`str`.
+    :return: the parsed KEGG reaction equation.
+    :rtype: :py:obj:`dict`.
     """
     compound_pattern = "C....."
     one_side_coefficients = {}
@@ -105,8 +112,10 @@ def kegg_kcf_parser(kcf):
                 8     6   9 2
     ///
 
-    :param kcf: the kcf text
+    :param kcf: the kcf text.
+    :type kcf: :py:obj:`str`.
     :return: the dictionary of parsed kcf file.
+    :rtype: :py:obj:`dict`.
     """
     compound_name, atom_count, atoms, bond_count, bonds = "", 0, [], 0, []
 
@@ -127,7 +136,7 @@ def kegg_kcf_parser(kcf):
                 bonds.append({"first_atom_number":tokens[1], "second_atom_number": tokens[2], "bond_type": tokens[3]})
     return {"compound_name": compound_name, "atoms": atoms, "bonds": bonds}
 
-
+# Define the reaction center in the rclass definition.
 reaction_center = collections.namedtuple('reaction_center', ['i', 'kat', 'label', 'match', 'difference'])
 
 class RpairParser:
@@ -144,17 +153,23 @@ class RpairParser:
         4) Next, we need to find the one to one atom mappings between the two compounds based on the mapped center atoms.
         5) To solve this issue, we first disassemble each compound into several different components. This is due to the
         difference atoms in the two compounds.
+        6) Then we need to find the mappings of the disassembled components.
 
         Here, we can see that several different combinations are involved. Please pay attention to this!
     """
 
     def __init__(self, rclass_name, rclass_definitions, one_compound, the_other_compound):
         """
+        RpairParser initializer.
 
-        :param rclass_name:
-        :param rclass_definitions:
-        :param one_compound:
-        :param the_other_compound:
+        :param rclass_name: the rclass name.
+        :type rclass_name: :py:obj:`str`.
+        :param rclass_definitions: a list of rclass definitions.
+        :type rclass_definitions: :py:obj:`list`.
+        :param one_compound: one compound involved in the pair.
+        :type one_compound: :class:`~MDH.compound.Compound`.
+        :param the_other_compound: the other compound involved in the pair.
+        :type the_other_compound: :class:`~MDH.compound.Compound`.
         """
         self.rclass_name = rclass_name
         self.rclass_definitions = rclass_definitions
@@ -164,9 +179,14 @@ class RpairParser:
     @staticmethod
     def generate_kat_neighbors(compound):
         """
-        To generate the
-        :param compound:
-        :return:
+        To generate the atom neighbors represented by KEGG atom type for each atom in the compound.
+        This is used to find the center atom.
+        We used KEGG atom type since the descriptions of atoms in rclass definitions use KEGG atom type.
+
+        :param compound: the compound entity.
+        :type compound: :class:`~MDH.compound.Compound`.
+        :return: the list of atom with its neighbors.
+        :rtype: :py:obj:`list`.
         """
         atoms = []
         for atom in compound.atoms:
@@ -178,8 +198,9 @@ class RpairParser:
     @staticmethod
     def search_target_atom(atoms, target):
         """
+        To search the target atom from a list of atoms.
 
-        :param atoms:
+        :param atoms: a list of atoms to be searched.
         :param target:
         :return:
         """
@@ -215,7 +236,6 @@ class RpairParser:
         :param center_atom_index: list of atom index list for each reaction centers.
         :return:
         """
-
         combines = []
         def dfs(i, seen):
             if i == len(center_atom_index):
@@ -346,7 +366,7 @@ class RpairParser:
                     graph[i].append(j)
                     graph[j].append(i)
 
-        nodes = set(graph.keys() + center_atom_index)
+        nodes = set(list(graph.keys()) + center_atom_index)
         visited = set()
         components = []
         for node in nodes:
@@ -413,12 +433,16 @@ class RpairParser:
         """
         left_partial_compound.color_compound(r_groups=False, bond_stereo=False, atom_stereo=False, resonance=True)
         right_partial_compound.color_compound(r_groups=False, bond_stereo=False, atom_stereo=False, resonance=True)
-        mapped_atoms = collections.Counter()
+        left, mapped = 0, 0
         for atom_left in left_partial_compound.atoms:
-            for atom_right in right_partial_compound.atoms:
-                if atom_left.color_layers == atom_right.color_layers:
-                    mapped_atoms[atom_left.atom_number] += 1
-        return len(mapped_atoms) == len(left_partial_compound.atoms)
+            if atom_left.default_symbol != "H":
+                left += 1
+                for atom_right in right_partial_compound.atoms:
+                    if atom_left.color_layers == atom_right.color_layers:
+                        mapped += 1
+                        break
+        #print(left, mapped)
+        return left == mapped
 
     def map_separate_components(self, left_removed_bonds, right_removed_bonds, left_index_comb, right_index_comb):
         """
@@ -437,6 +461,18 @@ class RpairParser:
         for left_component, right_component in component_pairs:
             left_partial_compound = self.construct_partial_compound(self.one_compound, left_component, left_removed_bonds)
             right_partial_compound = self.construct_partial_compound(self.the_other_compound, right_component, right_removed_bonds)
+            #print(left_component)
+            #print(right_component)
+            #print(len([atom for atom in left_partial_compound.atoms if atom.default_symbol != "H"]))
+            #print(len([atom for atom in right_partial_compound.atoms if atom.default_symbol != "H"]))
+            #print("left structure matrix")
+            #print(left_partial_compound.structure_matrix(resonance=True))
+            #print("right structure matrix")
+            #print(right_partial_compound.structure_matrix(resonance=True))
+            #print("left distance matrix")
+            #print(left_partial_compound.distance_matrix)
+            #print("right distance matrix")
+            #print(right_partial_compound.distance_matrix)
             if not self.preliminary_atom_mappings_check(left_partial_compound, right_partial_compound):
                 continue
             mappings = left_partial_compound.find_mappings(right_partial_compound, resonance=True, r_distance=False)
@@ -510,16 +546,18 @@ class RpairParser:
 
 def create_compound_kcf(kcf_file):
     """
-    Create compound identities based on the KEGG kcf file.
-    :param kcf_directory:
-    :return:
-    """
-    # To put all the compounds into dictionary.
+    To construct compound entity based on the KEGG kcf file.
 
+    :param kcf_file: the filename contains kcf text.
+    :type kcf_file: :py:obj:`str`.
+    :return: the constructed compound entity.
+    :rtype: :class:`~MDH.compound.Compound`.
+    """
     kcf_dict = kegg_kcf_parser(tools.open_text(kcf_file).split("\n"))
     atoms = [compound.Atom(atom["atom_symbol"], atom["atom_number"], x=atom["x"], y=atom["y"], kat=atom["kat"]) for
              atom in kcf_dict["atoms"]]
     bonds = [compound.Bond(bond["first_atom_number"], bond["second_atom_number"], bond["bond_type"]) for bond in kcf_dict["bonds"]]
+    
     return compound.Compound(kcf_dict["compound_name"], atoms, bonds)
 
 # steps, we need to first construct KEGG kcf compounds, and use them to construct aromatic substructure set.
@@ -538,16 +576,26 @@ def create_compound_kcf(kcf_file):
 
 
 def add_kat(compound, kcf_compound):
+    """
+    To add kegg atom type to each atom in the compound based on the corresponding kcf compound.
+
+    :param compound: a compound entity.
+    :type compound: :class:`~MDH.compound.Compound`.
+    :param kcf_compound: the corresponding compound entity parsed from KCF file.
+    :type kcf_compound: :class:`~MDH.compound.Compound`.
+    :return: None.
+    :rtype: :py:obj:`None`.
+    """
     compound.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False)
     kcf_compound.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False)
     color_kat = { atom.color: atom.kat for atom in kcf_compound.atoms if atom.default_symbol != "H" }
+
     for atom in compound.atoms:
         if atom.default_symbol != "H":
-            if atom.color in color_kat:
-                atom.kat = color_kat[atom.color]
-            else:
-                print(compound.compound_name)
-                break
+            if atom.color not in color_kat:
+                print(atom.atom_number)
+            atom.kat = color_kat[atom.color]
+            
 
 # when we create the kegg reaction, we need to parse the atom mappings based on rclass!
 # To avoid parsing the same rclass repeatedly, let's parse the rclass first, and look it up when we need.
@@ -600,6 +648,33 @@ def create_reactions(reaction_directory, compounds, atom_mappings):
                                            this_atom_mappings, one_side_coefficients))
     return reactions
 
+@timeout_decorator.timeout(200)
+def compound_pair_mappings(rclass_name, rclass_definitions, one_compound, the_other_compound):
+    """
+    To get the atom mappings between two compounds based on the rclass definitions.
+
+    :param rclass_name: the name of the rclass.
+    :type rclass_name: :py:obj:`str`.
+    :param rclass_definitions: the list of rclass definitions.
+    :type rclass_definitions: :py:obj:`list`.
+    :param one_compound: one compound entity involved in the compound pair.
+    :type one_compound: :class:`~MDH.compound.Compound`.
+    :param the_other_compound: the other compound entity involved in the compound pair.
+    :type the_other_compound: :class:`~MDH.compound.Compound`.
+    :return: the compound pair name and the its atom mappings.
+    :rtype: :py:obj:`str` and :py:obj:`list`.
+    """
+    atom_mappings = []
+    try:
+        one_mappings = RpairParser(rclass_name, rclass_definitions, one_compound, the_other_compound).map_center_atoms()
+        the_other_mappings = RpairParser(rclass_name, rclass_definitions, the_other_compound, one_compound).map_center_atoms()
+        atom_mappings = one_mappings if len(one_mappings) > len(the_other_mappings) else the_other_mappings
+    except Exception:
+        # print(rclass_name + "_" + one_compound.compound_name[4:] + "_" + the_other_compound.compound_name[4:] + "can hardly be parsed.")
+        pass
+    return one_compound.compound_name[4:] + "_" + the_other_compound.compound_name[4:], atom_mappings
+
+
 def create_atom_mappings(rclass_directory, compounds):
     """
     :param rclass_directory:
@@ -612,31 +687,20 @@ def create_atom_mappings(rclass_directory, compounds):
         this_rclass = kegg_data_parser(tools.open_text(rclass_file).split("\n"))
         rclass_definitions = this_rclass["DEFINITION"]
         rclass_name = this_rclass["ENTRY"][0].split()[0]
+        compound_pairs = []
         for line in this_rclass["RPAIR"]:
             tokens = line.split()
             for token in tokens:
                 one_compound_name, the_other_compound_name = token.split("_")
-                one_compound, the_other_compound = compounds["cpd:" + one_compound_name], compounds["cpd:"+the_other_compound_name]
-                one_mappings = RpairParser(rclass_name, rclass_definitions, one_compound, the_other_compound).map_center_atoms()
-                the_other_mappings = RpairParser(rclass_name, rclass_definitions, the_other_compound, one_compound).map_center_atoms()
-                atom_mappings[rclass_name][token] = one_mappings if len(one_mappings) > len(the_other_mappings) else the_other_mappings
+                if "cpd:" + one_compound_name in compounds and "cpd:" + the_other_compound_name in compounds:
+                    compound_pairs.append((compounds["cpd:" + one_compound_name], compounds["cpd:" + the_other_compound_name]))
+
+        with multiprocessing.Pool() as pool:
+            results = pool.starmap(compound_pair_mappings, ((rclass_name, rclass_definitions, one_compound, the_other_compound)
+                                                            for one_compound, the_other_compound in compound_pairs))
+        for name, mapping in results:
+            atom_mappings[rclass_name + "_" + name] = mapping
+            if not mapping:
+                print(rclass_name + "_" + name)
     return atom_mappings
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

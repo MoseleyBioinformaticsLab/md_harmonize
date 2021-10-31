@@ -119,6 +119,9 @@ class CompoundHarmonizationManager(HarmonizationManager):
         self.compound_in_edges[edge.one_side.name] -= 1
         self.compound_in_edges[edge.the_other_side.name] -= 1
 
+    def get_edge_list(self):
+
+        return list(self.harmonized_edges.keys())
 
 class ReactionHarmonizationManager(HarmonizationManager):
 

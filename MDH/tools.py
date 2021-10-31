@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-
 import json
 import jsonpickle
 
@@ -10,9 +9,12 @@ def save_to_text(data, filename):
     """
     To save the data in a text file.
 
-    :param data:
-    :param filename:
-    :return:
+    :param data: data to be saved.
+    :type data: :py:obj:`str`.
+    :param filename: the file to save the data.
+    :type filename: :py:obj:`str`.
+    :return: None.
+    :rtype: :py:obj:`None`.
     """
     with open(filename, 'w') as outfile:
         outfile.write(data)
@@ -20,9 +22,13 @@ def save_to_text(data, filename):
 def save_to_jsonpickle(data, filename):
     """
     To save the data via jsonpickle.
-    :param data:
-    :param filename:
-    :return:
+
+    :param data: data to be saved.
+    :type data: :py:obj:`obj`.
+    :param filename: the file to save the data.
+    :type filename: :py:obj:`str`.
+    :return: None.
+    :rtype: :py:obj:`None`.
     """
     with open(filename, 'w') as outfile:
         outfile.write(jsonpickle.encode(data, keys=True))
@@ -30,19 +36,27 @@ def save_to_jsonpickle(data, filename):
 def save_to_json(data, filename):
     """
     To save the data into json.
-    :param data:
-    :param filename:
-    :return:
+
+    :param data: data to be saved.
+    :type data: :py:obj:`obj`.
+    :param filename: the file to save the data.
+    :type filename: :py:obj:`str`.
+    :return: None.
+    :rtype: :py:obj:`None`.
     """
     with open(filename, 'w') as outfile:
         json.dump(data, outfile, indent=4)
 
 def open_text(filename, encoding='utf-8'):
     """
-    To open the text file.
-    :param filename:
-    :param encoding:
-    :return:
+    To load text file.
+
+    :param filename: the file to be loaded.
+    :type filename: :py:obj:`str`.
+    :param encoding: The name of the encoding used to decode the stream’s bytes into strings.
+    :type encoding: :py:obj:`str`.
+    :return: the decoded data from the file.
+    :rtype: :py:obj:`str`.
     """
     with open(filename, 'r', encoding=encoding) as infile:
         data = infile.read()
@@ -50,9 +64,12 @@ def open_text(filename, encoding='utf-8'):
 
 def open_jsonpickle(filename):
     """
-    To open the data via jsonpickle.
-    :param filename:
-    :return:
+    To load data via jsonpickle.
+
+    :param filename: the file to be loaded.
+    :type filename: :py:obj:`str`.
+    :return: the decoded data from the file.
+    :rtype: :py:obj:`obj`.
     """
     with open(filename, 'r') as infile:
         data = jsonpickle.decode(infile.read(), keys=True)
@@ -60,18 +77,15 @@ def open_jsonpickle(filename):
 
 def open_json(filename):
     """
-    To open the data via json.
-    :param filename:
-    :return:
+    To load data via json.
+
+    :param filename: the file to be loaded.
+    :type filename: :py:obj:`str`.
+    :return: the decoded data from the file.
+    :rtype: :py:obj:`obj`.
     """
     with open(filename, 'r') as infile:
         data = json.load(infile)
     return data
 
-
-if __name__ == '__main__':
-
-    data = open_text("/mlab/data/hji236/projects/metabolic_database_harmonization/MetaCyc_parser.py").split("\n")
-    for line in data:
-        print(line)
 

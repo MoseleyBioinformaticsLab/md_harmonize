@@ -11,7 +11,6 @@ and the :class:`~MDH.compound.Compound` class to construct compound entity.
 """
 
 import collections
-import itertools
 import numpy
 import heapq
 from pathlib import Path
@@ -31,22 +30,38 @@ class Atom:
                  inversion_retention_flag="0", exact_change_flag="0", kat=""):
         """Atom initializer.
 
-        :param str atom_symbol: atom_symbol.
-        :param str atom_number: atom_number.
-        :param str x: the atom x coordinate.
-        :param str y: the atom y coordinate.
-        :param str z: the atom z coordinate.
-        :param str mass_difference: difference from mass in periodic table.
-        :param str charge: charge.
-        :param str atom_stereo_parity: atom stereo parity.
-        :param str hydrogen_count: hydrogen_count.
-        :param str stereo_care_box: stereo_care_box.
-        :param str valence: valence.
-        :param str h0designator: h0designator.
-        :param str atom_atom_mapping_number: atom_atom_mapping_number.
-        :param str inversion_retention_flag: inversion_retention_flag.
-        :param str exact_change_flag: exact_change_flag.
-        :param str kat: KEGG atom type.
+        :param atom_symbol: atom_symbol.
+        :type atom_symbol: :py:obj:`str`.
+        :param atom_number: atom_number.
+        :type atom_number: :py:obj:`int`.
+        :param x: the atom x coordinate.
+        :type x: :py:obj:`str`.
+        :param y: the atom y coordinate.
+        :type y: :py:obj:`str`.
+        :param z: the atom z coordinate.
+        :type z: :py:obj:`str`.
+        :param mass_difference: difference from mass in periodic table.
+        :type mass_difference: :py:obj:`str`.
+        :param charge: charge.
+        :type charge: :py:obj:`str`.
+        :param atom_stereo_parity: atom stereo parity.
+        :type atom_stereo_parity: :py:obj:`str`.
+        :param hydrogen_count: hydrogen_count.
+        :type hydrogen_count: :py:obj:`str`.
+        :param stereo_care_box: stereo_care_box.
+        :type stereo_care_box: :py:obj:`str`.
+        :param valence: valence.
+        :type: valence: :py:obj:`str`.
+        :param h0designator: h0designator.
+        :type h0designator: :py:obj:`str`.
+        :param atom_atom_mapping_number: atom_atom_mapping_number.
+        :type atom_atom_mapping_number: :py:obj:`str`.
+        :param inversion_retention_flag: inversion_retention_flag.
+        :type inversion_retention_flag: :py:obj:`str`.
+        :param exact_change_flag: exact_change_flag.
+        :type exact_change_flag: :py:obj:`str`.
+        :param kat: KEGG atom type.
+        :type kat: :py:obj:`str`.
     	"""
         self.x = float(x.strip())
         self.y = float(y.strip())
@@ -77,35 +92,48 @@ class Atom:
 
     def update_symbol(self, symbol):
         """
-        To update the symbol of the atom.
-        :param str symbol: the updated atom symbol.
+        To update the atom symbol.
 
+        :param symbol: the updated atom symbol.
+        :type symbol: :py:obj:`str`.
         :return: the updated atom_symbol.
+        :rtype: :py:obj:`str`.
     	"""
         self.atom_symbol = symbol
         return self.atom_symbol
 
     def update_atom_number(self, index):
         """
-        Update the
-        :param index:
-        :return:
+        To update the atom number.
+
+        :param index: the updated atom number.
+        :type index: :py:obj:`int`.
+        :return: the updated atom number.
+        :rtype: :py:obj:`int`.
         """
         self.atom_number = index
         return self.atom_number
 
     @property
     def default_symbol(self):
+        """
+        To get the atom symbol. If the atom symbol is not specified, return "R".
 
+        :return: the atom symbol.
+        :rtype: :py:obj:`str`.
+        """
         if self.is_r:
             return "R"
         return self.atom_symbol
 
     def remove_neighbors(self, neighbors):
         """
-        To add neighbors to the atom.
-        :param list neighbors: the index of neighbors that will be removed from this atom.
+        To remove neighbors to the atom.
+
+        :param neighbors: the list of neighbors that will be removed from this atom.
+        :type neighbors: :py:obj:`list`.
         :return: the updated list of neighbors of the atom.
+        :rtype: :py:obj:`list`.
         """
         for atom_index in neighbors:
             if atom_index in self.neighbors:
@@ -115,9 +143,11 @@ class Atom:
     def add_neighbors(self, neighbors):
         """
         To add neighbors to the atom.
-        :param list neighbors: the index of neighbors that will be added to this atom.
 
+        :param neighbors: the list of neighbors that will be removed from this atom.
+        :type neighbors: :py:obj:`list`.
         :return: the updated list of neighbors of the atom.
+        :rtype: :py:obj:`list`.
         """
         for atom_index in neighbors:
             if atom_index not in self.neighbors:
@@ -126,10 +156,12 @@ class Atom:
 
     def update_stereochemistry(self, stereo):
         """
-        To update the stereochemistry of the atom.
-        :param str stereo: the updated atom stereochemistry.
+        To update the atom stereochemistry.
 
-        :return: the updated stereochemistry.
+        :param stereo: the updated atom stereochemistry.
+        :type stereo: :py:obj:`str`.
+        :return: the updated atom stereochemistry.
+        :rtype: :py:obj:`str`.
     	"""
         self.atom_stereo_parity = stereo
         return self.atom_stereo_parity
@@ -137,16 +169,16 @@ class Atom:
     def color_atom(self, isotope_resolved=False, charge=False, atom_stereo=False):
         """
         To generate the zero layer atom color.
+
         :param isotope_resolved: If true, add isotope information when constructing colors.
-        :type isotope_resolved: :py:obj:`True` or :py:obj:`False`.
+        :type isotope_resolved: :py:class:`bool`.
         :param charge: If true, add charge information when constructing colors.
-        :type charge: :py:obj:`True` or :py:obj:`False`.
+        :type charge: :py:class:`bool`.
         :param atom_stereo: If true, add atom stereochemistry information when constructing colors.
-        :type atom_stereo: :py:obj:`True` or :py:obj:`False`.
-
+        :type atom_stereo: :py:class:`bool`.
 	    :return: the zero layer atom color.
+	    :rtype: :py:obj:`str`.
     	"""
-
         self.color_0 = ""
         self.color_0 += self.default_symbol
         if atom_stereo:
@@ -160,9 +192,10 @@ class Atom:
 
     def reset_color(self):
         """
-        Set the color of the atom to empty.
+        Reset the atom color.
 
-        :return:
+        :return: None.
+        :rtype: :py:obj:`None`.
     	"""
         self.color_0 = ""
         self.color = ""
@@ -171,28 +204,34 @@ class Atom:
     @property
     def is_r(self):
         """
-        To determine if the atom is an R group.
+        To determine if the atom symbol is specified.
 
-        :return: boolean.
+        :return: bool whether the atom symbol is specified.
+        :rtype: :py:class:`bool`.
         """
-        if "A" in self.atom_symbol or "R" in self.atom_symbol or "*" in self.atom_symbol:
+        if "A" in self.atom_symbol or "R" in self.atom_symbol or "*" in self.atom_symbol or self.atom_symbol == "X":
             if self.atom_symbol not in not_r_groups:
                 return True
         return False
 
     def update_kat(self, kat):
         """
-        Update the atom kegg atom type.
-        :param kat:
-        :return:
+        To update the atom KEGG atom type.
+
+        :param kat: the KEGG atom type for this atom,
+        :type kat: :py:obj:`str`.
+        :return: the updated KEGG atom type.
+        :rtype: :py:obj:`str`.
         """
         self.kat = kat
         return self.kat
 
     def clone(self):
         """
+        To clone the atom.
 
-        :return:
+        :return: the cloned atom.
+        :rtype: :class:`~MDH.compound.Atom`.
         """
         return Atom(self.atom_symbol, self.atom_number, x=str(self.x), y=str(self.y), z=str(self.z), mass_difference=self.mass_difference,
                     charge=str(self.charge), atom_stereo_parity=self.atom_stereo_parity, hydrogen_count=self.hydrogen_count,
@@ -207,14 +246,20 @@ class Bond:
     def __init__(self, first_atom_number, second_atom_number, bond_type, bond_stereo="0", bond_topology="0", reacting_center_status="0"):
         """Bond initializer.
 
-        :param str first_atom_number: the index of the first atom forming this bond.
-        :param str second_atom_number: the index of the second atom forming this bond.
-        :param str bond_type: the bond type. (1 = Single, 2 = Double, 3 = Triple, 4 = Aromatic, 5 = Single or
+        :param first_atom_number: the index of the first atom forming this bond.
+        :type first_atom_number: :py:obj:`str`.
+        :param second_atom_number: the index of the second atom forming this bond.
+        :type second_atom_number: :py:obj:`str`.
+        :param bond_type: the bond type. (1 = Single, 2 = Double, 3 = Triple, 4 = Aromatic, 5 = Single or
         Double, 6 = Single or Aromatic, 7 = double or Aromatic 8 = Any)
-        :param str bond_stereo: the bond stereo. (Single bonds: 0 = not stereo, 1 = Up, 4 = Either, 6 = Down;
+        :type bond_type: :py:obj:`str`.
+        :param bond_stereo: the bond stereo. (Single bonds: 0 = not stereo, 1 = Up, 4 = Either, 6 = Down;
         Double bonds: determined by x, y, z coordinates)
-        :param str bond_topology: bond topology. (O = Either, 1 = Ring, 2 = Chain)
-        :param str reacting_center_status: reacting center status.
+        :type bond_stereo: :py:obj:`str`.
+        :param bond_topology: bond topology. (O = Either, 1 = Ring, 2 = Chain)
+        :type bond_topology: :py:obj:`str`.
+        :param reacting_center_status: reacting center status.
+        :type reacting_center_status: :py:obj:`str`.
     	"""
         self.first_atom_number = int(first_atom_number) - 1
         self.second_atom_number = int(second_atom_number) - 1
@@ -225,46 +270,58 @@ class Bond:
  
     def update_bond_type(self, bond_type):
         """
-        To update the bond type of the atom.
-        :param str bond_type: the updated bond type.
+        To update the bond type.
 
+        :param bond_type: the updated bond type.
+        :type bond_type: :py:obj:`str`.
         :return: the updated bond type.
+        :rtype: :py:obj:`str`.
     	"""
         self.bond_type = str(bond_type)
         return self.bond_type
 
     def update_stereochemistry(self, stereo):
         """
-        To update the stereochemistry of the bond.
-        :param str stereo: the updated atom stereochemistry.
+        To update the bond stereochemistry.
 
-        :return: the updated stereochemistry.
+        :param stereo: the updated bond stereochemistry.
+        :type stereo: :py:obj:`str`.
+        :return: the updated bond stereochemistry.
+        :rtype: :py:obj:`str`.
     	"""
         self.bond_stereo = str(stereo)
         return self.bond_stereo
 
     def update_first_atom(self, index):
         """
+        To update the first atom number of the bond.
 
-        :param index:
-        :return:
+        :param index: the updated first atom number.
+        :type index: :py:obj:`int`.
+        :return: the updated first atom number.
+        :rtype: :py:obj:`int`.
         """
         self.first_atom_number = index
         return self.first_atom_number
 
     def update_second_atom(self, index):
         """
+        To update the second atom number of the bond.
 
-        :param index:
-        :return:
+        :param index: the updated second atom number.
+        :type index: :py:obj:`int`.
+        :return: the updated second atom number.
+        :rtype: :py:obj:`int`.
         """
         self.second_atom_number = index
         return self.second_atom_number
 
     def clone(self):
         """
+        To clone the bond.
 
-        :return:
+        :return: the cloned bond.
+        :rtype: :class:`~MDH.compound.Bond`.
         """
         return Bond(str(self.first_atom_number+1), str(self.second_atom_number+1), self.bond_type, bond_stereo=self.bond_stereo,
                     bond_topology=self.bond_topology, reacting_center_status=self.reacting_center_status)
@@ -277,9 +334,12 @@ class Compound:
     def __init__(self, compound_name, atoms, bonds):
         """Compound initializer.
 			
-        :param str compound_name: the compound name.
-        :param list atoms: a list of :class:`~MDH.compound.Atom` entities in the compound.
-        :param list bonds: a list of :class:`~MDH.compound.Bond` entities in the compound.
+        :param compound_name: the compound name.
+        :type compound_name: :py:obj:`str`.
+        :param atoms: a list of :class:`~MDH.compound.Atom` entities in the compound.
+        :type atoms: :py:obj:`list`.
+        :param bonds: a list of :class:`~MDH.compound.Bond` entities in the compound.
+        :type bonds: :py:obj:`list`.
     	"""
         self.compound_name = compound_name
         self.atoms = atoms
@@ -300,21 +360,34 @@ class Compound:
         self.calculate_distance_to_r_groups()
 
     def encode(self):
+        """
+        To clone the compound.
+
+        :return: the cloned compound.
+        :rtype: :class:`~MDH.compound.Compound`.
+        """
         return self.compound_name, [atom.clone() for atom in self.atoms], [bond.clone() for bond in self.bonds]
 
     @property
     def name(self):
+        """
+        To get the compound name.
+        :return: the compound name.
+        :rtype: :py:obj:`str`.
+        """
         return self.compound_name
 
     @staticmethod
     def create(molfile):
         """
         Create the compound entity based on the molfile representation.
-        :param molfile:
-        :return:
+
+        :param molfile: the filename of the molfile.
+        :type molfile: :py:obj:`str`.
+        :return: the constructed compound entity.
+        :rtype: :class:`~MDH.compound.Compound`.
         """
         compound_name = Path(molfile).stem
-        print(compound_name)
         try:
             with open(molfile, 'r') as infile:
                 ct_object = ctfile.load(infile)
@@ -334,7 +407,8 @@ class Compound:
         """
         To construct the formula of this compound (only consider heavy atoms).
 
-        :return: string.
+        :return: string formula of the compound.
+        :rtype: :py:obj:`str`.
     	"""
         counter = collections.Counter()
         for atom in self.atoms:
@@ -350,9 +424,14 @@ class Compound:
     def composition(self):
         """
         To get the atom symbols and bond types in the compound.
-        :return:
+
+        :return: the atom and bond information of the compound
+        :rtype: :py:obj:`dict`.
         """
-        return set([atom.default_symbol for atom in self.atoms] + [bond.bond_type for bond in self.bonds])
+        atom_composition = collections.Counter([atom.default_symbol for atom in self.atoms])
+        bond_composition = collections.Counter([bond.bond_type for bond in self.bonds])
+        atom_composition.update(bond_composition)
+        return atom_composition
 
     @property
     def r_groups(self):
@@ -360,6 +439,7 @@ class Compound:
         To get all the R groups in the compound.
 
         :return: the list of index of all the R groups.
+        :rtype: :py:obj:`list`.
     	"""
         return [index for index, atom in enumerate(self.atoms) if atom.is_r]
 
@@ -367,7 +447,8 @@ class Compound:
         """
         To check if the compound contains R group(s).
 
-        :return: boolean.
+        :return: bool whether the compound contains R group.
+        :rtype: :py:class:`bool`.
     	"""
         return self.r_groups != []
 
@@ -375,7 +456,8 @@ class Compound:
         """
         To check if the compound has atoms that have no connections to other atoms.
 
-        :return: boolean
+        :return: bool whether the compound has isolated atoms.
+        :rtype: :py:class:`bool`.
     	"""
         for atom in self.atoms:
             if atom.bond_counts == 0:
@@ -385,18 +467,20 @@ class Compound:
     @property
     def metal_index(self):
         """
-        To get the indexes of metals without connections to other atoms in the compound.
+        To get the list of metals in the compound.
 
-        :return: the list of index of isolated metals.
+        :return: a list of atom numbers of metals.
+        :rtype: :py:class:`list`.
         """
         return [index for index, atom in enumerate(self.atoms) if atom.default_symbol in metal_symbols]
     
     @property
     def h_index(self):
         """
-        To get the index of H(s) in the compound.
+        To get the list of H(s) in the compound.
 
-        :return: the list of index of Hs.
+        :return: a list of atom numbers of H(s).
+        :rtype: :py:class:`list`.
     	"""
         return [index for index, atom in enumerate(self.atoms) if atom.default_symbol == "H"]
 
@@ -404,35 +488,39 @@ class Compound:
     def heavy_atoms(self):
         """
         To get all the heavy atoms in the compound.
-        :param self:
-        :return: the list of heavy atoms in the compound.
-        """
 
+        :return: a list of atom numbers of heavy atoms.
+        :rtype: :py:class:`list`.
+        """
         return [atom for atom in self.atoms if atom.default_symbol != "H"]
 
     @property
     def index_of_heavy_atoms(self):
         """
-        To map the atom index to heavy atoms.
+        To map the atom number to index of the heavy atom list.
 
-        :return: the dictionary of atom index to atom entity.
+        :return: the dictionary of atom number to atom index of heavy atoms.
+        :rtype: :py:class:`dict`.
     	"""
         return { atom.atom_number: i for i, atom in enumerate(self.heavy_atoms) }
 
-    def is_symmetric(self, atom_index):
-
-        for index in atom_index:
-            color = self.atoms[index].color
-            if len(self.color_compound()[color]) > 1:
-                return False
-        return True
+    # def is_symmetric(self, atom_index):
+    #
+    #     for index in atom_index:
+    #         color = self.atoms[index].color
+    #         if len(self.color_compound()[color]) > 1:
+    #             return False
+    #     return True
        
     def color_groups(self, excluded=None):
         """
         To update the compound color groups after coloring.
 
-        :return: the dictionary of atom color name with the corresponding list of atom index.
+        :return: the dictionary of atom color with the list of atom number.
+        :rtype: :py:class:`dict`.
     	"""
+        if not excluded:
+            excluded = []
         color_groups = collections.defaultdict(list)
         for atom in self.atoms:
             if atom.atom_number not in excluded:
@@ -441,9 +529,10 @@ class Compound:
 
     def detect_abnormal_atom(self):
         """
-        Find the atoms with invalid bond counts.
+        To find the atoms with invalid bond counts.
 
-        :return: the list of abnormal atom index.
+        :return: a list of atom numbers with invalid bond counts.
+        :rtype: :py:class:`list`.
     	"""
         abnormal_atoms = collections.defaultdict(list)
         for index, atom in enumerate(self.atoms):
@@ -460,9 +549,10 @@ class Compound:
 
     def curate_invalid_n(self):
         """
-        Curate the invalid N atoms.
+        To curate the invalid N atoms.
 
-        :return:
+        :return: None.
+        :rtype: :py:obj:`None`.
     	"""
         abnormal_atoms = self.detect_abnormal_atom()
         for atom_index in abnormal_atoms["N"]:
@@ -473,17 +563,17 @@ class Compound:
                     self.atoms[neighbor].charge -= 1
                     self.bond_lookup[(atom.atom_number, neighbor)].update_stereochemistry("1")
 
-    def metals(self):
-        """
-        To get all the metals in the compound.
-
-        :return: the dictionary of metal and the corresponding list of index.
-    	"""
-        metals = collections.defaultdict(list)
-        for index, atom in enumerate(self.atoms):
-            if atom.default_symbol in metal_symbols:
-                metals[atom.default_symbol].append(index)
-        return metals
+    # def metals(self):
+    #     """
+    #     To get all the metals in the compound.
+    #
+    #     :return: the dictionary of metal and the corresponding list of index.
+    # 	"""
+    #     metals = collections.defaultdict(list)
+    #     for index, atom in enumerate(self.atoms):
+    #         if atom.default_symbol in metal_symbols:
+    #             metals[atom.default_symbol].append(index)
+    #     return metals
 
     # def update_aromatic_bond_type(self, cycles):
     #     """
@@ -504,6 +594,19 @@ class Compound:
     #         bond.update_bond_type("1")
 
     def update_aromatic_bond(self, aromatic_bonds, aromatic_atoms):
+        """
+        To update the bond type of aromatic bonds in the compound.
+        Two steps are involved:
+            1) Update the bond in the aromatic ring to type "4".
+            2) Update the double bond connecting to the aromatic ring to "1".
+
+        :param aromatic_bonds: a list of aromatic bonds in the compound (represented by the first and second atom number).
+        :type aromatic_bonds: :py:class:`list`.
+        :param aromatic_atoms: a list of aromatic atoms in the aromatic ring.
+        :type aromatic_atoms: :py:class:`list`.
+        :return: None.
+        :rtype: :py:obj:`None`.
+        """
 
         for atom_i, atom_j in aromatic_bonds:
             self.bond_lookup[(atom_i, atom_j)].update_bond_type("4")
@@ -513,7 +616,8 @@ class Compound:
 
     def extract_double_bond_connecting_cycle(self, atom_in_cycle):
         """
-        Extract the double bonds connecting to the aromatic cycles.
+        To extract the double bonds connecting to the aromatic cycles.
+
         :param list atom_in_cycle: the list of atom index in the aromatic cycles.
 
         :return: the list of double bond connecting to the aromatic cycles.
@@ -692,8 +796,8 @@ class Compound:
             atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
             if atom_1 in self.index_of_heavy_atoms and atom_2 in self.index_of_heavy_atoms:
                 bond_type = int(bond.bond_type)
-                if resonance and bond_type == "2":
-                    bond_type = "1"
+                if resonance and bond_type == 2:
+                    bond_type = 1
                 matrix[self.index_of_heavy_atoms[atom_1]][self.index_of_heavy_atoms[atom_2]] = bond_type
                 matrix[self.index_of_heavy_atoms[atom_2]][self.index_of_heavy_atoms[atom_1]] = bond_type
         return matrix
@@ -763,9 +867,10 @@ class Compound:
         the_other.update_color_tuple(resonance=resonance)
         mappings = []
         mapping_matrix = BASS.make_mapping_matrix(the_other, self, True, True, r_distance)
+    
         if mapping_matrix is not None:
             mappings = BASS.find_mappings(the_other.structure_matrix(resonance=resonance), the_other.distance_matrix,
-            	self.structure_matrix(resonance=resonance), self.distance_matrix, mapping_matrix)
+                                          self.structure_matrix(resonance=resonance), self.distance_matrix, mapping_matrix)
         # for the mappings, the from_idx, to_idx in enumerate(mapping), from_idx is in the_other_compound, to_idx is in the self.
         return mappings
 
@@ -972,7 +1077,7 @@ class Compound:
         :return: the list ranked atoms. [heavy_side, light_side]
         """
         if len(neighbors) < 2:
-            return self.atoms[neighbors[0]], None
+            return neighbors[0], None
 
         one_atom, the_other_atom = neighbors[0], neighbors[1]
 
@@ -1003,7 +1108,7 @@ class Compound:
             else:
                 return [one_atom, one_atom]
 
-    def get_next_layer_neighbors(self, cur_layer_neighbors, visited):
+    def get_next_layer_neighbors(self, cur_layer_neighbors, visited, excluded=None):
         """
         To get the next layer's neighbors.
         :param list cur_layer_neighbors: the list of atom index of neighboring atoms at the current layer.
@@ -1011,10 +1116,12 @@ class Compound:
 
         :return: the next layer's neighbors.
     	"""
+        if not excluded:
+            excluded = []
         next_layer_neighbors = []
         for index in cur_layer_neighbors:
             for next_neighbor in self.atoms[index].neighbors:
-                if next_neighbor not in visited:
+                if next_neighbor not in visited and next_neighbor not in excluded:
                     next_layer_neighbors.append(next_neighbor)
                     visited.add(next_neighbor)
         return next_layer_neighbors
@@ -1043,7 +1150,7 @@ class Compound:
         atoms_to_color = [i for i in range(len(self.atoms)) if i not in excluded_index]
         self.reset_color()
         self.generate_atom_zero_layer_color(isotope_resolved=isotope_resolved, charge=charge, atom_stereo=atom_stereo)
-        self.first_round_color( atoms_to_color, excluded_index=excluded_index, bond_stereo=bond_stereo, resonance=resonance)
+        self.first_round_color(atoms_to_color, excluded_index=excluded_index, bond_stereo=bond_stereo, resonance=resonance)
         self.curate_invalid_symmetric_atoms(atoms_to_color, excluded_index=excluded_index, bond_stereo=bond_stereo,
                                             resonance=resonance)
         self.color_metal(bond_stereo=bond_stereo, resonance=resonance)
@@ -1092,6 +1199,8 @@ class Compound:
 
         :return: the dictionary of atom index to its color name containing neighbors.
     	"""
+        if not excluded:
+            excluded = []
         atom_color_with_neighbors = collections.defaultdict(str)
         for index in atom_index:
             atom = self.atoms[index]
@@ -1148,13 +1257,15 @@ class Compound:
                 atom = self.atoms[atom_index]
                 color_elements = collections.Counter()
                 for neighbor_index in atom_neighbors[atom_index]:
-                    color_elements[atom_color_with_neighbors[neighbor_index]] += 1
+                    if neighbor_index not in excluded_index:
+                        color_elements[atom_color_with_neighbors[neighbor_index]] += 1
                 added = ""
                 for name in sorted(color_elements):
                     added += "({0}_{1})".format(color_elements[name], name) if color_elements[name] > 1 else "({0})".format(name)
                 atom.color += added
                 atom.color_layers[i+1] = atom.color
-                atom_neighbors[atom.atom_number] = self.get_next_layer_neighbors(atom_neighbors[atom_index], visited[atom_index])
+                atom_neighbors[atom.atom_number] = self.get_next_layer_neighbors(atom_neighbors[atom_index], visited[atom_index],
+                                                                                 excluded=excluded_index)
                 current_layer_color_groups[atom.color].append(atom_index)
 
             if i > 3:
@@ -1192,14 +1303,16 @@ class Compound:
                 while flag:
                     count += 1
                     target_index = atom_index_with_same_color[0]
-                    target_color_list = [atom_color_with_neighbors[atom_index] for atom_index in current_layer[target_index]]
+                    target_color_list = [atom_color_with_neighbors[atom_index] for atom_index in current_layer[target_index]
+                                         if atom_index not in excluded_index]
                     target_color_list.sort()
                     target_color = ''.join(target_color_list)
 
                     #check if neighbors of this layer are the same among all the atoms with the same color identifier.
                     for compared_index in current_layer.keys():
                         if compared_index != target_index:
-                            compared_color_list = [atom_color_with_neighbors[atom_index] for atom_index in current_layer[compared_index]]
+                            compared_color_list = [atom_color_with_neighbors[atom_index] for atom_index in
+                                                   current_layer[compared_index] if atom_index not in excluded_index]
                             compared_color_list.sort()
                             compared_atom_color = ''.join(compared_color_list)
 
@@ -1210,7 +1323,8 @@ class Compound:
                     # If the share the same neighbors, check the next layer.
                     if flag:
                         for atom_index in current_layer.keys():
-                            next_layer_neighbors = self.get_next_layer_neighbors(current_layer[atom_index], visited[atom_index])
+                            next_layer_neighbors = self.get_next_layer_neighbors(current_layer[atom_index], visited[atom_index],
+                                                                                 excluded=excluded_index)
                             current_layer[atom_index] = next_layer_neighbors
                         # pruning check, to see if the have the same number of next layer's neighbors.
                         target_length = len(current_layer[target_index])
@@ -1237,9 +1351,9 @@ class Compound:
         """
         not_valid = self.invalid_symmetric_atoms(atoms_to_color, excluded_index, bond_stereo=bond_stereo, resonance=resonance)
         while not_valid:
-            atom_color_with_neighbors = self.generate_atom_color_with_neighbors(atoms_to_color, zero_core_color=False,
-                                                                                zero_neighbor_color=True, resonance=resonance,
-                                                                                bond_stereo=bond_stereo)
+            atom_color_with_neighbors = self.generate_atom_color_with_neighbors(atoms_to_color, excluded=excluded_index,
+                                                                                zero_core_color=False, zero_neighbor_color=False,
+                                                                                resonance=resonance, bond_stereo=bond_stereo)
             for invalid_symmetric_atom_index in not_valid:
                 for atom_index in invalid_symmetric_atom_index:
                     visited = {atom_index}
@@ -1248,13 +1362,15 @@ class Compound:
                     while current_layer_neighbors:
                         color_elements = collections.Counter()
                         for neighbor_index in current_layer_neighbors:
-                            color_elements[atom_color_with_neighbors[neighbor_index]] += 1
+                            if neighbor_index not in excluded_index:
+                                color_elements[atom_color_with_neighbors[neighbor_index]] += 1
                         added = ""
                         for name in sorted(color_elements):
                             added += "({0}_{1})".format(color_elements[name], name) if color_elements[name] > 1 else \
                                 "({0})".format(name)
                         atom_color += added
-                        current_layer_neighbors = self.get_next_layer_neighbors(current_layer_neighbors, visited)
+                        current_layer_neighbors = self.get_next_layer_neighbors(current_layer_neighbors, visited,
+                                                                                excluded=excluded_index)
                     self.atoms[atom_index].color = atom_color
             not_valid = self.invalid_symmetric_atoms(atoms_to_color, excluded_index, bond_stereo=bond_stereo,
                                                      resonance=resonance)
@@ -1273,7 +1389,7 @@ class Compound:
                                                                             zero_core_color=True, zero_neighbor_color=False,
                                                                             resonance=resonance, bond_stereo=bond_stereo)
         for atom_index in self.metal_index:
-            self.atoms[atom_index] = atom_color_with_neighbors[atom_index]
+            self.atoms[atom_index].color = atom_color_with_neighbors[atom_index]
       
     def color_h(self, bond_stereo=False, resonance=True):
         """To color the metals in the compound. Here we just incorporate information of directly connected atoms.
@@ -1288,7 +1404,7 @@ class Compound:
                                                                             zero_neighbor_color=False, resonance=resonance,
                                                                             bond_stereo=bond_stereo)
         for atom_index in self.h_index:
-            self.atoms[atom_index] = atom_color_with_neighbors[atom_index]
+            self.atoms[atom_index].color = atom_color_with_neighbors[atom_index]
 
     def metal_color_identifier(self, details=True):
         """
@@ -1341,6 +1457,8 @@ class Compound:
 
     def get_chemical_details(self, excluded=None):
 
+        if not excluded:
+            excluded = []
         chemical_details = []
         for atom in self.atoms:
             if atom.atom_number not in excluded and atom.atom_stereo_parity != "0":
@@ -1395,7 +1513,7 @@ class Compound:
 
         one_to_one_mappings = collections.defaultdict(list)
         for idx, atom in enumerate(self.atoms):
-            for the_other_idx, the_other_atom in enumerate(the_other_compound):
+            for the_other_idx, the_other_atom in enumerate(the_other_compound.atoms):
                 if atom.color == the_other_atom.color:
                     one_to_one_mappings[idx].append(the_other_idx)
         return one_to_one_mappings
@@ -1629,7 +1747,8 @@ class Compound:
         for idx in one_rs:
             r_atom = self.atoms[idx]
             visited = set(mappings[neighbor_index] for neighbor_index in r_atom.neighbors)
-            r_correspondents = [neighbor_index for index in visited for neighbor_index in the_other_compound.atoms[index].neighbors if neighbor_index not in mappings.values()]
+            r_correspondents = [neighbor_index for index in visited for neighbor_index in the_other_compound.atoms[index].neighbors
+                                if neighbor_index not in mappings.values()]
             visited |= set(r_correspondents)
             while r_correspondents:
                 full_mappings[idx].extend(r_correspondents)

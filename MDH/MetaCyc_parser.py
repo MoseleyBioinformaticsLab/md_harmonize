@@ -13,12 +13,15 @@ from . import reaction
 
 def reaction_side_parser(reaction_side):
     """
-    This is to parse FROM_SIDE or TO_SIDE in the reaction.
+     This is to parse FROM_SIDE or TO_SIDE in the reaction.
 
     eg: FROM-SIDE - (CPD-9147 0 8) (OXYGEN-MOLECULE 9 10)
-	
+
     Information includes compound name and the start and end mapping atoms in this compound.
     The order of the atoms are the orders in the compound molfile.
+
+    :param reaction_side:
+    :return:
     """
     i = 0
     compounds = collections.defaultdict(list)
@@ -78,14 +81,16 @@ def reaction_with_reaction_side_parser(atom_mappings):
     REACTION - RXN-11981
     NTH-ATOM-MAPPING - 1
     MAPPING-TYPE - NO-HYDROGEN-ENCODING
-    FROM-SIDE - (CPD-12950 0 23) (WATER 24 24) 
-    TO-SIDE - (CPD-12949 0 24) 
+    FROM-SIDE - (CPD-12950 0 23) (WATER 24 24)
+    TO-SIDE - (CPD-12949 0 24)
     INDICES - 0 1 2 3 5 4 7 6 9 10 11 13 12 14 15 16 17 8 18 19 21 20 22 24 23
 
-    note: the INDICES are atom mappings between two sides of the reaction. 
+    note: the INDICES are atom mappings between two sides of the reaction.
     TO-SIDE[i] is mapped to FROM-SIDE[idx] for i, idx in enumerate(INDICES).
     Pay attention to the direction!
 
+    :param atom_mappings:
+    :return:
     """
     reaction_dicts = {}
     current_reaction = {}
@@ -130,8 +135,11 @@ def reaction_parser(reaction_text):
     ^COMPARTMENT - CCO-IN
     RIGHT - WATER
     ^COMPARTMENT - CCO-IN
-    STD-REDUCTION-POTENTIAL - 0.1    
+    STD-REDUCTION-POTENTIAL - 0.1
     //
+
+    :param reaction_text:
+    :return:
     """
     reaction_dicts = {}
     current_reaction = collections.defaultdict(list)
@@ -165,6 +173,7 @@ def reaction_parser(reaction_text):
 def create_reactions(reaction_file, atom_mapping_file, compounds):
     """
     To create MetaCyc reaction entities.
+
     :param reaction_file:
     :param atom_mapping_file:
     :param compounds:

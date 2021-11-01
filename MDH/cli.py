@@ -191,14 +191,16 @@ def cli(args):
     elif args['test1']:
 
         aromatic_manager = aromatics.AromaticManager.decode(
-            tools.open_jsonpickle("/mlab/data/hji236/projects/MDH_test/aromatic_manager.json"))
+            tools.open_jsonpickle("/mlab/data/hji236/projects/MDH_test/kcf_aromatic_manager.json"))
         kegg_cpd_path = "/mlab/data/hji236/projects/MDH_test/standardized/KEGG/molfile_test"
         meta_cpd_path = "/mlab/data/hji236/projects/MDH_test/standardized/MetaCyc/molfile_test"
         to_file = "/mlab/data/hji236/projects/MDH_test/harmonized_edge_list.json"
         kegg_molfiles = glob.glob(kegg_cpd_path + "/*")
         meta_molfiles = glob.glob(meta_cpd_path + "/*")
         kegg_dict = function_multiprocess(kegg_molfiles, construct_cpd)
+        print("kegg parsed")
         meta_dict = function_multiprocess(meta_molfiles, construct_cpd)
+        print("metacyc parsed")
         for cpd_name in kegg_dict:
             cpd = kegg_dict[cpd_name]
             aromatic_manager.detect_aromatic_substructures(cpd)
@@ -216,30 +218,39 @@ def cli(args):
 
     elif args['test']:
 
-        aromatic_manager = aromatics.AromaticManager.decode(tools.open_jsonpickle("/mlab/data/hji236/projects/MDH_test/aromatic_manager.json"))
+        # aromatic_manager = aromatics.AromaticManager.decode(tools.open_jsonpickle("/mlab/data/hji236/projects/MDH_test/aromatic_manager.json"))
+        cpds = tools.open_jsonpickle("/mlab/data/hji236/projects/MDH_test/KEGG_kcf_aromatics.json")
+        update_cpds = []
+        for cpd in cpds:
+            update_cpds.append((cpd["compound_name"], cpd["atoms"], cpd["bonds"]))
+        aromatic_manager = aromatics.AromaticManager.decode(update_cpds)
+        save_file = "/mlab/data/hji236/projects/MDH_test/kcf_aromatics.json"
+        tools.save_to_jsonpickle(aromatic_manager.encode(), save_file)
+
+
         cpd_path = "/mlab/data/hji236/projects/MDH_test/standardized/KEGG/molfile"
         kcf_path = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf"
         rclass_path = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/rclass/"
         to_file = "/mlab/data/hji236/projects/MDH_test/kegg_atom_mappings.json"
-        parser = parser_dict['KEGG']
-        
-        molfiles = glob.glob(cpd_path + "/*")
-        compound_dict = function_multiprocess(molfiles, construct_cpd)
-
-        print("mofile construct")
-
-        kcf_files = glob.glob(kcf_path + "/*")
-        compound_dict_kcf = function_multiprocess(kcf_files, construct_kcf)
-        print("kcf construct")
-
-        for cpd in compound_dict:
-            if cpd[4:] in compound_dict_kcf:
-                try:
-                    parser.add_kat(compound_dict[cpd], compound_dict_kcf[cpd[4:]])
-                except Exception as e:
-                    print(e)
-                    print("modified molfile, ", cpd)
-                    pass
+        # parser = parser_dict['KEGG']
+        #
+        # molfiles = glob.glob(cpd_path + "/*")
+        # compound_dict = function_multiprocess(molfiles, construct_cpd)
+        #
+        # print("mofile construct")
+        #
+        # kcf_files = glob.glob(kcf_path + "/*")
+        # compound_dict_kcf = function_multiprocess(kcf_files, construct_kcf)
+        # print("kcf construct")
+        #
+        # for cpd in compound_dict:
+        #     if cpd[4:] in compound_dict_kcf:
+        #         try:
+        #             parser.add_kat(compound_dict[cpd], compound_dict_kcf[cpd[4:]])
+        #         except Exception as e:
+        #             print(e)
+        #             print("modified molfile, ", cpd)
+        #             pass
 
                 
         #       
@@ -249,14 +260,14 @@ def cli(args):
         #         if "cpd:" + kcf_compound.cpd.compound_name in compound_dict:
         #             parser.add_kat(compound_dict["cpd:" + kcf_compound.cpd.compound_name], kcf_compound)
 
-        atom_mappings = parser.create_atom_mappings(rclass_path, compound_dict)
-        tools.save_to_json(atom_mappings, to_file)
-
-        for cpd_name in compound_dict:
-            cpd = compound_dict[cpd_name]
-            #aromatic_manager.detect_aromatic_substructures(cpd)
-            cpd.define_bond_stereochemistry()
-            cpd.curate_invalid_n()
+        # atom_mappings = parser.create_atom_mappings(rclass_path, compound_dict)
+        # tools.save_to_json(atom_mappings, to_file)
+        #
+        # for cpd_name in compound_dict:
+        #     cpd = compound_dict[cpd_name]
+        #     #aromatic_manager.detect_aromatic_substructures(cpd)
+        #     cpd.define_bond_stereochemistry()
+        #     cpd.curate_invalid_n()
 
 
 

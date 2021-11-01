@@ -177,6 +177,7 @@ class AromaticManager:
             atoms.update(atoms)
 
         cpd.update_aromatic_bond(aromatic_bonds, aromatic_atoms)
+        print("finish aromatic detection: ", cpd.compound_name)
 
     @staticmethod
     def construct_aromatic_entity(cpd, aromatic_cycles):

@@ -21,11 +21,20 @@ class HarmonizedEdge:
 
     @property
     def reversed_relationship(self):
+        """
+
+        :return:
+        """
         if self.relationship == 2 or self.relationship == 0:
             return self.relationship
         return -self.relationship
 
     def pair_relationship(self, name):
+        """
+
+        :param name:
+        :return:
+        """
         if name == self.one_side.name:
             return self.relationship
         else:
@@ -50,7 +59,11 @@ class HarmonizedCompoundEdge(HarmonizedEdge):
         return atom_mappings
 
     def pair_atom_mappings(self, name):
+        """
 
+        :param name:
+        :return:
+        """
         if name == self.one_side.name:
             return self.mappings
         else:
@@ -84,19 +97,32 @@ class HarmonizationManager:
             return name_2 + "@" + name_1
 
     def add_edge(self, edge):
+        """
 
+        :param edge:
+        :return:
+        """
         key = self.create_key(edge.one_side.name, edge.the_other_side.name)
         if key not in self.harmonized_edges:
             self.harmonized_edges[key] = edge
 
     def remove_edge(self, edge):
+        """
 
+        :param edge:
+        :return:
+        """
         key = self.create_key(edge.one_side.name, edge.the_other_side.name)
         if key in self.harmonized_edges:
             self.harmonized_edges.pop(key)
 
     def search(self, name_1, name_2):
+        """
 
+        :param name_1:
+        :param name_2:
+        :return:
+        """
         key = self.create_key(name_1, name_2)
         if key in self.harmonized_edges:
             return self.harmonized_edges[key]
@@ -106,21 +132,37 @@ class HarmonizationManager:
 class CompoundHarmonizationManager(HarmonizationManager):
 
     def __init__(self):
+        """
+
+        """
         super().__init__()
         self.compound_in_edges = collections.Counter()
 
     def add_edge(self, edge):
+        """
+
+        :param edge:
+        :return:
+        """
         super().add_edge(edge)
         self.compound_in_edges[edge.one_side.name] += 1
         self.compound_in_edges[edge.the_other_side.name] += 1
 
     def remove_edge(self, edge):
+        """
+
+        :param edge:
+        :return:
+        """
         super().remove_edge(edge)
         self.compound_in_edges[edge.one_side.name] -= 1
         self.compound_in_edges[edge.the_other_side.name] -= 1
 
     def get_edge_list(self):
+        """
 
+        :return:
+        """
         return list(self.harmonized_edges.keys())
 
 class ReactionHarmonizationManager(HarmonizationManager):
@@ -131,7 +173,12 @@ class ReactionHarmonizationManager(HarmonizationManager):
 
     @staticmethod
     def compare_ecs(one_ecs, the_other_ecs):
+        """
 
+        :param one_ecs:
+        :param the_other_ecs:
+        :return:
+        """
         if [ec for ec in one_ecs[4] if ec in the_other_ecs[4]]:
             return 4
         if [ec for ec in one_ecs[3] if ec in the_other_ecs[3]]:
@@ -140,7 +187,11 @@ class ReactionHarmonizationManager(HarmonizationManager):
 
     @staticmethod
     def determine_relationship(relationships):
+        """
 
+        :param relationships:
+        :return:
+        """
         counter = collections.Counter(relationships)
         if counter[2] > 0:
             return 2
@@ -152,9 +203,13 @@ class ReactionHarmonizationManager(HarmonizationManager):
             return -1
         return 0
 
-
     def harmonize_reaction(self, one_reaction, the_other_reaction):
+        """
 
+        :param one_reaction:
+        :param the_other_reaction:
+        :return:
+        """
         ec_comparison = self.compare_ecs(one_reaction.ecs, the_other_reaction.ecs)
         if not ec_comparison:
             # Don't share the same ec, skip it.
@@ -200,7 +255,13 @@ class ReactionHarmonizationManager(HarmonizationManager):
                 self.match_unmapped_compounds(the_other_unmapped_compounds[0], the_other_unmapped_compounds[1])
 
     def unmapped_compounds(self, one_compounds, the_other_compounds, mappings):
+        """
 
+        :param one_compounds:
+        :param the_other_compounds:
+        :param mappings:
+        :return:
+        """
         one_side_left = [cpd for cpd in one_compounds if cpd.name not in mappings.keys()]
         used_the_other = set()
         for one_cpd in mappings:
@@ -209,7 +270,12 @@ class ReactionHarmonizationManager(HarmonizationManager):
         return one_side_left, the_other_side_left
 
     def match_unmapped_compounds(self, one_side_left, the_other_side_left):
+        """
 
+        :param one_side_left:
+        :param the_other_side_left:
+        :return:
+        """
         for one_cpd in one_side_left:
             for the_other_cpd in the_other_side_left:
                 if one_cpd.formula == the_other_cpd.formula:
@@ -247,7 +313,13 @@ class ReactionHarmonizationManager(HarmonizationManager):
                         self.compound_harmonization_manager.add_edge(harmonized_compound_edge)
 
     def jaccard(self, one_compounds, the_other_compounds, mappings):
+        """
 
+        :param one_compounds:
+        :param the_other_compounds:
+        :param mappings:
+        :return:
+        """
         one_in_reactions = [self.compound_harmonization_manager.compound_in_edges[cpd.name] > 0 for cpd in one_compounds].count(True)
         the_other_in_reactions = [self.compound_harmonization_manager.compound_in_edges[cpd.name] > 0 for cpd in the_other_compounds].count(True)
         denominator = one_in_reactions + the_other_in_reactions - len(mappings)
@@ -256,7 +328,12 @@ class ReactionHarmonizationManager(HarmonizationManager):
         return 0
 
     def compound_mappings(self, one_compounds, the_other_compounds):
+        """
 
+        :param one_compounds:
+        :param the_other_compounds:
+        :return:
+        """
         mappings = collections.defaultdict(dict)
         for one_compound in one_compounds:
             for the_other_compound in the_other_compounds:
@@ -266,7 +343,11 @@ class ReactionHarmonizationManager(HarmonizationManager):
         return mappings
 
     def compound_one_to_one_mappings(self, mappings):
+        """
 
+        :param mappings:
+        :return:
+        """
         one_to_one_mappings = {}
         sorted_one_side = list(mappings.keys())
         sorted_one_side.sort()
@@ -292,7 +373,11 @@ class ReactionHarmonizationManager(HarmonizationManager):
 
 
 def harmonize_compound_list(compound_list):
+    """
 
+    :param compound_list:
+    :return:
+    """
     compound_harmonization_manager = CompoundHarmonizationManager()
     # here, we need to color the compound for harmonization, do it the same time to avoid redundant coloring.
     # we first just harmonize compounds with the same coloring identifiers.
@@ -320,7 +405,12 @@ def harmonize_compound_list(compound_list):
     return compound_harmonization_manager
 
 def harmonize_reaction_list(reaction_list, compound_harmonization_manager):
+    """
 
+    :param reaction_list:
+    :param compound_harmonization_manager:
+    :return:
+    """
     reaction_harmonized_manager = ReactionHarmonizationManager(compound_harmonization_manager)
     k = len(reaction_list)
     last_edges = 0

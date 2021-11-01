@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 
 """
+
 MetaCyc_parser.py is used to parse MetaCyc text data. 
 Note: All MetaCyc reactions atom_mappings are stored in a single text file.
+
 """
 
 import collections
@@ -17,11 +19,13 @@ def reaction_side_parser(reaction_side):
 
     eg: FROM-SIDE - (CPD-9147 0 8) (OXYGEN-MOLECULE 9 10)
 
-    Information includes compound name and the start and end mapping atoms in this compound.
+    Information includes compound name and the start and end atom index in this compound used for atom mappings.
     The order of the atoms are the orders in the compound molfile.
 
-    :param reaction_side:
-    :return:
+    :param reaction_side: the text description of reaction side.
+    :type reaction_side: :py:obj:`str`.
+    :return: the dictionary of compounds and the corresponding start and end atom index in the atom mappings.
+    :rtype: :py:obj:`dict`.
     """
     i = 0
     compounds = collections.defaultdict(list)
@@ -49,11 +53,16 @@ def reaction_side_parser(reaction_side):
 
 def generate_one_to_one_mappings(from_side, to_side, indices):
     """
+    To generate the one to one atom mappings between two the sides of metabolic reaction.
 
-    :param from_side:
-    :param to_side:
-    :param indices:
-    :return:
+    :param from_side: the dictionary of compounds with their corresponding start and end atom index in the from side.
+    :type from_side: :py:obj:`dict`.
+    :param to_side: the dictionary of compounds with their corresponding start and end atom index in the to side.
+    :type to_side: :py:obj:`dict`.
+    :param indices: the list of mapped atoms.
+    :type indices: :py:obj:`list`.
+    :return: the list of mapped atoms between the two sides.
+    :rtype: :py:obj:`list`.
     """
     n = len(indices)
     from_index_dict = {}
@@ -73,7 +82,7 @@ def generate_one_to_one_mappings(from_side, to_side, indices):
         one_to_one_mappings.append((from_index_dict[from_index], to_index_dict[to_index]))
     return one_to_one_mappings
 
-def reaction_with_reaction_side_parser(atom_mappings):
+def atom_mappings_parser(atom_mapping_text):
     """
     This is to parse the MetaCyc reaction with atom mappings.
 
@@ -89,16 +98,19 @@ def reaction_with_reaction_side_parser(atom_mappings):
     TO-SIDE[i] is mapped to FROM-SIDE[idx] for i, idx in enumerate(INDICES).
     Pay attention to the direction!
 
-    :param atom_mappings:
-    :return:
+    :param atom_mapping_text: the text descriptions of reactions with atom mappings.
+    :type atom_mapping_text: :py:obj:`str`.
+    :return: the dictionary of reactions with atom mappings.
+    :rtype: :py:obj:`dict`.
     """
     reaction_dicts = {}
     current_reaction = {}
-    for line in atom_mappings:
+    for line in atom_mapping_text:
         if line.startswith("#"):
             continue
         elif line.startswith("//"):
-            reaction_dicts["ONE_TO_ONE_MAPPINGS"] = generate_one_to_one_mappings(current_reaction["FROM-SIDE"],current_reaction["TO-SIDE"], current_reaction["INDICES"])
+            reaction_dicts["ONE_TO_ONE_MAPPINGS"] = generate_one_to_one_mappings(current_reaction["FROM-SIDE"], current_reaction["TO-SIDE"],
+                                                                                 current_reaction["INDICES"])
             reaction_dicts[current_reaction['REACTION']] = copy.deepcopy(current_reaction)
             current_reaction = {}
         else:
@@ -138,8 +150,10 @@ def reaction_parser(reaction_text):
     STD-REDUCTION-POTENTIAL - 0.1
     //
 
-    :param reaction_text:
-    :return:
+    :param reaction_text: the text descriptions of MetaCyc reactions.
+    :type reaction_text: :py:obj:`str`.
+    :return: the dict of parsed MetaCyc reactions.
+    :rtype: :py:obj:`dict`.
     """
     reaction_dicts = {}
     current_reaction = collections.defaultdict(list)
@@ -174,13 +188,17 @@ def create_reactions(reaction_file, atom_mapping_file, compounds):
     """
     To create MetaCyc reaction entities.
 
-    :param reaction_file:
-    :param atom_mapping_file:
-    :param compounds:
-    :return:
+    :param reaction_file: the filename of the reaction file.
+    :type reaction_file: :py:obj:`str`.
+    :param atom_mapping_file: the filename of the atom mapping file.
+    :type atom_mapping_file: :py:obj:`str`.
+    :param compounds: a dictionary of :class:`~MDH.compound.Compound` entities.
+    :type compounds: :py:obj:`dict`.
+    :return: the constructed `~MDH.reaction.Reaction` entities.
+    :rtype: :py:obj:`list`.
     """
     reaction_dict = reaction_parser(tools.open_text(reaction_file).split("\n"))
-    atom_mappings = reaction_with_reaction_side_parser(tools.open_text(atom_mapping_file).split("\n"))
+    atom_mappings = atom_mappings_parser(tools.open_text(atom_mapping_file).split("\n"))
     reactions = []
     for reaction_name in reaction_dict:
         this_reaction = reaction_dict[reaction_name]

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """
-update.py is used to download KEGG compound and reaction data from web.
+KEGG_database_scraper.py is used to download KEGG data (including compound, reaction, kcf, and rclass) from web.
 
 This URL can change.
 """

@@ -1,5 +1,10 @@
 #!/usr/bin/python3
 
+"""
+tools.py provides functions to open file or save data to file.
+
+"""
+
 import json
 import jsonpickle
 

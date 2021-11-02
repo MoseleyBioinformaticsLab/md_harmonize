@@ -211,9 +211,9 @@ class RpairParser:
         return atoms
 
     @staticmethod
-    def search_target_atom(atoms, target):
+    def find_target_atom(atoms, target):
         """
-        To search the target atom from a list of atoms.
+        To find the target atom from a list of atoms.
 
         :param atoms: a list of atoms to be searched.
         :type atoms: :py:obj:`list`.
@@ -281,8 +281,8 @@ class RpairParser:
             right_neighbors = [item for item in right_difference if item != "*"] + [item for item in right_match if item != "*"]
             left_neighbors.sort()
             right_neighbors.sort()
-            left_atom_index = self.search_target_atom(left_kat_neighbors, (left_center, left_neighbors))
-            right_atom_index = self.search_target_atom(right_kat_neighbors, (right_center, right_neighbors))
+            left_atom_index = self.find_target_atom(left_kat_neighbors, (left_center, left_neighbors))
+            right_atom_index = self.find_target_atom(right_kat_neighbors, (right_center, right_neighbors))
             left_reaction_centers.append(self.create_reaction_centers(i, left_center, left_difference, right_difference, left_match, right_match))
             right_reaction_centers.append(self.create_reaction_centers(i, right_center, right_difference, left_difference, right_match, left_match))
             left_center_candidates.append(left_atom_index)
@@ -326,7 +326,7 @@ class RpairParser:
         :type center_atom_numbers: :py:obj:`list`.
         :param reaction_centers: the list of reaction center descriptions of the compound.
         :type reaction_centers: :py:obj:`list`.
-        :return: the list of bonds (represented by the atom numbers that forming the bond) that needs to be removed
+        :return: the list of bonds (represented by the atom numbers in the bond) that needs to be removed
         based on the RDM descriptions.
         :rtype: :py:obj:`list`.
         """
@@ -368,7 +368,7 @@ class RpairParser:
                         this_mapping = self.map_components(left_removed_bonds, right_removed_bonds,
                                                            left_centers, right_centers)
                         if this_mapping:
-                            miss_count = self.count_different_atom_identifiers(this_mapping)
+                            miss_count = self.count_changed_atom_identifiers(this_mapping)
                             if len(optimal_atom_mappings) < len(this_mapping) or \
                                     (len(optimal_atom_mappings) == len(this_mapping) and minimum_miss_count > miss_count):
                                 minimum_miss_count = miss_count
@@ -381,13 +381,19 @@ class RpairParser:
         return one_to_one_mappings
 
     @staticmethod
-    def detect_components(compound, removed_bonds, center_atom_index):
+    def detect_components(compound, removed_bonds, center_atom_numbers):
         """
+        To detect all the components in the compound after remove some bonds.
+        Basic idea is the breadth first seach algorithm.
 
-        :param compound:
-        :param removed_bonds:
-        :param center_atom_index:
-        :return:
+        :param compound: the :class:`~MDH.compound.Compound` entity.
+        :type compound: :class:`~MDH.compound.Compound` entity.
+        :param removed_bonds: the list of removed bonds (represented by the atom numbers in the bond) in the compound.
+        :type removed_bonds: :py:obj:`list`.
+        :param center_atom_numbers: the list of atom numbers of the center atoms in the compound.
+        :type center_atom_numbers: :py:obj:`list`.
+        :return: the list of components of the compound represented by a list of atom numbers.
+        :rtype: :py:obj:`list`.
         """
         graph = collections.defaultdict(list)
         for bond in compound.bonds:
@@ -397,7 +403,7 @@ class RpairParser:
                     graph[i].append(j)
                     graph[j].append(i)
 
-        nodes = set(list(graph.keys()) + center_atom_index)
+        nodes = set(list(graph.keys()) + center_atom_numbers)
         visited = set()
         components = []
         for node in nodes:
@@ -416,12 +422,19 @@ class RpairParser:
         return components
 
     @staticmethod
-    def get_component_pairs(left_components, right_components):
+    def pair_components(left_components, right_components):
         """
-        To get the component pairs with the same number of atoms.
-        :param left_components:
-        :param right_components:
-        :return:
+        The two compounds are divided into separate components due to difference atoms. We need to pair each component in
+        one compound to its counterpart component in the other compound.
+        Here roughly pair the components based on the number of atoms in the component. Therefore, every component in one  
+        compound can be paired with several components in the other compound. 
+        
+        :param left_components: the components in one compound.
+        :type left_components: :py:obj:`list`.
+        :param right_components: the components in the other compound.
+        :type right_components: :py:obj:`list`.
+        :return: the list of paired components.
+        :rtype: :py:obj:`list`.
         """
         component_pairs = []
         for left_component in left_components:
@@ -431,24 +444,28 @@ class RpairParser:
         return component_pairs
 
     @staticmethod
-    def construct_component(cpd, atom_index, removed_bonds):
+    def construct_component(cpd, atom_numbers, removed_bonds):
         """
-        To construct a partial compound based on the atom index and the removed bonds.
+        To construct a :class:`~MDH.compound.Compound` entity for the component based on the atom index and removed bonds, 
+        faciliating the following atom mappings.
 
-        :param cpd:
-        :type cpd:
-        :param atom_index:
-        :param removed_bonds:
-        :return:
+        :param cpd: the :class:`~MDH.compound.Compound` entity.
+        :type cpd: :class:`~MDH.compound.Compound`.
+        :param atom_numbers: the list of atom numbers for atoms in the component.
+        :type atom_numbers: :py:obj:`list`.
+        :param removed_bonds: the list of removed bonds (represented by the atom numbers in the bond) in the compound.
+        :type removed_bonds: :py:obj:`list`.
+        :return: the constructed component.
+        :rtype: :class:`~MDH.compound.Compound`.
         """
-        atoms = [cpd.atoms[idx].clone() for idx in atom_index]
+        atoms = [cpd.atoms[idx].clone() for idx in atom_numbers]
         idx_dict = {int(atom.atom_number): i for i, atom in enumerate(atoms)}
         for i, atom in enumerate(atoms):
             atom.update_atom_number(i)
         bonds = []
         for bond in cpd.bonds:
             atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
-            if atom_1 in atom_index and atom_2 in atom_index and (atom_1, atom_2) not in removed_bonds and \
+            if atom_1 in atom_numbers and atom_2 in atom_numbers and (atom_1, atom_2) not in removed_bonds and \
                     (atom_2, atom_1) not in removed_bonds:
                 cloned_bond = bond.clone()
                 cloned_bond.update_first_atom(idx_dict[atom_1])
@@ -457,67 +474,84 @@ class RpairParser:
         return compound.Compound("partial_compound", atoms, bonds)
 
     @staticmethod
-    def preliminary_atom_mappings_check(left_partial_compound, right_partial_compound):
+    def preliminary_atom_mappings_check(left_component, right_component):
         """
-        To roughly evaluate if the atoms between the two partial compounds can be mapped.
-        :param left_partial_compound:
-        :param right_partial_compound:
-        :return:
+        To roughly evaluate if the atoms between the two components can be mapped.
+        We compare if the every atom color in the left component has its counterpart in the right component.
+        Here, we only consider the backbond of the structure.
+
+        :param left_component: the component in one compound.
+        :type left_component: :class:`~MDH.compound.Compound`.
+        :param right_component: the component in the other compound.
+        :type right_component: :class:`~MDH.compound.Compound`.
+        :return: bool whether the atoms in the two components can be mapped.
+        :rtype: :py:class:`bool`.
         """
-        left_partial_compound.color_compound(r_groups=False, bond_stereo=False, atom_stereo=False, resonance=True)
-        right_partial_compound.color_compound(r_groups=False, bond_stereo=False, atom_stereo=False, resonance=True)
+        left_component.color_compound(r_groups=False, bond_stereo=False, atom_stereo=False, resonance=True)
+        right_component.color_compound(r_groups=False, bond_stereo=False, atom_stereo=False, resonance=True)
         left, mapped = 0, 0
-        for atom_left in left_partial_compound.atoms:
+        for atom_left in left_component.atoms:
             if atom_left.default_symbol != "H":
                 left += 1
-                for atom_right in right_partial_compound.atoms:
+                for atom_right in right_component.atoms:
                     if atom_left.color_layers == atom_right.color_layers:
                         mapped += 1
                         break
         #print(left, mapped)
         return left == mapped
 
-    def map_components(self, left_removed_bonds, right_removed_bonds, left_index_comb, right_index_comb):
+    def map_components(self, left_removed_bonds, right_removed_bonds, left_centers, right_centers):
         """
+        To find optimal map for every component in the compound pair.
 
-        :param left_removed_bonds:
-        :param right_removed_bonds:
-        :param left_index_comb:
-        :param right_index_comb:
-        :return:
+        :param left_removed_bonds: the list of removed bonds in one compound.
+        :type left_removed_bonds: :py:obj:`list`.
+        :param right_removed_bonds: the list of removed bonds in the other compound.
+        :type right_removed_bonds: :py:obj:`list`.
+        :param left_centers: the list of atom numbers of the center atoms in the one compound.
+        :type left_centers: :py:obj:`list`.
+        :param right_centers: the list of atom numbers of the center atoms in the other compound.
+        :type right_centers: :py:obj:`list`.
+        :return: the atom mappings for the compound pair based on the removed bonds and center atoms.
+        :rtype: :py:obj:`dict`.
         """
-
-        left_components = self.detect_components(self.one_compound, left_removed_bonds, left_index_comb)
-        right_components = self.detect_components(self.the_other_compound, right_removed_bonds, right_index_comb)
-        component_pairs = self.get_component_pairs(left_components, right_components)
+        left_component_list = self.detect_components(self.one_compound, left_removed_bonds, left_centers)
+        right_component_list = self.detect_components(self.the_other_compound, right_removed_bonds, right_centers)
+        component_pairs = self.pair_components(left_component_list, right_component_list)
         atom_mappings = []
-        for left_component, right_component in component_pairs:
-            left_partial_compound = self.construct_component(self.one_compound, left_component, left_removed_bonds)
-            right_partial_compound = self.construct_component(self.the_other_compound, right_component, right_removed_bonds)
-            if not self.preliminary_atom_mappings_check(left_partial_compound, right_partial_compound):
+        for left_component_index, right_component_index in component_pairs:
+            left_component = self.construct_component(self.one_compound, left_component_index, left_removed_bonds)
+            right_component = self.construct_component(self.the_other_compound, right_component_index, right_removed_bonds)
+            if not self.preliminary_atom_mappings_check(left_component, right_component):
                 continue
-            mappings = left_partial_compound.find_mappings(right_partial_compound, resonance=True, r_distance=False)
-            one_to_one_mappings_list = left_partial_compound.generate_one_to_one_mappings(right_partial_compound, mappings)
+            mappings = left_component.find_mappings(right_component, resonance=True, r_distance=False)
+            one_to_one_mappings_list = left_component.generate_one_to_one_mappings(right_component, mappings)
             optimal_one_to_one_mappings = None
             minimum_miss_count = float("inf")
             for one_to_one_mappings in one_to_one_mappings_list:
                 original_index_mappings = {}
                 for i in one_to_one_mappings:
-                    original_index_mappings[left_component[i]] = right_component[one_to_one_mappings[i]]
-                    if self.validate_component_atom_mappings(left_index_comb, right_index_comb, original_index_mappings):
-                        miss_count = self.count_different_atom_identifiers(original_index_mappings)
+                    original_index_mappings[left_component_index[i]] = right_component_index[one_to_one_mappings[i]]
+                    if self.validate_component_atom_mappings(left_centers, right_centers, original_index_mappings):
+                        miss_count = self.count_changed_atom_identifiers(original_index_mappings)
                         if miss_count < minimum_miss_count:
                             minimum_miss_count = miss_count
                             optimal_one_to_one_mappings = original_index_mappings
             if optimal_one_to_one_mappings:
                 atom_mappings.append(optimal_one_to_one_mappings)
-        return self.combine_component_atom_mappings(atom_mappings)
+        return self.combine_atom_mappings(atom_mappings)
 
-    def combine_component_atom_mappings(self, atom_mappings):
+    def combine_atom_mappings(self, atom_mappings):
         """
+        To combine the atom mappings of all the components.
+        We just mentioned in the pair_components function that every component can have several mappings.
+        Here, we choose the optimal mapping with least count of changed atom local identifier. And make sure
+        that each atom can only to mapped once.
 
-        :param atom_mappings:
-        :return:
+        :param atom_mappings: the list of atom mappings for all the components.
+        :type atom_mappings: :py:obj:`list`.
+        :return: the atom mappings for the compound pair.
+        :rtype: :py:obj:`dict`.
         """
         groups = collections.defaultdict(list)
         collective_mappings = {}
@@ -528,7 +562,7 @@ class RpairParser:
                 collective_mappings.update(atom_mappings[groups[g][0]])
             else:
                 orders = groups[g]
-                orders.sort(key=lambda x: self.count_different_atom_identifiers(atom_mappings[x]))
+                orders.sort(key=lambda x: self.count_changed_atom_identifiers(atom_mappings[x]))
                 for idx in orders:
                     if all(atom_index not in collective_mappings for atom_index in atom_mappings[idx]) and \
                             all(atom_index not in collective_mappings.values() for atom_index in atom_mappings[idx].values()):
@@ -554,7 +588,7 @@ class RpairParser:
                 return False
         return True
 
-    def count_different_atom_identifiers(self, one_to_one_mappings):
+    def count_changed_atom_identifiers(self, one_to_one_mappings):
         """
         To count the mapped atoms with changed local atom identifier. The different atoms (D in RCLASS definitions)
         can cause change of local environment, which can change the atom identifier.

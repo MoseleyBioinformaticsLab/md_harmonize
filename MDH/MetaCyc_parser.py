@@ -229,14 +229,3 @@ def create_reactions(reaction_file, atom_mapping_file, compounds):
                                            atom_mappings[reaction_name]["ONE_TO_ONE_MAPPINGS"], coefficients))
     return reactions
 
-
-
-
-
-
-
-
-
-
-
-

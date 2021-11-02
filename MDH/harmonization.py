@@ -6,13 +6,15 @@ class HarmonizedEdge:
 
     def __init__(self, one_side, the_other_side, relationship, type, mappings):
         """
-        
-        :param one_side: 
+
+        :param one_side:
         :param the_other_side:
         :param relationship: equivalent, generic-specific, or loose.
         :param type: for compound edge, this represents resonance, linear-circular, r group, same structure;
         for reaction edge: this represents 3 level match or 4 level match.
+        :param mappings:
         """
+
         self.one_side = one_side
         self.the_other_side = the_other_side
         self.relationship = relationship
@@ -80,6 +82,9 @@ class HarmonizedReactionEdge(HarmonizedEdge):
 class HarmonizationManager:
 
     def __init__(self):
+        """
+
+        """
 
         self.harmonized_edges = {}
 

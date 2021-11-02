@@ -4,7 +4,7 @@
 MDH.aromatics
 ~~~~~~~~~~~~~
 
-This module provides the :class:`~MDH.reaction.Reaction` class entity.
+This module provides the :class:`~MDH.aromatics.AromaticManager` class entity.
 
 """
 

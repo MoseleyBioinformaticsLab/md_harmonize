@@ -48,9 +48,9 @@ def kegg_data_parser(data):
     ///
 
     :param data: the KEGG reaction description.
-    :type data: :py:obj:`str`.
+    :type data: :py:class:`str`.
     :return: the dictionary of parsed KEGG data.
-    :rtype: :py:obj:`dict`.
+    :rtype: :py:class:`dict`.
     """
     reaction_dict = collections.defaultdict(list)
     key = ""
@@ -72,9 +72,9 @@ def parse_equation(equation):
     C00029 + C00001 + 2 C00003 <=> C00167 + 2 C00004 + 2 C00080
 
     :param equation: the equation string.
-    :type equation: :py:obj:`str`.
+    :type equation: :py:class:`str`.
     :return: the parsed KEGG reaction equation.
-    :rtype: :py:obj:`dict`.
+    :rtype: :py:class:`dict`.
     """
     compound_pattern = "C....."
     one_side_coefficients = {}
@@ -119,9 +119,9 @@ def kegg_kcf_parser(kcf):
     ///
 
     :param kcf: the kcf text.
-    :type kcf: :py:obj:`str`.
+    :type kcf: :py:class:`str`.
     :return: the dictionary of parsed kcf file.
-    :rtype: :py:obj:`dict`.
+    :rtype: :py:class:`dict`.
     """
     compound_name, atom_count, atoms, bond_count, bonds = "", 0, [], 0, []
 
@@ -178,9 +178,9 @@ class RpairParser:
         RpairParser initializer.
 
         :param rclass_name: the rclass name.
-        :type rclass_name: :py:obj:`str`.
+        :type rclass_name: :py:class:`str`.
         :param rclass_definitions: a list of rclass definitions.
-        :type rclass_definitions: :py:obj:`list`.
+        :type rclass_definitions: :py:class:`list`.
         :param one_compound: one compound involved in the pair.
         :type one_compound: :class:`~MDH.compound.Compound`.
         :param the_other_compound: the other compound involved in the pair.
@@ -201,7 +201,7 @@ class RpairParser:
         :param compound: the compound entity.
         :type compound: :class:`~MDH.compound.Compound`.
         :return: the list of atom with its neighbors.
-        :rtype: :py:obj:`list`.
+        :rtype: :py:class:`list`.
         """
         atoms = []
         for atom in compound.atoms:
@@ -216,11 +216,11 @@ class RpairParser:
         To find the target atom from a list of atoms.
 
         :param atoms: a list of atoms to be searched.
-        :type atoms: :py:obj:`list`.
+        :type atoms: :py:class:`list`.
         :param target: the target atom to be searched.
-        :type target: :py:obj:`set`.
+        :type target: :py:class:`set`.
         :return: the list of atom number that match the target.
-        :rtype: :py:obj:`list`.
+        :rtype: :py:class:`list`.
         """
         target_index = []
         for i, atom in enumerate(atoms):
@@ -234,17 +234,17 @@ class RpairParser:
         To create the center atom based on its connected atoms and the its counterpart atom in the other compound.
 
         :param i: the ith rclass definition.
-        :type i: :py:obj:`int`.
+        :type i: :py:class:`int`.
         :param kat: KEGG atom type of the center atom.
-        :type kat: :py:obj:`str`.
+        :type kat: :py:class:`str`.
         :param difference: the list of KEGG atom type of different connected atoms
-        :type difference: :py:obj:`list`.
+        :type difference: :py:class:`list`.
         :param the_other_difference: the list of KEGG atom type of different connected atoms of the other compound.
-        :type the_other_difference: :py:obj:`list`.
+        :type the_other_difference: :py:class:`list`.
         :param match: the list of KEGG atom type of the matched connected atoms.
-        :type match: :py:obj:`list`.
+        :type match: :py:class:`list`.
         :param the_other_match: the list of KEGG atom type of the matched connected atoms of the other compound.
-        :type the_other_match: :py:obj:`list`.
+        :type the_other_match: :py:class:`list`.
         :return: the constructed reaction center.
         :rtype: py:class:`~collections.namedtuple`.
         """
@@ -264,7 +264,7 @@ class RpairParser:
         associated with enzymatic reactions.
 
         :return: the list of reaction centers and their corresponding candidate atoms.
-        :rtype: :py:obj:`list`.
+        :rtype: :py:class:`list`.
         """
         left_reaction_centers, right_reaction_centers = [], []
         left_center_candidates, right_center_candidates = [], []
@@ -296,10 +296,10 @@ class RpairParser:
         
         :param center_atom_index: list of atom index list for each reaction centers. eg: three reaction centers:
         [[0, 1, 2], [5, 6], [10, 11]].
-        :type center_atom_index: :py:obj:`list`.
+        :type center_atom_index: :py:class:`list`.
         :return: the list of combined reaction centers. eg: [[0, 5, 10], [0, 5, 11], [0, 6, 10], [0, 6, 11], [1, 5, 10],
         [1, 5, 11], [1, 6, 10], [1, 6, 11], [2, 5, 10], [2, 5, 11], [2, 6, 10], [2, 6, 11]]
-        :rtype: :py:obj:`list`.
+        :rtype: :py:class:`list`.
         """
         combines = []
         def dfs(i, seen):
@@ -323,12 +323,12 @@ class RpairParser:
         :param compound: the :class:`~MDH.compound.Compound` entity.
         :type compound: :class:`~MDH.compound.Compound`.
         :param center_atom_numbers: the list of atom numbers of center atom in the compound.
-        :type center_atom_numbers: :py:obj:`list`.
+        :type center_atom_numbers: :py:class:`list`.
         :param reaction_centers: the list of reaction center descriptions of the compound.
-        :type reaction_centers: :py:obj:`list`.
+        :type reaction_centers: :py:class:`list`.
         :return: the list of bonds (represented by the atom numbers in the bond) that needs to be removed
         based on the RDM descriptions.
-        :rtype: :py:obj:`list`.
+        :rtype: :py:class:`list`.
         """
         removed_bonds = [[]]
         for i, idx in enumerate(center_atom_numbers):
@@ -350,7 +350,7 @@ class RpairParser:
         To generate the one to one atom mappings of the compound pair.
 
         :return: the list of atom mappings.
-        :rtype: :py:obj:`list`.
+        :rtype: :py:class:`list`.
         """
         left_center_candidates, right_center_candidates, left_reaction_centers, right_reaction_centers = self.find_center_atoms()
         left_centers_list = self.get_center_list(left_center_candidates)
@@ -389,11 +389,11 @@ class RpairParser:
         :param compound: the :class:`~MDH.compound.Compound` entity.
         :type compound: :class:`~MDH.compound.Compound` entity.
         :param removed_bonds: the list of removed bonds (represented by the atom numbers in the bond) in the compound.
-        :type removed_bonds: :py:obj:`list`.
+        :type removed_bonds: :py:class:`list`.
         :param center_atom_numbers: the list of atom numbers of the center atoms in the compound.
-        :type center_atom_numbers: :py:obj:`list`.
+        :type center_atom_numbers: :py:class:`list`.
         :return: the list of components of the compound represented by a list of atom numbers.
-        :rtype: :py:obj:`list`.
+        :rtype: :py:class:`list`.
         """
         graph = collections.defaultdict(list)
         for bond in compound.bonds:
@@ -430,11 +430,11 @@ class RpairParser:
         compound can be paired with several components in the other compound. 
         
         :param left_components: the components in one compound.
-        :type left_components: :py:obj:`list`.
+        :type left_components: :py:class:`list`.
         :param right_components: the components in the other compound.
-        :type right_components: :py:obj:`list`.
+        :type right_components: :py:class:`list`.
         :return: the list of paired components.
-        :rtype: :py:obj:`list`.
+        :rtype: :py:class:`list`.
         """
         component_pairs = []
         for left_component in left_components:
@@ -452,9 +452,9 @@ class RpairParser:
         :param cpd: the :class:`~MDH.compound.Compound` entity.
         :type cpd: :class:`~MDH.compound.Compound`.
         :param atom_numbers: the list of atom numbers for atoms in the component.
-        :type atom_numbers: :py:obj:`list`.
+        :type atom_numbers: :py:class:`list`.
         :param removed_bonds: the list of removed bonds (represented by the atom numbers in the bond) in the compound.
-        :type removed_bonds: :py:obj:`list`.
+        :type removed_bonds: :py:class:`list`.
         :return: the constructed component.
         :rtype: :class:`~MDH.compound.Compound`.
         """
@@ -478,17 +478,17 @@ class RpairParser:
         """
         To roughly evaluate if the atoms between the two components can be mapped.
         We compare if the every atom color in the left component has its counterpart in the right component.
-        Here, we only consider the backbond of the structure.
+        Here, we only consider the backbone of the structure.
 
         :param left_component: the component in one compound.
         :type left_component: :class:`~MDH.compound.Compound`.
         :param right_component: the component in the other compound.
         :type right_component: :class:`~MDH.compound.Compound`.
         :return: bool whether the atoms in the two components can be mapped.
-        :rtype: :py:class:`bool`.
+        :rtype: :py:obj:`bool`.
         """
-        left_component.color_compound(r_groups=False, bond_stereo=False, atom_stereo=False, resonance=True)
-        right_component.color_compound(r_groups=False, bond_stereo=False, atom_stereo=False, resonance=True)
+        left_component.color_compound(r_groups=False, bond_stereo=False, atom_stereo=False, resonance=True, backbone=True)
+        right_component.color_compound(r_groups=False, bond_stereo=False, atom_stereo=False, resonance=True, backbone=True)
         left, mapped = 0, 0
         for atom_left in left_component.atoms:
             if atom_left.default_symbol != "H":
@@ -505,15 +505,15 @@ class RpairParser:
         To find optimal map for every component in the compound pair.
 
         :param left_removed_bonds: the list of removed bonds in one compound.
-        :type left_removed_bonds: :py:obj:`list`.
+        :type left_removed_bonds: :py:class:`list`.
         :param right_removed_bonds: the list of removed bonds in the other compound.
-        :type right_removed_bonds: :py:obj:`list`.
+        :type right_removed_bonds: :py:class:`list`.
         :param left_centers: the list of atom numbers of the center atoms in the one compound.
-        :type left_centers: :py:obj:`list`.
+        :type left_centers: :py:class:`list`.
         :param right_centers: the list of atom numbers of the center atoms in the other compound.
-        :type right_centers: :py:obj:`list`.
+        :type right_centers: :py:class:`list`.
         :return: the atom mappings for the compound pair based on the removed bonds and center atoms.
-        :rtype: :py:obj:`dict`.
+        :rtype: :py:class:`dict`.
         """
         left_component_list = self.detect_components(self.one_compound, left_removed_bonds, left_centers)
         right_component_list = self.detect_components(self.the_other_compound, right_removed_bonds, right_centers)
@@ -524,8 +524,7 @@ class RpairParser:
             right_component = self.construct_component(self.the_other_compound, right_component_index, right_removed_bonds)
             if not self.preliminary_atom_mappings_check(left_component, right_component):
                 continue
-            mappings = left_component.find_mappings(right_component, resonance=True, r_distance=False)
-            one_to_one_mappings_list = left_component.generate_one_to_one_mappings(right_component, mappings)
+            one_to_one_mappings_list = left_component.find_mappings(right_component, resonance=True, r_distance=False, backbone=True)
             optimal_one_to_one_mappings = None
             minimum_miss_count = float("inf")
             for one_to_one_mappings in one_to_one_mappings_list:
@@ -549,9 +548,9 @@ class RpairParser:
         that each atom can only to mapped once.
 
         :param atom_mappings: the list of atom mappings for all the components.
-        :type atom_mappings: :py:obj:`list`.
+        :type atom_mappings: :py:class:`list`.
         :return: the atom mappings for the compound pair.
-        :rtype: :py:obj:`dict`.
+        :rtype: :py:class:`dict`.
         """
         groups = collections.defaultdict(list)
         collective_mappings = {}
@@ -575,13 +574,13 @@ class RpairParser:
         To check if the mapped the atoms can corresponds to the mapped reaction center atoms.
         
         :param left_centers: the list of center atom index in the left compound.
-        :type left_centers: :py:obj:`list`.
+        :type left_centers: :py:class:`list`.
         :param right_centers: the list of center atom index in the right compound.
-        :type right_centers: :py:obj:`list`.
+        :type right_centers: :py:class:`list`.
         :param component_atom_mappings: the one to one atom mappings of one component.
-        :type component_atom_mappings: :py:obj:`dict`.
+        :type component_atom_mappings: :py:class:`dict`.
         :return: bool whether the mappings are valid.
-        :rtype: :py:class:`bool`.
+        :rtype: :py:obj:`bool`.
         """
         for i, j in zip(left_centers, right_centers):
             if i in component_atom_mappings and j != component_atom_mappings[i]:
@@ -594,9 +593,9 @@ class RpairParser:
         can cause change of local environment, which can change the atom identifier.
 
         :param one_to_one_mappings: the dictionary of atom mappings between the two compounds.
-        :type one_to_one_mappings: :py:obj:`dict`.
+        :type one_to_one_mappings: :py:class:`dict`.
         :return: the total number of mapped atoms with different local identifier.
-        :rtype: :py:obj:`int`.
+        :rtype: :py:class:`int`.
         """
         count = 0
         for idx_1 in one_to_one_mappings:
@@ -613,7 +612,7 @@ def create_compound_kcf(kcf_file):
     To construct compound entity based on the KEGG kcf file.
 
     :param kcf_file: the filename contains kcf text.
-    :type kcf_file: :py:obj:`str`.
+    :type kcf_file: :py:class:`str`.
     :return: the constructed compound entity.
     :rtype: :class:`~MDH.compound.Compound`.
     """
@@ -652,13 +651,13 @@ def create_reactions(reaction_directory, compounds, atom_mappings):
     To create KEGG `~MDH.reaction.Reaction` entities.
 
     :param reaction_directory: the directory that stores all the reaction files.
-    :type reaction_directory: :py:obj:`str`.
+    :type reaction_directory: :py:class:`str`.
     :param compounds: a dictionary of :class:`~MDH.compound.Compound` entities.
-    :type compounds: :py:obj:`dict`.
+    :type compounds: :py:class:`dict`.
     :param atom_mappings: the compound pair name and the its atom mappings.
-    :type atom_mappings: :py:obj:`dict`.
+    :type atom_mappings: :py:class:`dict`.
     :return: the constructed `~MDH.reaction.Reaction` entities.
-    :rtype: :py:obj:`list`.
+    :rtype: :py:class:`list`.
     """
     # here we compounds, rlcass descriptions, and reactions.
     reaction_files = glob.glob(reaction_directory+"*")
@@ -713,15 +712,15 @@ def compound_pair_mappings(rclass_name, rclass_definitions, one_compound, the_ot
     To get the atom mappings between two compounds based on the rclass definitions.
 
     :param rclass_name: the name of the rclass.
-    :type rclass_name: :py:obj:`str`.
+    :type rclass_name: :py:class:`str`.
     :param rclass_definitions: the list of rclass definitions.
-    :type rclass_definitions: :py:obj:`list`.
+    :type rclass_definitions: :py:class:`list`.
     :param one_compound: one compound entity involved in the compound pair.
     :type one_compound: :class:`~MDH.compound.Compound`.
     :param the_other_compound: the other compound entity involved in the compound pair.
     :type the_other_compound: :class:`~MDH.compound.Compound`.
     :return: the compound pair name and the its atom mappings.
-    :rtype: :py:obj:`str` and :py:obj:`list`.
+    :rtype: :py:class:`str` and :py:class:`list`.
     """
     atom_mappings = []
     try:
@@ -738,11 +737,11 @@ def create_atom_mappings(rclass_directory, compounds):
     To generate the atom mappings between compounds based on RCLASS definitions.
 
     :param rclass_directory: the directory that stores the rclass files.
-    :type rclass_directory: :py:obj:`str`.
+    :type rclass_directory: :py:class:`str`.
     :param compounds: a dictionary of :class:`~MDH.compound.Compound` entities.
-    :type compounds: :py:obj:`dict`.
+    :type compounds: :py:class:`dict`.
     :return: the atom mappings of compound pairs.
-    :rtype: :py:obj:`dict`.
+    :rtype: :py:class:`dict`.
     """
     rclass_files = glob.glob(rclass_directory + "*")
     atom_mappings = collections.defaultdict(dict)

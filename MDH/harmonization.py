@@ -6,6 +6,7 @@ class HarmonizedEdge:
 
     def __init__(self, one_side, the_other_side, relationship, type, mappings):
         """
+        HarmonizedEdge initializer.
 
         :param one_side:
         :param the_other_side:
@@ -379,7 +380,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
 
 def harmonize_compound_list(compound_list):
     """
-
+    
     :param compound_list:
     :return:
     """
@@ -411,7 +412,7 @@ def harmonize_compound_list(compound_list):
 
 def harmonize_reaction_list(reaction_list, compound_harmonization_manager):
     """
-
+    
     :param reaction_list:
     :param compound_harmonization_manager:
     :return:

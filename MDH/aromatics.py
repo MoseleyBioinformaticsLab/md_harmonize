@@ -28,7 +28,7 @@ class AromaticManager:
         AromaticManager initializer.
 
         :param aromatic_substructures: a list of aromatic substructures.
-        :type aromatic_substructures: :py:obj:`list`.
+        :type aromatic_substructures: :py:class:`list`.
         """
         self.aromatic_substructures = aromatic_substructures if aromatic_substructures else []
         self.indigo = Indigo()
@@ -41,7 +41,7 @@ class AromaticManager:
         the cythonized entities cannot be pickled.)
 
         :return: the list of aromatic substructures.
-        :rtype: :py:obj:`list`.
+        :rtype: :py:class:`list`.
         """
         return [cpd.encode() for cpd in self.aromatic_substructures]
 
@@ -51,7 +51,7 @@ class AromaticManager:
         To construct the AromaticManager based on the components of aromatic substructures.
 
         :param aromatic_structures: the list of components of aromatic substructures.
-        :type aromatic_structures: :py:obj:`list`.
+        :type aromatic_structures: :py:class:`list`.
         :return: the constructed AromaticManager.
         :rtype: :class:`~MDH.aromatics.AromaticManager`.
         """
@@ -62,7 +62,7 @@ class AromaticManager:
         Add newly detected aromatic structures to the manager. Make sure no duplicates in the aromatic substructures.
 
         :param substructures: a list of aromatic substructures.
-        :type substructures: :py:obj:`list`.
+        :type substructures: :py:class:`list`.
         :return: None.
         :rtype: :py:obj:`None`.
         """
@@ -104,7 +104,7 @@ class AromaticManager:
         To extract aromatic substructures via Indigo, and add the newly detected aromatic substructures to the AromaticManger.
 
         :param molfile: the filename of the molfile.
-        :type molfile: :py:obj:`str`.
+        :type molfile: :py:class:`str`.
         :return: None.
         :rtype: :py:obj:`None`.
         """
@@ -121,9 +121,9 @@ class AromaticManager:
         To detect the aromatic bonds in the compound via Indigo method.
 
         :param molfile: the filename of the molfile.
-        :type molfile: :py:obj:`str`.
+        :type molfile: :py:class:`str`.
         :return: the set of aromatic bonds represented by first_atom_number and second_atom_number of the bond.
-        :rtype: :py:obj:`set`.
+        :rtype: :py:class:`set`.
         """
         aromatic_bonds = set()
         try:
@@ -143,9 +143,9 @@ class AromaticManager:
         To fuse the cycles with shared atoms.
 
         :param cycles: the list of individual cycles represented by atom numbers.
-        :type cycles: :py:obj:`list`.
+        :type cycles: :py:class:`list`.
         :return: the list of fused cycles.
-        :rtype: :py:obj:`list`.
+        :rtype: :py:class:`list`.
         """
         # to remove the cycle that is contained in another cycle.
         index_set = set(index for cycle in cycles for index in cycle)
@@ -169,7 +169,7 @@ class AromaticManager:
         :param cpd: the :class:`~MDH.compound.Compound` entity.
         :type cpd: :class:`~MDH.compound.Compound`.
         :return: a list of aromatic bonds (represented by two atom numbers forming the bond), and a list of aromatic atom numbers.
-        :rtype: :py:obj:`list`.
+        :rtype: :py:class:`list`.
         """
         aromatic_bonds = set()
         aromatic_atoms = set()
@@ -220,9 +220,9 @@ class AromaticManager:
         :param cpd: the :class:`~MDH.compound.Compound` entity.
         :type cpd: :class:`~MDH.compound.Compound`.
         :param aromatic_cycles: the list of aromatic cycles represented by atom numbers in the compound.
-        :type aromatic_cycles: :py:obj:`list`.
+        :type aromatic_cycles: :py:class:`list`.
         :return: the list of constructed aromatic substructures.
-        :rtype: :py:obj:`list`.
+        :rtype: :py:class:`list`.
         """
         count = 0
         aromatic_substructures = []
@@ -258,7 +258,7 @@ class AromaticManager:
         :param cpd: the :class:`~MDH.compound.Compound` entity.
         :type cpd: :class:`~MDH.compound.Compound`.
         :return: the list of aromatic cycles represented by atom numbers.
-        :rtype: :py:obj:`list`.
+        :rtype: :py:class:`list`.
         """
         aromatic_elements = ["C", "N"]
         aromatic_types = ["C8x", "C8y", "N4x", "N4y", "N5x", "N5y"]

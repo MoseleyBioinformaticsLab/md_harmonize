@@ -1,31 +1,48 @@
 #!/usr/bin/python3
+"""
+MDH.harmonization
+~~~~~~~~~~~~~~~~~
 
+This module provides the :class:`~MDH.harmonization.HarmonizedEdge` class, the :class:`MDH.harmonization.HarmonizedCompoundEdge` class,
+and the :class:`~MDH.harmonization.HarmonizedReactionEdge` class .
+
+"""
 import collections
 
 class HarmonizedEdge:
+    """
+    The HarmonizedEdge can represent compound or reaction pairs.
+    """
 
-    def __init__(self, one_side, the_other_side, relationship, type, mappings):
+    def __init__(self, one_side, the_other_side, relationship, edge_type, mappings):
         """
         HarmonizedEdge initializer.
 
-        :param one_side:
-        :param the_other_side:
+        :param one_side: one side of the edge. This can be compound or reaction.
+        :type one_side: :class:`~MDH.compound.Compound` or :class:`~MDH.reaction.Reaction`.
+        :param the_other_side: the other side of the edge. This can be compound or reaction.
+        :type the_other_side: :class:`~MDH.compound.Compound` or :class:`~MDH.reaction.Reaction`.
         :param relationship: equivalent, generic-specific, or loose.
-        :param type: for compound edge, this represents resonance, linear-circular, r group, same structure;
-        for reaction edge: this represents 3 level match or 4 level match.
-        :param mappings:
+        :type relationship: :py:class:`int`.
+        :param edge_type: for compound edge, this represents resonance, linear-circular, r group, same structure;
+        for reaction edge, this represents 3 level match or 4 level match.
+        :type edge_type: :py:class:`str` or :py:class:`int`.
+        :param mappings: for compound edge, the mappings refer to mapped atoms between compounds; for reaction edge,
+        the mappings refer to mapped compounds between reaction.
         """
         self.one_side = one_side
         self.the_other_side = the_other_side
         self.relationship = relationship
-        self.type = type
+        self.type = edge_type
         self.mappings = mappings
 
     @property
     def reversed_relationship(self):
         """
+        To get the relationship between the other side and one side.
 
-        :return:
+        :return: the reversed relationship.
+        :rtype: :py:class:`int`.
         """
         if self.relationship == 2 or self.relationship == 0:
             return self.relationship
@@ -33,9 +50,12 @@ class HarmonizedEdge:
 
     def pair_relationship(self, name):
         """
+        When we map compounds in the reaction, we can access the compound edge from either side.
 
-        :param name:
-        :return:
+        :param name: the name of the searched one side.
+        :type name: :py:class:`str`.
+        :return: the relationship of the searched pair.
+        :rtype: :py:class:`int`.
         """
         if name == self.one_side.name:
             return self.relationship
@@ -45,14 +65,16 @@ class HarmonizedEdge:
 
 class HarmonizedCompoundEdge(HarmonizedEdge):
 
-    def __init__(self, one_compound, the_other_compound, relationship, type, atom_mappings):
-        super().__init__(one_compound, the_other_compound, relationship, type, atom_mappings)
+    def __init__(self, one_compound, the_other_compound, relationship, edge_type, mappings):
+        super().__init__(one_compound, the_other_compound, relationship, edge_type, mappings)
 
     @property
     def reversed_mappings(self):
         """
-        To get the atom mappings from the_other_compound to
-        :return:
+        To get the atom mappings from compound on the other side to compound on the one side.
+
+        :return: atom mappings between the other side compound to one side compound.
+        :rtype: :py:class:`dict`.
         """
         atom_mappings = collections.defaultdict(list)
         for from_atom in self.mappings:
@@ -62,9 +84,12 @@ class HarmonizedCompoundEdge(HarmonizedEdge):
 
     def pair_atom_mappings(self, name):
         """
+        To get the atom mappings of the harmonized compound edge, where one side equals to the parameter name.
 
-        :param name:
-        :return:
+        :param name: the compound name.
+        :type name: :py:class:`str`.
+        :return: the atom mappings.
+        :rtype: :py:class:`dict`.
         """
         if name == self.one_side.name:
             return self.mappings
@@ -74,27 +99,29 @@ class HarmonizedCompoundEdge(HarmonizedEdge):
 
 class HarmonizedReactionEdge(HarmonizedEdge):
 
-    def __init__(self, one_reaction, the_other_reaction, relationship, type, compound_mappings):
-        super().__init__(one_reaction, the_other_reaction, relationship, type, compound_mappings)
-
+    def __init__(self, one_reaction, the_other_reaction, relationship, edge_type, mappings):
+        super().__init__(one_reaction, the_other_reaction, relationship, edge_type, mappings)
 
 
 class HarmonizationManager:
 
     def __init__(self):
         """
-
+        HarmonizationManager initializer.
         """
-
         self.harmonized_edges = {}
 
     @staticmethod
     def create_key(name_1, name_2):
         """
         To create the edge key.
-        :param name_1:
-        :param name_2:
-        :return:
+
+        :param name_1: the name of one side of the edge.
+        :type name_1: :py:class:`str`.
+        :param name_2: the name of the other side of the edge.
+        :type name_2: :py:class:`str`.
+        :return: the key of the edge.
+        :rtype: :py:class:`str`.
         """
         if name_1 > name_2:
             return name_1 + "@" + name_2
@@ -103,30 +130,44 @@ class HarmonizationManager:
 
     def add_edge(self, edge):
         """
+        To add this edge to the harmonized edges.
 
-        :param edge:
-        :return:
+        :param edge: the :class:`~MDH.harmonization.HarmonizedEdge` entity.
+        :type edge: :class:`~MDH.harmonization.HarmonizedEdge`.
+        :return: bool whether the edge does not exist and is added successfully.
+        :rtype: :py:obj:`bool`.
         """
         key = self.create_key(edge.one_side.name, edge.the_other_side.name)
         if key not in self.harmonized_edges:
             self.harmonized_edges[key] = edge
+            return True
+        return False
 
     def remove_edge(self, edge):
         """
+        To remove this edge from the harmonized edges.
 
-        :param edge:
-        :return:
+        :param edge: the :class:`~MDH.harmonization.HarmonizedEdge` entity.
+        :type edge: :class:`~MDH.harmonization.HarmonizedEdge`.
+        :return: bool whether the edge exists and is removed successfully.
+        :rtype: :py:obj:`bool`.
         """
         key = self.create_key(edge.one_side.name, edge.the_other_side.name)
         if key in self.harmonized_edges:
             self.harmonized_edges.pop(key)
+            return True
+        return False
 
     def search(self, name_1, name_2):
         """
+        To search the edge based on the names of the two sides.
 
-        :param name_1:
-        :param name_2:
-        :return:
+        :param name_1: the name of one side of the edge.
+        :type name_1: :py:class:`str`.
+        :param name_2: the name of the other side of the edge.
+        :type name_2: :py:class:`str`.
+        :return: edge if the edge exists or None.
+        :rtype: :class:`~MDH.harmonization.HarmonizedEdge` or :py:obj:`None`.
         """
         key = self.create_key(name_1, name_2)
         if key in self.harmonized_edges:
@@ -138,10 +179,11 @@ class CompoundHarmonizationManager(HarmonizationManager):
 
     def __init__(self):
         """
-
+        CompoundHarmonizationManager initializer.
         """
         super().__init__()
         self.compound_in_edges = collections.Counter()
+        self.visited = set()
 
     def add_edge(self, edge):
         """

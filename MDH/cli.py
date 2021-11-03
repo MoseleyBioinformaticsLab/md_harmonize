@@ -199,8 +199,8 @@ def cli(args):
         meta_molfiles = glob.glob(meta_cpd_path + "/*")
         kegg_dict = function_multiprocess(kegg_molfiles, construct_cpd)
         print("kegg parsed")
-        meta_dict = function_multiprocess(meta_molfiles, construct_cpd)
-        print("metacyc parsed")
+        #meta_dict = function_multiprocess(meta_molfiles, construct_cpd)
+        #print("metacyc parsed")
         #
         # with multiprocessing.Pool() as pool:
         #     results = pool.map(aromatic_manager.detect_aromatic_substructures, list(kegg_dict.values()) )

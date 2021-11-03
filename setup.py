@@ -1,10 +1,11 @@
 #!/usr/bin/python3
 
 import re
-from setuptools import setup, find_packages, Extension
+from setuptools import find_packages
+from distutils.core import setup
+from distutils.extension import Extension
 import numpy
-import Cython.Build
-
+from Cython.Distutils import build_ext
 #from distuils.core import setup
 
 
@@ -41,7 +42,7 @@ REQUIRES = [
 
 
 EXTENSIONS = [
-    Extension("MDH.BASS",sources=["MDH/BASS.pyx"],extra_compile_args=["-O3"], language='c++', include_dirs=[numpy.get_include()])
+    Extension("MDH.BASS",sources=["MDH/BASS.pyx"], extra_compile_args=["-O3"], language='c++', include_dirs=[numpy.get_include()])
 ]
 
 setup(
@@ -54,11 +55,11 @@ setup(
         keywords='metabolite, metabolic reaction',
         license='Modified Clear BSD License',
         url='',
-        cmdclass={'build_ext': Cython.Build.build_ext},
+        ext_modules=EXTENSIONS,
+        cmdclass={'build_ext': build_ext},
         install_requires=REQUIRES,
         long_description=readme(),
         platforms='any',
-        ext_modules=Cython.Build.cythonize(EXTENSIONS),
         classifiers=[
             'Development Status :: 4 - Beta',
             'Environment :: Console',

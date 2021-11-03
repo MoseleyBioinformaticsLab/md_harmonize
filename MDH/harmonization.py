@@ -8,7 +8,7 @@ class HarmonizedEdge:
         """
         HarmonizedEdge initializer.
 
-        :param one_side:
+        :param one_side: one side of the edge.
         :param the_other_side:
         :param relationship: equivalent, generic-specific, or loose.
         :param type: for compound edge, this represents resonance, linear-circular, r group, same structure;

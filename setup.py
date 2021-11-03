@@ -5,6 +5,9 @@ from setuptools import setup, find_packages, Extension
 import numpy
 import Cython.Build
 
+#from distuils.core import setup
+
+
 # try:
 #     from Cython.Distutils import build_ext
 #     HAVE_CYTHON = True
@@ -38,7 +41,7 @@ REQUIRES = [
 
 
 EXTENSIONS = [
-    Extension("MDH.BASS",sources=["MDH/BASS.pyx"],extra_compile_args=["-O3"], include_dirs=[numpy.get_include()])
+    Extension("MDH.BASS",sources=["MDH/BASS.pyx"],extra_compile_args=["-O3"], language='c++', include_dirs=[numpy.get_include()])
 ]
 
 setup(
@@ -55,7 +58,7 @@ setup(
         install_requires=REQUIRES,
         long_description=readme(),
         platforms='any',
-        ext_modules=EXTENSIONS,
+        ext_modules=Cython.Build.cythonize(EXTENSIONS),
         classifiers=[
             'Development Status :: 4 - Beta',
             'Environment :: Console',

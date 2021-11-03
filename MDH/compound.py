@@ -33,37 +33,37 @@ class Atom:
         """Atom initializer.
 
         :param atom_symbol: atom_symbol.
-        :type atom_symbol: :py:obj:`str`.
+        :type atom_symbol: :py:class:`str`.
         :param atom_number: atom_number.
-        :type atom_number: :py:obj:`int`.
+        :type atom_number: :py:class:`int`.
         :param x: the atom x coordinate.
-        :type x: :py:obj:`str`.
+        :type x: :py:class:`str`.
         :param y: the atom y coordinate.
-        :type y: :py:obj:`str`.
+        :type y: :py:class:`str`.
         :param z: the atom z coordinate.
-        :type z: :py:obj:`str`.
+        :type z: :py:class:`str`.
         :param mass_difference: difference from mass in periodic table.
-        :type mass_difference: :py:obj:`str`.
+        :type mass_difference: :py:class:`str`.
         :param charge: charge.
-        :type charge: :py:obj:`str`.
+        :type charge: :py:class:`str`.
         :param atom_stereo_parity: atom stereo parity.
-        :type atom_stereo_parity: :py:obj:`str`.
+        :type atom_stereo_parity: :py:class:`str`.
         :param hydrogen_count: hydrogen_count.
-        :type hydrogen_count: :py:obj:`str`.
+        :type hydrogen_count: :py:class:`str`.
         :param stereo_care_box: stereo_care_box.
-        :type stereo_care_box: :py:obj:`str`.
+        :type stereo_care_box: :py:class:`str`.
         :param valence: valence.
-        :type: valence: :py:obj:`str`.
+        :type: valence: :py:class:`str`.
         :param h0designator: h0designator.
-        :type h0designator: :py:obj:`str`.
+        :type h0designator: :py:class:`str`.
         :param atom_atom_mapping_number: atom_atom_mapping_number.
-        :type atom_atom_mapping_number: :py:obj:`str`.
+        :type atom_atom_mapping_number: :py:class:`str`.
         :param inversion_retention_flag: inversion_retention_flag.
-        :type inversion_retention_flag: :py:obj:`str`.
+        :type inversion_retention_flag: :py:class:`str`.
         :param exact_change_flag: exact_change_flag.
-        :type exact_change_flag: :py:obj:`str`.
+        :type exact_change_flag: :py:class:`str`.
         :param kat: KEGG atom type.
-        :type kat: :py:obj:`str`.
+        :type kat: :py:class:`str`.
     	"""
         self.x = float(x.strip())
         self.y = float(y.strip())

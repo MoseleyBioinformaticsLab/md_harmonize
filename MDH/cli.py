@@ -194,13 +194,16 @@ def cli(args):
             tools.open_jsonpickle("/mlab/data/hji236/projects/MDH_test/kcf_aromatic_manager.json"))
         kegg_cpd_path = "/mlab/data/hji236/projects/MDH_test/standardized/KEGG/molfile_test"
         meta_cpd_path = "/mlab/data/hji236/projects/MDH_test/standardized/MetaCyc/molfile_test"
-        to_file = "/mlab/data/hji236/projects/MDH_test/harmonized_edge_list.json"
+        to_file = "/mlab/data/hji236/projects/MDH_test/harmonized_edge_list_1.json"
         kegg_molfiles = glob.glob(kegg_cpd_path + "/*")
         meta_molfiles = glob.glob(meta_cpd_path + "/*")
         kegg_dict = function_multiprocess(kegg_molfiles, construct_cpd)
         print("kegg parsed")
         meta_dict = function_multiprocess(meta_molfiles, construct_cpd)
         print("metacyc parsed")
+        #
+        # with multiprocessing.Pool() as pool:
+        #     results = pool.map(aromatic_manager.detect_aromatic_substructures, list(kegg_dict.values()) )
         for cpd_name in kegg_dict:
             cpd = kegg_dict[cpd_name]
             aromatic_manager.detect_aromatic_substructures(cpd)

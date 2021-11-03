@@ -3,13 +3,14 @@
 import re
 from setuptools import setup, find_packages, Extension
 import numpy
+import Cython.Build
 
-try:
-    from Cython.Distutils import build_ext
-    HAVE_CYTHON = True
-except ImportError:
-    from setuptools.command.build_ext import build_ext
-    HAVE_CYTHON = False
+# try:
+#     from Cython.Distutils import build_ext
+#     HAVE_CYTHON = True
+# except ImportError:
+#     from setuptools.command.build_ext import build_ext
+#     HAVE_CYTHON = False
 
 def find_version():
     with open('MDH/__init__.py', 'r') as fd:
@@ -32,6 +33,7 @@ REQUIRES = [
         "epam.indigo",
         "ctfile",
         "timeout-decorator",
+        "cython"
 ]
 
 
@@ -49,7 +51,7 @@ setup(
         keywords='metabolite, metabolic reaction',
         license='Modified Clear BSD License',
         url='',
-        cmdclass={'build_ext': build_ext},
+        cmdclass={'build_ext': Cython.Build.build_ext},
         install_requires=REQUIRES,
         long_description=readme(),
         platforms='any',

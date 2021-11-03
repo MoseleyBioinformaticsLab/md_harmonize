@@ -23,7 +23,7 @@ def entry_list(target_url):
     :param target_url: the url to fetch.
     :type target_url: :py:class:`str`.
     :return: the list of entry names.
-    :rtype: :py:obj:`list`.
+    :rtype: :py:class:`list`.
     """
     file = urllib.request.urlopen(target_url)
     the_list = []
@@ -36,13 +36,13 @@ def update_entity(entries, sub_directory, directory, suffix=""):
     To download the KEGG entity (compound, reaction, or rclass) and save it into a file.
 
     :param entries: the list of entry name to download.
-    :type entries: :py:obj:`list`.
+    :type entries: :py:class:`list`.
     :param sub_directory: the subdirectory to save the downloaded file.
-    :type sub_directory: :py:obj:`str`.
+    :type sub_directory: :py:class:`str`.
     :param directory: the main directory to save the downloaded file.
-    :type directory: :py:obj:`str`.
+    :type directory: :py:class:`str`.
     :param suffix: the suffix needed for download, like the mol for compound molfile and kcf for compound kcf file.
-    :type suffix: :py:obj:`str`.
+    :type suffix: :py:class:`str`.
     :return: None.
     :rtype: :py:obj:`None`.
     """
@@ -58,7 +58,7 @@ def download(directory):
     To down load all the KEGG required files.
 
     :param directory: the directory to store the data.
-    :type directory: :py:obj:`str`.
+    :type directory: :py:class:`str`.
     :return: None.
     :rtype: :py:obj:`None`.
     """

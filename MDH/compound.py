@@ -21,7 +21,7 @@ from .supplement import standard_bond_counts
 from .supplement import atomic_weights
 from .supplement import metal_symbols
 from .supplement import index_to_charge
-from .supplement import charge_to_index
+# from .supplement import charge_to_index
 
 class Atom:
 
@@ -1611,7 +1611,7 @@ class Compound:
         :return: the relationship and the atom mappings between the two compounds.
         :rtype: :py:class:`int` and :py:class:`dict`.
         """
-        relationship, mis_count = self.compare_chemical_details(self.get_chemical_details(),
+        relationship, unmapped_count = self.compare_chemical_details(self.get_chemical_details(),
                                                                 the_other_compound.get_chemical_details())
         # return relationship and atom mappings.
         return relationship, self.generate_atom_mapping_by_atom_color(the_other_compound)
@@ -1693,7 +1693,11 @@ class Compound:
 
     def circular_pair_relationship(self, the_other_compound):
         """
-         To determine the relationship of two compounds with interchangeable circular and linear representations.
+        To determine the relationship of two compounds with interchangeable circular and linear representations.
+        We first find the critical atoms that involve in the formation of ring. There can be several possibilities.
+        Then we break the ring, and restore the double bond in the aldehyde group that forms the ring.
+        Finally, check if the updated structure is the same with the other compound. And determine the relationship
+        between the two compounds as well as generate the atom mappings.
 
         :param the_other_compound: the other :class:`~MDH.compound.Compound` entity.
         :type the_other_compound: :class:`~MDH.compound.Compound`.
@@ -1707,7 +1711,7 @@ class Compound:
         the_other_color = the_other_compound.backbone_color_identifier(r_groups=True) + \
                           the_other_compound.metal_color_identifier(details=False)
         for critical_atoms in critical_atom_list:
-            self.remove_cycle(critical_atoms)
+            self.break_cycle(critical_atoms)
             this_color = self.backbone_color_identifier(r_groups=True) + self.metal_color_identifier(details=False)
             if this_color == the_other_color:
                 excluded_atoms_the_other = the_other_compound.exclude_atoms([self.atoms[i].color for i in critical_atoms])
@@ -1737,13 +1741,12 @@ class Compound:
                 excluded_index.append(i)
         return excluded_index
 
-    def remove_cycle(self, critical_atoms):
+    def break_cycle(self, critical_atoms):
         """
 
         :param critical_atoms:
         :return:
         """
-
         atom_o, atom_c, atom_oo = critical_atoms
         # break the cycle
         self.atoms[atom_o].remove_neighbors([atom_c])
@@ -1759,7 +1762,6 @@ class Compound:
         :param critical_atoms:
         :return:
         """
-
         atom_o, atom_c, atom_oo = critical_atoms
         self.atoms[atom_o].add_neighbors([atom_c])
         self.atoms[atom_c].add_neighbors([atom_o])

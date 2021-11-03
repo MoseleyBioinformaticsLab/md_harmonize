@@ -15,7 +15,6 @@ class HarmonizedEdge:
         for reaction edge: this represents 3 level match or 4 level match.
         :param mappings:
         """
-
         self.one_side = one_side
         self.the_other_side = the_other_side
         self.relationship = relationship

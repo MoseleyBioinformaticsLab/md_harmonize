@@ -7,7 +7,7 @@ import os
 
 def standardize_molfile(molfile, to_path):
     """
-    Standardize molfile using openbabel.
+    To standardize molfile using openbabel.
 
     :param molfile: the filename to the original molfile.
     :type molfile: :py:class:`str`.

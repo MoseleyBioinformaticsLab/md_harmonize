@@ -159,35 +159,6 @@ class AromaticManager:
                 break
         return cycles
     
-    @staticmethod
-    def single_detect(aromatic, cpd):
-        """
-        To detect if the compound contains this specific aromatic substructure.
-
-        :param aromatic: the aromatic substructure.
-        :type aromatic: :class:`~MDH.compound.Compound`.
-        :param cpd: the :class:`~MDH.compound.Compound` entity.
-        :type cpd: :class:`~MDH.compound.Compound`.
-        :return: a list of aromatic bonds (represented by two atom numbers forming the bond), and a list of aromatic atom numbers.
-        :rtype: :py:class:`list`.
-        """
-        aromatic_bonds = set()
-        aromatic_atoms = set()
-        if all(aromatic.composition[key] <= cpd.composition[key] for key in aromatic.composition):
-            mapping_matrix = BASS.make_mapping_matrix(aromatic, cpd, True, True, False)
-            if mapping_matrix is not None:
-                for assignment in BASS.find_mappings(aromatic.structure_matrix(resonance=False), aromatic.distance_matrix,
-                                                     cpd.structure_matrix(resonance=False), cpd.distance_matrix, mapping_matrix):
-                    for bond in aromatic.bonds:
-                        if aromatic.atoms[bond.first_atom_number].in_cycle and aromatic.atoms[bond.second_atom_number].in_cycle:
-                            first_atom_number = cpd.heavy_atoms[assignment[bond.first_atom_number]].atom_number
-                            second_atom_number = cpd.heavy_atoms[assignment[bond.second_atom_number]].atom_number
-                            bond_index = (min(first_atom_number, second_atom_number), max(first_atom_number, second_atom_number))
-                            aromatic_bonds.add(bond_index)
-                            aromatic_atoms.add(first_atom_number)
-                            aromatic_atoms.add(second_atom_number)
-        return aromatic_bonds, aromatic_atoms
-
     def detect_aromatic_substructures(self, cpd):
         """
         Detect all the aromatic substructures in the cpd, and update the bond type of aromatic bonds.
@@ -201,12 +172,20 @@ class AromaticManager:
         aromatic_atoms = set()
         cpd.update_color_tuple()
 
-        with multiprocessing.Pool() as pool:
-            results = pool.starmap(self.single_detect, ((sub, cpd) for sub in self.aromatic_substructures))
-
-        for bonds, atoms in results:
-            aromatic_bonds.update(bonds)
-            atoms.update(atoms)
+        for aromatic in self.aromatic_substructures:
+            if all(aromatic.composition[key] <= cpd.composition[key] for key in aromatic.composition):
+                mapping_matrix = BASS.make_mapping_matrix(aromatic, cpd, True, True, False)
+                if mapping_matrix is not None:
+                    for assignment in BASS.find_mappings(aromatic.structure_matrix(resonance=False), aromatic.distance_matrix,
+                                                         cpd.structure_matrix(resonance=False), cpd.distance_matrix, mapping_matrix):
+                        for bond in aromatic.bonds:
+                            if aromatic.atoms[bond.first_atom_number].in_cycle and aromatic.atoms[bond.second_atom_number].in_cycle:
+                                first_atom_number = cpd.heavy_atoms[assignment[bond.first_atom_number]].atom_number
+                                second_atom_number = cpd.heavy_atoms[assignment[bond.second_atom_number]].atom_number
+                                bond_index = (min(first_atom_number, second_atom_number), max(first_atom_number, second_atom_number))
+                                aromatic_bonds.add(bond_index)
+                                aromatic_atoms.add(first_atom_number)
+                                aromatic_atoms.add(second_atom_number)
 
         cpd.update_aromatic_bond(aromatic_bonds, aromatic_atoms)
         print("finish aromatic detection: ", cpd.compound_name)

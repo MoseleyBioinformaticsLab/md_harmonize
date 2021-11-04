@@ -21,6 +21,7 @@ Options:
 import glob
 import os
 import multiprocessing
+import time
 from . import KEGG_database_scraper
 from . import KEGG_parser
 from . import MetaCyc_parser
@@ -192,7 +193,7 @@ def cli(args):
 
         aromatic_manager = aromatics.AromaticManager.decode(
             tools.open_jsonpickle("/mlab/data/hji236/projects/MDH_test/kcf_aromatic_manager.json"))
-        kegg_cpd_path = "/mlab/data/hji236/projects/MDH_test/standardized/KEGG/molfile_test"
+        kegg_cpd_path = "/mlab/data/hji236/projects/MDH_test/standardized/KEGG/molfile_test1"
         meta_cpd_path = "/mlab/data/hji236/projects/MDH_test/standardized/MetaCyc/molfile_test"
         to_file = "/mlab/data/hji236/projects/MDH_test/harmonized_edge_list_1.json"
         kegg_molfiles = glob.glob(kegg_cpd_path + "/*")
@@ -204,19 +205,25 @@ def cli(args):
         #
         # with multiprocessing.Pool() as pool:
         #     results = pool.map(aromatic_manager.detect_aromatic_substructures, list(kegg_dict.values()) )
+        print(len(aromatic_manager.aromatic_substructures))
+        print(kegg_dict)
+        t0 = time.time()
         for cpd_name in kegg_dict:
             cpd = kegg_dict[cpd_name]
+            #print(cpd_name)
             aromatic_manager.detect_aromatic_substructures(cpd)
-            cpd.define_bond_stereochemistry()
-            cpd.curate_invalid_n()
-        for cpd_name in meta_dict:
-            cpd = meta_dict[cpd_name]
-            aromatic_manager.detect_aromatic_substructures(cpd)
-            cpd.define_bond_stereochemistry()
-            cpd.curate_invalid_n()
-        compound_harmonization_manager = harmonization.harmonize_compound_list([kegg_dict, meta_dict])
-        edge_list = compound_harmonization_manager.get_edge_list()
-        tools.save_to_json(edge_list, to_file)
+        t1 = time.time()
+        print(t1-t0)
+            #cpd.define_bond_stereochemistry()
+            #cpd.curate_invalid_n()
+        #for cpd_name in meta_dict:
+        #    cpd = meta_dict[cpd_name]
+        #    aromatic_manager.detect_aromatic_substructures(cpd)
+        #    cpd.define_bond_stereochemistry()
+        #    cpd.curate_invalid_n()
+        #compound_harmonization_manager = harmonization.harmonize_compound_list([kegg_dict, meta_dict])
+        #edge_list = compound_harmonization_manager.get_edge_list()
+        #tools.save_to_json(edge_list, to_file)
 
 
     elif args['test']:

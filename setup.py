@@ -1,20 +1,12 @@
 #!/usr/bin/python3
 
+import os
+import sys
 import re
-from setuptools import find_packages
-from distutils.core import setup
-from distutils.extension import Extension
+from setuptools import setup, find_packages, Extension
+import Cython.Build
 import numpy
-from Cython.Distutils import build_ext
-#from distuils.core import setup
 
-
-# try:
-#     from Cython.Distutils import build_ext
-#     HAVE_CYTHON = True
-# except ImportError:
-#     from setuptools.command.build_ext import build_ext
-#     HAVE_CYTHON = False
 
 def find_version():
     with open('MDH/__init__.py', 'r') as fd:
@@ -42,7 +34,7 @@ REQUIRES = [
 
 
 EXTENSIONS = [
-    Extension("MDH.BASS",sources=["MDH/BASS.pyx"], extra_compile_args=["-O3"], language='c++', include_dirs=[numpy.get_include()])
+    Extension("MDH.BASS_test",sources=["MDH/BASS_test.pyx"], extra_compile_args=['-O3'], include_dirs=[numpy.get_include()])
 ]
 
 setup(
@@ -56,7 +48,7 @@ setup(
         license='Modified Clear BSD License',
         url='',
         ext_modules=EXTENSIONS,
-        cmdclass={'build_ext': build_ext},
+        cmdclass={'build_ext': Cython.Build.build_ext},
         install_requires=REQUIRES,
         long_description=readme(),
         platforms='any',

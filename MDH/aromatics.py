@@ -9,8 +9,8 @@ This module provides the :class:`~MDH.aromatics.AromaticManager` class entity.
 """
 
 from . import compound
-from . import BASS
-
+#from . import BASS
+from . import BASS_test
 import multiprocessing
 from indigo import *
 
@@ -70,9 +70,10 @@ class AromaticManager:
             flag = False
             for aromatic_substructure in self.aromatic_substructures:
                 if all(aromatic_substructure.composition[key] == substructure.composition[key] for key in substructure.composition):
-                    mapping_matrix = BASS.make_mapping_matrix(aromatic_substructure, substructure, True, True, False)
+                    #mapping_matrix = BASS.make_mapping_matrix(aromatic_substructure, substructure, True, True, False)
+                    mapping_matrix = BASS_test.make_mapping_matrix(aromatic_substructure, substructure, True, True)
                     if mapping_matrix is not None:
-                        isomorphs = BASS.find_mappings(aromatic_substructure.structure_matrix(resonance=False),
+                        isomorphs = BASS_test.find_mappings(aromatic_substructure.structure_matrix(resonance=False),
                                                        aromatic_substructure.distance_matrix, substructure.structure_matrix(resonance=False),
                                                        substructure.distance_matrix, mapping_matrix)
                         if isomorphs != [] and isomorphs is not None:
@@ -171,12 +172,25 @@ class AromaticManager:
         aromatic_bonds = set()
         aromatic_atoms = set()
         cpd.update_color_tuple()
-
+        #print("atoms in cycles", [atom.atom_number for atom in cpd.atoms if atom.in_cycle])
+        #print("atom color tuple")
+        #for atom in cpd.atoms:
+            #if atom.default_symbol != "H":
+                #print(atom.color_tuple)
         for aromatic in self.aromatic_substructures:
+
             if all(aromatic.composition[key] <= cpd.composition[key] for key in aromatic.composition):
-                mapping_matrix = BASS.make_mapping_matrix(aromatic, cpd, True, True, False)
+                #print("aromatic name:", aromatic.compound_name)
+                #print("atoms in cycle:", [atom.atom_number for atom in aromatic.atoms if atom.in_cycle])
+                #print("atom color tuple")
+                #for atom in aromatic.atoms:
+                #    print(atom.color_tuple)
+                #mapping_matrix = BASS.make_mapping_matrix(aromatic, cpd, True, True, False)
+                mapping_matrix = BASS_test.make_mapping_matrix(aromatic, cpd, True, True)
+                #print("mapping matrix")
+                #print(mapping_matrix)
                 if mapping_matrix is not None:
-                    for assignment in BASS.find_mappings(aromatic.structure_matrix(resonance=False), aromatic.distance_matrix,
+                    for assignment in BASS_test.find_mappings(aromatic.structure_matrix(resonance=False), aromatic.distance_matrix,
                                                          cpd.structure_matrix(resonance=False), cpd.distance_matrix, mapping_matrix):
                         for bond in aromatic.bonds:
                             if aromatic.atoms[bond.first_atom_number].in_cycle and aromatic.atoms[bond.second_atom_number].in_cycle:
@@ -186,7 +200,10 @@ class AromaticManager:
                                 aromatic_bonds.add(bond_index)
                                 aromatic_atoms.add(first_atom_number)
                                 aromatic_atoms.add(second_atom_number)
-
+            #else:
+                #print("aromatic name not valid", aromatic.compound_name)
+        #print(aromatic_bonds)
+        #print(aromatic_atoms)
         cpd.update_aromatic_bond(aromatic_bonds, aromatic_atoms)
         print("finish aromatic detection: ", cpd.compound_name)
 

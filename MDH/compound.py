@@ -33,37 +33,37 @@ class Atom:
         """Atom initializer.
 
         :param atom_symbol: atom_symbol.
-        :type atom_symbol: :py:class:`str`.
+        :type atom_symbol: :py:obj:`str`.
         :param atom_number: atom_number.
-        :type atom_number: :py:class:`int`.
+        :type atom_number: :py:obj:`int`.
         :param x: the atom x coordinate.
-        :type x: :py:class:`str`.
+        :type x: :py:obj:`str`.
         :param y: the atom y coordinate.
-        :type y: :py:class:`str`.
+        :type y: :py:obj:`str`.
         :param z: the atom z coordinate.
-        :type z: :py:class:`str`.
+        :type z: :py:obj:`str`.
         :param mass_difference: difference from mass in periodic table.
-        :type mass_difference: :py:class:`str`.
+        :type mass_difference: :py:obj:`str`.
         :param charge: charge.
-        :type charge: :py:class:`str`.
+        :type charge: :py:obj:`str`.
         :param atom_stereo_parity: atom stereo parity.
-        :type atom_stereo_parity: :py:class:`str`.
+        :type atom_stereo_parity: :py:obj:`str`.
         :param hydrogen_count: hydrogen_count.
-        :type hydrogen_count: :py:class:`str`.
+        :type hydrogen_count: :py:obj:`str`.
         :param stereo_care_box: stereo_care_box.
-        :type stereo_care_box: :py:class:`str`.
+        :type stereo_care_box: :py:obj:`str`.
         :param valence: valence.
-        :type: valence: :py:class:`str`.
+        :type: valence: :py:obj:`str`.
         :param h0designator: h0designator.
-        :type h0designator: :py:class:`str`.
+        :type h0designator: :py:obj:`str`.
         :param atom_atom_mapping_number: atom_atom_mapping_number.
-        :type atom_atom_mapping_number: :py:class:`str`.
+        :type atom_atom_mapping_number: :py:obj:`str`.
         :param inversion_retention_flag: inversion_retention_flag.
-        :type inversion_retention_flag: :py:class:`str`.
+        :type inversion_retention_flag: :py:obj:`str`.
         :param exact_change_flag: exact_change_flag.
-        :type exact_change_flag: :py:class:`str`.
+        :type exact_change_flag: :py:obj:`str`.
         :param kat: KEGG atom type.
-        :type kat: :py:class:`str`.
+        :type kat: :py:obj:`str`.
     	"""
         self.x = float(x.strip())
         self.y = float(y.strip())
@@ -265,7 +265,7 @@ class Bond:
     	"""
         self.first_atom_number = int(first_atom_number) - 1
         self.second_atom_number = int(second_atom_number) - 1
-        self.bond_type = bond_type.strip()
+        self.bond_type = bond_type.strip()ele
         self.bond_stereo = bond_stereo.strip() if bond_stereo.strip() != "4" and bond_stereo.strip() != "8" else "0"
         self.bond_topology = bond_topology.strip()
         self.reacting_center_status = reacting_center_status.strip()
@@ -1611,7 +1611,7 @@ class Compound:
         :return: the relationship and the atom mappings between the two compounds.
         :rtype: :py:class:`int` and :py:class:`dict`.
         """
-        relationship, unmapped_count = self.compare_chemical_details(self.get_chemical_details(),
+        relationship, mis_count = self.compare_chemical_details(self.get_chemical_details(),
                                                                 the_other_compound.get_chemical_details())
         # return relationship and atom mappings.
         return relationship, self.generate_atom_mapping_by_atom_color(the_other_compound)

@@ -1023,6 +1023,7 @@ class Compound:
             /   \   /   \
             L   H   L   L
             trans   cis
+        
         :param bond: the bond entity.
         :type bond: :class:`~MDH.compound.Bond`.
         :return: the calculated bond stereochemistry.
@@ -1100,7 +1101,7 @@ class Compound:
         :param neighbors: the list of atom numbers of the atoms connecting the atom forming the double bond.
         :type neighbors: :py:class:`list`.
         :param atom_forming_double_bond: the bond entity.
-	    :type atom_forming_double_bond: :class:`~MDH.compound.Bond`
+	:type atom_forming_double_bond: :class:`~MDH.compound.Bond`
         :return: heavy and light branches. [heavy_side, light_side]
         :rtype: :py:class:`list`.
         """
@@ -1540,7 +1541,6 @@ class Compound:
     # If the two compounds can be paired, we need to determine their relationship by checking the chemical details (eg:
     # bond stereochemistry and atom stereochemistry.
 
-
     def get_chemical_details(self, excluded=None):
         """
         To get the chemical details of the compound, which include the atom stereo chemistry and bond stereo chemistry.
@@ -1771,7 +1771,8 @@ class Compound:
 
     def find_critical_atom_in_cycle(self):
         """
-        To find the C (atom_c) and O (atom_oo) in aldehyde group, as well as O (atom_o) in the hydroxy that are involved in the ring formation. We need to break the bond between the atom_c and atom_o to form the linear transformation.
+        To find the C (atom_c) and O (atom_oo) in aldehyde group, as well as O (atom_o) in the hydroxy that are involved 
+        in the ring formation. We need to break the bond between the atom_c and atom_o to form the linear transformation.
         Please check one example of aldol reaction in the sugar if the description is not confusing.
 
         :return: the list of critical atoms.
@@ -1805,11 +1806,30 @@ class Compound:
 
     def validate_mapping_with_r(self, the_other_compound, one_rs, mapping):
         """
-
-        :param the_other_compound:
-        :param one_rs:
-        :param mapping:
-        :return:
+        To validate the atom mappings with r groups. 
+        Here are two things we need to pay attention to:
+        1) For the generic compound, its R group can be mapped to a branch or just H in the specific compound.
+        2) For the specific compound, every unmatched branch needs to correspond to a R group in the generic compound.
+        In other words, the generic compound can have extra R groups that have no matched branch, but the specific compound
+        cannot have unmatched branches that don't have corresponding R group.
+        
+        For the specific validation:
+        1) We find all the linkages of R group and mapped atom in the compound, represented by the corresponding atom number in
+        the other compound and the bond type. (We used the corresponding atom number in the other compound for the next comparison
+        of the R linkages in the two compounds.
+        2) For every mapped atom in the other compound, we need to find if it has neighbors that are not mapped. Then the atom 
+        should be linked to a R group. We represent the linkage by the atom number and the bond type.
+        3) Based on the above validation criteria, we have to make sure that the R linkages in the other compound is the subset of 
+        the R linkages in this compound.
+        
+        :param the_other_compound: the other :class:`~MDH.compound.Compound` entity.
+        :type the_other_compound: :class:`~MDH.compound.Compound`.
+        :param one_rs: the R groups in the compound.
+        :type one_rs: :py:class:`list`.
+        :param mapping: the atom mappings between the mapped parts of the two compounds.
+        :type mapping: :py:class:`dict`.
+        :return: bool whether the atom mappings are valid.
+        :rtype: :py:obj:`bool`.
         """
         # this is to compare the R GROUPS.
         # self is the more generic one, which suggests it should have more linkages.
@@ -1837,10 +1857,19 @@ class Compound:
 
     def compare_chemical_details_with_mapping(self, the_other_compound, mapping):
         """
+        To compare the chemical details of mapped atoms of the two compounds.
+        This part targets compound pairs with resonance or r_group type.
+        Only parts of chemicals need to be checked.
+        1) atoms are not involved in resonance part or connected to R groups (both cases can be tested by the first layer atom
+        coloring identifer.
+        2) bond are formed by the atoms describe above.
 
-        :param the_other_compound:
-        :param mapping:
-        :return:
+        :param the_other_compound: the other :class:`~MDH.compound.Compound` entity.
+        :type the_other_compound: :class:`~MDH.compound.Compound`.
+        :param mapping: the mapped atoms between the two compounds.
+        :type mapping: :py:class:`dict`.
+        :return: the count of not mapped chemical details in both compounds.
+        :rtype: :py:class:`int`.
         """
         one_stereo_counts, the_other_stereo_counts = 0, 0
         one_consistent_atoms, the_other_consistent_atoms = set(), set()
@@ -1873,13 +1902,22 @@ class Compound:
 
     def optimal_mapping_with_r(self, the_other_compound, one_rs, mappings):
         """
+        To find the optimal mappings of compound pairs belonging to r_group type. In this case, multiple valid mappings
+        can exist. We need to find the optimal one. The standard is the mappings with minimal unmapped chemical details..
+        And the unmapped chemical details can exist in both compounds (generic or specific).
+        Also the unmapped chemical details will determine the relationship of the compound pair.
+        The priority: generic-specific, loose. 
+        Here the relationship cannot be equivalent.
 
-        :param the_other_compound:
-        :param one_rs:
-        :param mappings:
-        :return:
+        :param the_other_compound: the other :class:`~MDH.compound.Compound` entity.
+        :type the_other_compound: :class:`~MDH.compound.Compound`.
+        :param one_rs: the list of R groups in the compound.
+        :type one_rs: :py:class:`list`.
+        :param mappings: the atom mappings of the mapped parts of the two compounds.
+        :type mappings: :py:class:`dict`.
+        :return: the relationship and the atom mappings between the two compounds.
+        :rtype: :py:class:`int` and :py:class:`dict`.
         """
-
         optimal_index = {1: -1, -1: -1, 2: -1, 0: -1}
         min_count = {1: float("inf"), -1: float("inf"), 2: float("inf"), 0: float("inf")}
         for i, mm in enumerate(mappings):
@@ -1900,9 +1938,18 @@ class Compound:
 
     def with_r_pair_relationship(self, the_other_compound):
         """
+        To find the relationship and the atom mappings between the two compounds that has r_groups type.
+        Several steps are involved:
+        1) Ignore the R groups in the two compounds and find if one compound (generic compound) is included in the
+        other compound (specific compound).
+        2) If we can find the mappings, then we need to validate the mappings. Please the validate_mapping_with_r function.
+        3) Then we get the optimal atom mappings of the mapped parts.
+        4) We need to map the unmathced branches in the specific compound to the corresponding R group in the generic compound.
 
-        :param the_other_compound:
-        :return:
+        :param the_other_compound: the other :class:`~MDH.compound.Compound` entity.
+        :type the_other_compound: :class:`~MDH.compound.Compound`.
+        :return: the relationship and the atom mappings between the two compounds.
+        :rtype: :py:class:`int` and :py:class:`dict`.
         """
         # self is the substructure, more generic, contain less chemical details.
         one_rs = list(self.r_groups)
@@ -1919,7 +1966,7 @@ class Compound:
             the_other_compound.update_atom_symbol(the_other_rs, "R")
             return relationship, self.map_r_correspondents(one_rs, the_other_compound, optimal_mappings)
 
-        # match loosely.
+        # resonant match.
         self.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=True)
         the_other_compound.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=True)
         one_to_one_mappings = self.find_mappings(the_other_compound, resonance=True, r_distance=True)
@@ -1933,14 +1980,18 @@ class Compound:
     def map_r_correspondents(self, one_rs, the_other_compound, mappings):
         # again, the self compound is substructure, we need to figure out the R group atom in self compound and its
         # corresponding atoms in the other compound.
-        """
+        """ 
+        To map the unmathced branches in the specific compound to the corresponding R group in the generic compound.
 
-        :param one_rs:
-        :param the_other_compound:
-        :param mappings:
-        :return:
+        :param one_rs: the list of R groups in the compound.
+        :type one_rs: :py:class:`list`.
+        :param the_other_compound: the other :class:`~MDH.compound.Compound` entity.
+        :type the_other_compound: :class:`~MDH.compound.Compound`.
+        :param mappings: the atom mappings of the mapped parts of the two compounds.
+        :type mappings: :py:class:`dict`.
+        :return: the full atom mappings between the two compounds.
+        :rtype: :py:class:`dict`.
         """
-
         full_mappings = collections.defaultdict(list)
         for idx in one_rs:
             r_atom = self.atoms[idx]

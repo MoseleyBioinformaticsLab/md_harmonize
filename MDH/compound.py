@@ -1636,12 +1636,15 @@ class Compound:
 
     def optimal_resonant_mapping(self, the_other_compound, mappings):
         """
+        To find the optimal atom mappings for compound pairs that are resonant type.
 
-        :param the_other_compound:
-        :param mappings:
-        :return:
+        :param the_other_compound: the other :class:`~MDH.compound.Compound` entity.
+        :type the_other_compound: :class:`~MDH.compound.Compound`.
+        :param mappings: the list of atom mappings between the two compounds detected by BASS.
+        :type mappings: :py:class:`list`.
+        :return: the relationship and the atom mappings between the two compounds.
+        :rtype: :py:class:`int` and :py:class:`dict`.
         """
-
         optimal_index = {1: -1, -1: -1, 2: -1, 0: -1}
         min_count =  {1: float("inf"), -1: float("inf"), 2: float("inf"), 0: float("inf")}
         for i, mapping in enumerate(mappings):
@@ -1714,13 +1717,14 @@ class Compound:
             self.break_cycle(critical_atoms)
             this_color = self.backbone_color_identifier(r_groups=True) + self.metal_color_identifier(details=False)
             if this_color == the_other_color:
-                excluded_atoms_the_other = the_other_compound.exclude_atoms([self.atoms[i].color for i in critical_atoms])
+                atom_mappings = self.generate_atom_mapping_by_atom_color(the_other_compound)
+                excluded_atoms_the_other = list(set(itertools.chain([atom_mappings[i] for i in crtical_atoms])))
                 one_chemical_details = self.get_chemical_details(critical_atoms)
                 the_other_chemical_details = the_other_compound.get_chemical_details(excluded_atoms_the_other)
                 relationship, mis_count = self.compare_chemical_details(one_chemical_details, the_other_chemical_details)
                 if mis_count < min_count[relationship]:
                     min_count[relationship] = mis_count
-                    optimal_mappings[relationship] = self.generate_atom_mapping_by_atom_color(the_other_compound)
+                    optimal_mappings[relationship] = atom_mappings
             self.restore_cycle(critical_atoms)
         if min(min_count.values()) < float("inf"):
             relationship = self.determine_relationship(min_count)
@@ -1728,24 +1732,15 @@ class Compound:
         else:
             return None, None
 
-    def exclude_atoms(self, colors):
-        """
-
-        :param colors:
-        :return:
-        """
-
-        excluded_index = []
-        for i, atom in enumerate(self.atoms):
-            if atom.color in colors:
-                excluded_index.append(i)
-        return excluded_index
-
     def break_cycle(self, critical_atoms):
         """
+        To break the cycle caused by aldol reaction, which often occurs in the sugar.
+        Two steps are involved: 1) remove the neighbors. 2) restore the double bond in the aldehyde group.
 
-        :param critical_atoms:
-        :return:
+        :param critical_atoms: the three critical atoms that are involved in the ring formation.
+        :type critical_atoms: :py:class:`int`.
+        :return: None.
+        :rtype: :py:obj:`None`.
         """
         atom_o, atom_c, atom_oo = critical_atoms
         # break the cycle
@@ -1758,9 +1753,13 @@ class Compound:
 
     def restore_cycle(self, critical_atoms):
         """
+        To restore the ring caused by aldol reaction.
+        The reverse process of the above break_cycle.
 
-        :param critical_atoms:
-        :return:
+        :param critical_atoms: the three atoms are involved in the aldol reaction reaction.
+        :type critical_atoms: :py:class:`list`.
+        :return: None.
+        :rtype: :py:obj:`None`.
         """
         atom_o, atom_c, atom_oo = critical_atoms
         self.atoms[atom_o].add_neighbors([atom_c])
@@ -1772,12 +1771,15 @@ class Compound:
 
     def find_critical_atom_in_cycle(self):
         """
+        To find the C (atom_c) and O (atom_oo) in aldehyde group, as well as O (atom_o) in the hydroxy that are involved in the ring formation. We need to break the bond between the atom_c and atom_o to form the linear transformation.
+        Please check one example of aldol reaction in the sugar if the description is not confusing.
 
-        :return:
+        :return: the list of critical atoms.
+        :rtype: :py:class:`list`.
         """
-
         critical_atoms =[]
         for atom in self.atoms:
+            # Two Os are connected to one atom and one O is in the cycle.
             if atom.in_cycle and atom.default_symbol == "O":
                 for neighbor_index in atom.neighbors:
                     neighbor = self.atoms[neighbor_index]
@@ -1789,6 +1791,7 @@ class Compound:
 
     def update_atom_symbol(self, index, updated_symbol):
         """
+        To update the atom symbols. This is often used to remove/restore R group.
 
         :param index:
         :param updated_symbol:

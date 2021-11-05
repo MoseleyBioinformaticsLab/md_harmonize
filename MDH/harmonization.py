@@ -549,9 +549,13 @@ class ReactionHarmonizationManager(HarmonizationManager):
 
     def one_to_one_compound_mappings(self, mappings):
         """
+        To find the one to one compound mappings between the two reactions.
+        This step is to avoid very extreme cases that a compound in one reaction can be mapped to two or more compounds in the other reaction.
 
-        :param mappings:
-        :return:
+        :param mappings: the dictionary of compound mappings.
+        :type mappings: :py:class:`dict`.
+        :return: the list of relationship of compound pairs and dictionary of one to one compound mappings.
+        :rtype: :py:class:`list` and :py:class:`dict`..
         """
         one_to_one_mappings = {}
         sorted_one_side = list(mappings.keys())

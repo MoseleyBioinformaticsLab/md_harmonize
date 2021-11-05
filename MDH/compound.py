@@ -1793,11 +1793,13 @@ class Compound:
         """
         To update the atom symbols. This is often used to remove/restore R group.
 
-        :param index:
-        :param updated_symbol:
-        :return:
+        :param index: the atom symbols of these indexes to be updated.
+        :type index: :py:class:`list`.
+        :param updated_symbol: the updated symbol.
+        :type updated_symbol: :py:class:`str`.
+        :return: None.
+        :rtype: :py:obj:`None`.
         """
-
         for i in index:
             self.atoms[i].update_symbol(updated_symbol)
 

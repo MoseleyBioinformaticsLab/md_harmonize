@@ -197,23 +197,20 @@ def cli(args):
         meta_cpd_path = "/mlab/data/hji236/projects/MDH_test/standardized/MetaCyc/molfile_test"
         to_file = "/mlab/data/hji236/projects/MDH_test/harmonized_edge_list_1.json"
         kegg_molfiles = glob.glob(kegg_cpd_path + "/*")
-        meta_molfiles = glob.glob(meta_cpd_path + "/*")
+        #meta_molfiles = glob.glob(meta_cpd_path + "/*")
         kegg_dict = function_multiprocess(kegg_molfiles, construct_cpd)
         print("kegg parsed")
         #meta_dict = function_multiprocess(meta_molfiles, construct_cpd)
         #print("metacyc parsed")
         #
-        # with multiprocessing.Pool() as pool:
-        #     results = pool.map(aromatic_manager.detect_aromatic_substructures, list(kegg_dict.values()) )
-        print(len(aromatic_manager.aromatic_substructures))
-        print(kegg_dict)
-        t0 = time.time()
-        for cpd_name in kegg_dict:
-            cpd = kegg_dict[cpd_name]
-            #print(cpd_name)
-            aromatic_manager.detect_aromatic_substructures(cpd)
-        t1 = time.time()
-        print(t1-t0)
+        aromatic_detection = aromatic_manager.detect_aromatic_substructures
+        print(aromatic_detection)
+        with multiprocessing.Pool() as pool:
+            results = pool.map(aromatic_detection, list(kegg_dict.values()) )
+        #print(len(aromatic_manager.aromatic_substructures))
+        #for cpd_name in kegg_dict:
+        #    cpd = kegg_dict[cpd_name]
+        #    aromatic_manager.detect_aromatic_substructures(cpd)
             #cpd.define_bond_stereochemistry()
             #cpd.curate_invalid_n()
         #for cpd_name in meta_dict:
@@ -248,7 +245,7 @@ def cli(args):
         # compound_dict = function_multiprocess(molfiles, construct_cpd)
         #
         # print("mofile construct")
-        #
+        
         # kcf_files = glob.glob(kcf_path + "/*")
         # compound_dict_kcf = function_multiprocess(kcf_files, construct_kcf)
         # print("kcf construct")

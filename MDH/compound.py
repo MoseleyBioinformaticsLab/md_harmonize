@@ -265,7 +265,7 @@ class Bond:
     	"""
         self.first_atom_number = int(first_atom_number) - 1
         self.second_atom_number = int(second_atom_number) - 1
-        self.bond_type = bond_type.strip()ele
+        self.bond_type = bond_type.strip()
         self.bond_stereo = bond_stereo.strip() if bond_stereo.strip() != "4" and bond_stereo.strip() != "8" else "0"
         self.bond_topology = bond_topology.strip()
         self.reacting_center_status = reacting_center_status.strip()

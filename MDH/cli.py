@@ -204,13 +204,13 @@ def cli(args):
         #print("metacyc parsed")
         #
         aromatic_detection = aromatic_manager.detect_aromatic_substructures
-        print(aromatic_detection)
-        with multiprocessing.Pool() as pool:
-            results = pool.map(aromatic_detection, list(kegg_dict.values()) )
-        #print(len(aromatic_manager.aromatic_substructures))
-        #for cpd_name in kegg_dict:
-        #    cpd = kegg_dict[cpd_name]
-        #    aromatic_manager.detect_aromatic_substructures(cpd)
+        #print(aromatic_detection)
+        #with multiprocessing.Pool() as pool:
+        #    results = pool.map(aromatic_detection, list(kegg_dict.values()) )
+        print(len(aromatic_manager.aromatic_substructures))
+        for cpd_name in kegg_dict:
+            cpd = kegg_dict[cpd_name]
+            aromatic_manager.detect_aromatic_substructures(cpd)
             #cpd.define_bond_stereochemistry()
             #cpd.curate_invalid_n()
         #for cpd_name in meta_dict:
@@ -226,19 +226,19 @@ def cli(args):
     elif args['test']:
 
         # aromatic_manager = aromatics.AromaticManager.decode(tools.open_jsonpickle("/mlab/data/hji236/projects/MDH_test/aromatic_manager.json"))
-        cpds = tools.open_jsonpickle("/mlab/data/hji236/projects/MDH_test/KEGG_kcf_aromatics.json")
-        update_cpds = []
-        for cpd in cpds:
-            update_cpds.append((cpd["compound_name"], cpd["atoms"], cpd["bonds"]))
-        aromatic_manager = aromatics.AromaticManager.decode(update_cpds)
-        save_file = "/mlab/data/hji236/projects/MDH_test/kcf_aromatics.json"
-        tools.save_to_jsonpickle(aromatic_manager.encode(), save_file)
+        #cpds = tools.open_jsonpickle("/mlab/data/hji236/projects/MDH_test/KEGG_kcf_aromatics.json")
+        #update_cpds = []
+        #for cpd in cpds:
+        #    update_cpds.append((cpd["compound_name"], cpd["atoms"], cpd["bonds"]))
+        #aromatic_manager = aromatics.AromaticManager.decode(update_cpds)
+        #save_file = "/mlab/data/hji236/projects/MDH_test/kcf_aromatics.json"
+        #tools.save_to_jsonpickle(aromatic_manager.encode(), save_file)
 
 
-        cpd_path = "/mlab/data/hji236/projects/MDH_test/standardized/KEGG/molfile"
+        #cpd_path = "/mlab/data/hji236/projects/MDH_test/standardized/KEGG/molfile"
         kcf_path = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf"
-        rclass_path = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/rclass/"
-        to_file = "/mlab/data/hji236/projects/MDH_test/kegg_atom_mappings.json"
+        #rclass_path = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/rclass/"
+        #to_file = "/mlab/data/hji236/projects/MDH_test/kegg_atom_mappings.json"
         # parser = parser_dict['KEGG']
         #
         # molfiles = glob.glob(cpd_path + "/*")
@@ -246,8 +246,8 @@ def cli(args):
         #
         # print("mofile construct")
         
-        # kcf_files = glob.glob(kcf_path + "/*")
-        # compound_dict_kcf = function_multiprocess(kcf_files, construct_kcf)
+        kcf_files = glob.glob(kcf_path + "/*")
+        compound_dict_kcf = function_multiprocess(kcf_files, construct_kcf)
         # print("kcf construct")
         #
         # for cpd in compound_dict:
@@ -286,29 +286,12 @@ def cli(args):
         # manager1.add_aromatic_substructures(manager2.aromatic_substructures)
         # print(len(manager1.aromatic_substructures))
         # tools.save_to_jsonpickle(manager1.encode(), combined)
-
-        # file = "/mlab/data/hji236/projects/MDH_test/standardized/cpd:C00032.mol"
-        # data = tools.open_text(file)
-        # # print(data)
-        # cpd = compound.Compound.create(file)
-        # new_cpd = compound.Compound(cpd.compound_name, [atom.clone() for atom in cpd.atoms], [bond.clone() for bond in cpd.bonds])
-        # atom_cnt = 0
-        # for atom in cpd.atoms:
-        #     if atom.in_cycle:
-        #         atom_cnt += 1
-        #         print(atom.default_symbol, atom.atom_number)
-        # print(atom_cnt)
-        # bond_cnt = 0
-        # for bond in cpd.bonds:
-        #     if cpd.atoms[bond.first_atom_number].in_cycle and cpd.atoms[bond.second_atom_number].in_cycle:
-        #         bond_cnt += 1
-        #         print(bond.first_atom_number, bond.second_atom_number, bond.bond_type)
-        # print(bond_cnt)
-        # file = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf/cpd:C00032"
-        # parser = parser_dict['KEGG']
-        # aromatic_manager = aromatics.AromaticManager()
-        # kcf_cpd = parser.create_compound_kcf(file)
-        # aromatic_manager.kegg_aromatize(kcf_cpd)
+        aromatic_manager = aromatics.AromaticManager()
+        #kcf_cpd = parser.create_compound_kcf(file)
+        for kcf_cpd in compound_dict_kcf:
+            aromatic_manager.kegg_aromatize(compound_dict_kcf[kcf_cpd])
+        save_file = "/mlab/data/hji236/projects/MDH_test/kcf_aromatic_manager.json"
+        tools.save_to_jsonpickle(aromatic_manager.encode(), save_file)
         # cpd = aromatic_manager.aromatic_substructures[0]
         # for atom in cpd.atoms:
         #     atom.in_cycle = False

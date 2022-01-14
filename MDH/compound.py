@@ -91,6 +91,8 @@ class Atom:
         self.double_bond_counts = 0
         self.distance_to_r = 0
         self.kat = kat
+        self.is_r = True if ("A" in self.atom_symbol or "R" in self.atom_symbol or "*" in self.atom_symbol or self.atom_symbol == "X") and self.atom_symbol not in not_r_groups else False
+        self.default_symbol = "R" if self.is_r else self.atom_symbol
 
     def update_symbol(self, symbol):
         """
@@ -115,18 +117,6 @@ class Atom:
         """
         self.atom_number = index
         return self.atom_number
-
-    @property
-    def default_symbol(self):
-        """
-        To get the atom symbol. If the atom symbol is not specified, return "R".
-
-        :return: the atom symbol.
-        :rtype: :py:class:`str`.
-        """
-        if self.is_r:
-            return "R"
-        return self.atom_symbol
 
     def remove_neighbors(self, neighbors):
         """
@@ -203,19 +193,6 @@ class Atom:
         self.color = ""
         self.color_layers = {}
     
-    @property
-    def is_r(self):
-        """
-        To determine if the atom symbol is specified.
-
-        :return: bool whether the atom symbol is specified.
-        :rtype: :py:obj:`bool`.
-        """
-        if "A" in self.atom_symbol or "R" in self.atom_symbol or "*" in self.atom_symbol or self.atom_symbol == "X":
-            if self.atom_symbol not in not_r_groups:
-                return True
-        return False
-
     def update_kat(self, kat):
         """
         To update the atom KEGG atom type.
@@ -360,6 +337,7 @@ class Compound:
                 second_atom.bond_counts += int(bond.bond_type)     
         self.cycles = self.find_cycles()
         self.calculate_distance_to_r_groups()
+        self._distance_matrix = None
 
     def encode(self):
         """
@@ -836,22 +814,23 @@ class Compound:
         :return: the distance matrix of the compound.
         :rtype: :py:class:`ndarray`.
     	"""
-        if self.heavy_atoms:
-            distance_matrix = numpy.ones((len(self.heavy_atoms), len(self.heavy_atoms)),dtype=numpy.uint16 ) * len(self.heavy_atoms)
-            for bond in self.bonds:
-                atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
-                if atom_1 in self.index_of_heavy_atoms and atom_2 in self.index_of_heavy_atoms:
-                    distance_matrix[self.index_of_heavy_atoms[atom_1]][self.index_of_heavy_atoms[atom_2]] = 1
-                    distance_matrix[self.index_of_heavy_atoms[atom_2]][self.index_of_heavy_atoms[atom_1]] = 1
+        if self._distance_matrix is None:
+            if self.heavy_atoms:
+                distance_matrix = numpy.ones((len(self.heavy_atoms), len(self.heavy_atoms)),dtype=numpy.uint16 ) * len(self.heavy_atoms)
+                for bond in self.bonds:
+                    atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
+                    if atom_1 in self.index_of_heavy_atoms and atom_2 in self.index_of_heavy_atoms:
+                        distance_matrix[self.index_of_heavy_atoms[atom_1]][self.index_of_heavy_atoms[atom_2]] = 1
+                        distance_matrix[self.index_of_heavy_atoms[atom_2]][self.index_of_heavy_atoms[atom_1]] = 1
 
-            n = len(self.heavy_atoms)
-            for k in range(n):
-                for i in range(n):
-                    for j in range(n):
-                        if distance_matrix[i][j] > distance_matrix[i][k] + distance_matrix[k][j]:
-                            distance_matrix[i][j] = distance_matrix[i][k] + distance_matrix[k][j]
-            return distance_matrix
-        return None
+                n = len(self.heavy_atoms)
+                for k in range(n):
+                    for i in range(n):
+                        for j in range(n):
+                            if distance_matrix[i][j] > distance_matrix[i][k] + distance_matrix[k][j]:
+                                distance_matrix[i][j] = distance_matrix[i][k] + distance_matrix[k][j]
+                self._distance_matrix = distance_matrix
+        return self._distance_matrix
     
     def update_color_tuple(self, resonance=False):
         """

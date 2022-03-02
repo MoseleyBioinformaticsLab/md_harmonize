@@ -51,7 +51,21 @@ def update_entity(entries, sub_directory, directory, suffix=""):
         os.mkdir(path)
     for entry in entries:
         data = requests.get("http://rest.kegg.jp/get/{0}/{1}".format(entry, suffix))
-        tools.save_to_text(data.text, path + "/" + entry)
+        text = data.text
+        tools.save_to_text(text, path + "/" + entry)
+        if sub_directory == "molfile":
+            curate_molfile(path + "/" + entry)
+        
+def curate_molfile(file_path):
+
+    new_text = ""
+    with open(file_path, "r") as infile:
+        for line in infile:
+            new_text += line
+            if line.startswith("M  END"):
+                break
+    tools.save_to_text(new_text, file_path)
+    return 
 
 def download(directory):
     """
@@ -62,11 +76,11 @@ def download(directory):
     :return: None.
     :rtype: :py:obj:`None`.
     """
-    update_entity(entry_list(KEGG_reaction_list_URL), "reaction", directory)
-    update_entity(entry_list(KEGG_rclass_list_URL), "rclass", directory)
+    #update_entity(entry_list(KEGG_reaction_list_URL), "reaction", directory)
+    #update_entity(entry_list(KEGG_rclass_list_URL), "rclass", directory)
     update_entity(entry_list(KEGG_compound_list_URL), "molfile", directory, suffix="mol")
-    update_entity(entry_list(KEGG_compound_list_URL), "kcf", directory, suffix="kcf")
-
+    #update_entity(entry_list(KEGG_compound_list_URL), "kcf", directory, suffix="kcf")
+    
 
 
 

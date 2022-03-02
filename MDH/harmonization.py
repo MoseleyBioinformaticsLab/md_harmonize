@@ -598,17 +598,23 @@ def harmonize_compound_list(compound_list):
         for compound_name in compound_dict:
             compound_dict[compound_name].color_compound(r_groups=True, bond_stereo=False, atom_stereo=False,
                                                         resonance=False, isotope_resolved=False, charge=False)
+    print("finish coloring")
     k = len(compound_list)
     for i in range(k):
         for j in range(i + 1, k):
             compounds_one, compounds_two = compound_list[i], compound_list[j]
             for cpd_name_one in compounds_one:
                 for cpd_name_two in compounds_two:
+                    # here, we try to harmonize compounds with the same structure, use formula to remove unnecessary comparison. 
+                    # The whole compound string identifier can be rather long. Therefore, the comparison can take very long time.
+                    if compounds_one[cpd_name_one].formula != compounds_two[cpd_name_two].formula:
+                        continue
                     color_one = compounds_one[cpd_name_one].backbone_color_identifier(r_groups=True) + \
                                 compounds_one[cpd_name_one].metal_color_identifier(details=False)
                     color_two = compounds_two[cpd_name_two].backbone_color_identifier(r_groups=True) + \
                                 compounds_two[cpd_name_two].metal_color_identifier(details=False)
                     if color_one == color_two:
+                        print("find one pair", cpd_name_one, cpd_name_two)
                         relationship, atom_mappings = compounds_one[cpd_name_one].same_structure_relationship(compounds_two[cpd_name_two])
                         harmonized_compound_edge = HarmonizedEdge(compounds_one[cpd_name_one],
                                                                           compounds_two[cpd_name_two], relationship,

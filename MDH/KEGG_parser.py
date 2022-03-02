@@ -190,7 +190,39 @@ class RpairParser:
         self.rclass_definitions = rclass_definitions
         self.one_compound = one_compound
         self.the_other_compound = the_other_compound
+    
+    def map_atom_by_colors(self):
 
+        self.one_compound.color_compound()
+        self.the_other_compound.color_compound()
+        mapped = collections.defaultdict(list)
+        for atom_1 in self.one_compound.atoms:
+            for atom_2 in self.the_other_compound.atoms:
+                if atom_1.color_layers == atom_2.color_layers:
+                    mapped[atom_1.atom_number].append(atom_2.atom_number)
+        if len(mapped) != len(self.one_compound.atoms):
+            return {}
+        return mapped
+
+    def map_whole_compound(self):
+
+        if len(self.one_compound.atoms) != len(self.the_other_compound.atoms):
+            return {}
+        mapped = self.map_atom_by_colors()
+        
+        if not mapped:
+            return {}
+        
+        pre_matches = one_compound.find_mappings(the_other_compound, r_distance=False)
+        min_idx = -1
+        min_miscount = float("inf")
+        for i, one_to_one_mappings in enumerate(pre_matches):
+            miscount = self.count_changed_atom_identifiers(one_to_one_mappings)
+            if miscount < min_miscount:
+                min_idx = i
+                min_miscount = miscount
+        return pre_matches[min_idx] if min_idx != -1 else {}
+    
     @staticmethod
     def generate_kat_neighbors(compound):
         """
@@ -352,27 +384,30 @@ class RpairParser:
         :return: the list of atom mappings.
         :rtype: :py:class:`list`.
         """
-        left_center_candidates, right_center_candidates, left_reaction_centers, right_reaction_centers = self.find_center_atoms()
-        left_centers_list = self.get_center_list(left_center_candidates)
-        right_center_list = self.get_center_list(right_center_candidates)
 
-        minimum_miss_count = float("inf")
-        optimal_atom_mappings = {}
-        for left_centers in left_centers_list:
-            for right_centers in right_center_list:
+        optimal_atom_mappings = self.map_whole_compound()
+        if not optimal_atom_mappings:
+            left_center_candidates, right_center_candidates, left_reaction_centers, right_reaction_centers = self.find_center_atoms()
+            left_centers_list = self.get_center_list(left_center_candidates)
+            right_center_list = self.get_center_list(right_center_candidates)
+
+            minimum_miss_count = float("inf")
+            optimal_atom_mappings = {}
+            for left_centers in left_centers_list:
+                for right_centers in right_center_list:
                 # After removing the bonds, the compound will be disassembled into several parts. Try to match these pieces.
-                left_removed_bond_list = self.remove_different_bonds(self.one_compound, left_centers, left_reaction_centers)
-                right_removed_bonds_list = self.remove_different_bonds(self.the_other_compound, right_centers, right_reaction_centers)
-                for left_removed_bonds in left_removed_bond_list:
-                    for right_removed_bonds in right_removed_bonds_list:
-                        this_mapping = self.map_components(left_removed_bonds, right_removed_bonds,
+                    left_removed_bond_list = self.remove_different_bonds(self.one_compound, left_centers, left_reaction_centers)
+                    right_removed_bonds_list = self.remove_different_bonds(self.the_other_compound, right_centers, right_reaction_centers)
+                    for left_removed_bonds in left_removed_bond_list:
+                        for right_removed_bonds in right_removed_bonds_list:
+                            this_mapping = self.map_components(left_removed_bonds, right_removed_bonds,
                                                            left_centers, right_centers)
-                        if this_mapping:
-                            miss_count = self.count_changed_atom_identifiers(this_mapping)
-                            if len(optimal_atom_mappings) < len(this_mapping) or \
+                            if this_mapping:
+                                miss_count = self.count_changed_atom_identifiers(this_mapping)
+                                if len(optimal_atom_mappings) < len(this_mapping) or \
                                     (len(optimal_atom_mappings) == len(this_mapping) and minimum_miss_count > miss_count):
-                                minimum_miss_count = miss_count
-                                optimal_atom_mappings = this_mapping
+                                    minimum_miss_count = miss_count
+                                    optimal_atom_mappings = this_mapping
 
         one_to_one_mappings = []
         for from_idx in optimal_atom_mappings:
@@ -497,7 +532,6 @@ class RpairParser:
                     if atom_left.color_layers == atom_right.color_layers:
                         mapped += 1
                         break
-        #print(left, mapped)
         return left == mapped
 
     def map_components(self, left_removed_bonds, right_removed_bonds, left_centers, right_centers):
@@ -531,11 +565,11 @@ class RpairParser:
                 original_index_mappings = {}
                 for i in one_to_one_mappings:
                     original_index_mappings[left_component_index[i]] = right_component_index[one_to_one_mappings[i]]
-                    if self.validate_component_atom_mappings(left_centers, right_centers, original_index_mappings):
-                        miss_count = self.count_changed_atom_identifiers(original_index_mappings)
-                        if miss_count < minimum_miss_count:
-                            minimum_miss_count = miss_count
-                            optimal_one_to_one_mappings = original_index_mappings
+                if self.validate_component_atom_mappings(left_centers, right_centers, original_index_mappings):
+                    miss_count = self.count_changed_atom_identifiers(original_index_mappings)
+                    if miss_count < minimum_miss_count:
+                        minimum_miss_count = miss_count
+                        optimal_one_to_one_mappings = original_index_mappings
             if optimal_one_to_one_mappings:
                 atom_mappings.append(optimal_one_to_one_mappings)
         return self.combine_atom_mappings(atom_mappings)
@@ -623,26 +657,6 @@ def create_compound_kcf(kcf_file):
     
     return compound.Compound(kcf_dict["compound_name"], atoms, bonds)
 
-def add_kat(compound, kcf_compound):
-    """
-    To add kegg atom type to each atom in the compound based on the corresponding kcf compound.
-
-    :param compound: a compound entity.
-    :type compound: :class:`~MDH.compound.Compound`.
-    :param kcf_compound: the corresponding compound entity parsed from KCF file.
-    :type kcf_compound: :class:`~MDH.compound.Compound`.
-    :return: None.
-    :rtype: :py:obj:`None`.
-    """
-    compound.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False)
-    kcf_compound.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False)
-    color_kat = { atom.color: atom.kat for atom in kcf_compound.atoms if atom.default_symbol != "H" }
-
-    for atom in compound.atoms:
-        if atom.default_symbol != "H":
-            if atom.color not in color_kat:
-                print(atom.atom_number)
-            atom.kat = color_kat[atom.color]
 
 # when we create the kegg reaction, we need to parse the atom mappings based on rclass!
 # To avoid parsing the same rclass repeatedly, let's parse the rclass first, and look it up when we need.
@@ -665,6 +679,15 @@ def create_reactions(reaction_directory, compounds, atom_mappings):
     for reaction_file in reaction_files:
         this_reaction = kegg_data_parser(tools.open_text(reaction_file).split("\n"))
         reaction_name = this_reaction["ENTRY"][0].split()[0]
+        
+        one_side_coefficients, the_other_side_coefficients = parse_equation(this_reaction["EQUATION"][0])
+
+        if not all("cpd:" + compound_name in compounds for compound_name in one_side_coefficients) or not all("cpd:" + compound_name in compounds for compound_name in the_other_side_coefficients):
+            # here, we don't include the reactions that have unspecified compounds.
+            continue
+        one_side_compounds = [compounds["cpd:" + compound_name] for compound_name in one_side_coefficients]
+        the_other_side_compounds = [compounds["cpd:" + compound_name] for compound_name in the_other_side_coefficients]
+        one_side_coefficients.update(the_other_side_coefficients)
 
         raw_ecs = this_reaction["ENZYME"] if "ENZYME" in this_reaction else []
         ecs = collections.defaultdict(list)
@@ -680,28 +703,29 @@ def create_reactions(reaction_directory, compounds, atom_mappings):
             # ORTHOLOGY can contain information of ecs. Please check the example of reaction.
             for line in this_reaction["ORTHOLOGY"]:
                 ec_pattern = "\[EC:.*\]"
-                ec_numbers = re.findall(ec_pattern, line)[0][4:-1].split()
-                for ec in ec_numbers:
-                    numbers = ec.split(".")
-                    while numbers and numbers[-1] == "-":
-                        numbers.pop()
-                    ecs[len(numbers)].append(".".join(numbers))
-
-        one_side_coefficients, the_other_side_coefficients = parse_equation(this_reaction["EQUATION"][0])
-        one_side_compounds = [compounds["cpd:" + compound_name] for compound_name in one_side_coefficients]
-        the_other_side_compounds = [compounds["cpd:" + compound_name] for compound_name in the_other_side_coefficients]
-        one_side_coefficients.update(the_other_side_coefficients)
+                ec_numbers = re.findall(ec_pattern, line)
+                if ec_numbers:
+                    ec_numbers = ec_numbers[0][4:-1].split()
+                    for ec in ec_numbers:
+                        numbers = ec.split(".")
+                        while numbers and numbers[-1] == "-":
+                            numbers.pop()
+                        ecs[len(numbers)].append(".".join(numbers))
 
         this_atom_mappings = []
         for line in this_reaction["RCLASS"]:
-            rclass, rpair = line.split()
-            cpd_1, cpd_2 = rpair.split("_")
-            key_1 = "_".join([rclass, cpd_1, cpd_2])
-            key_2 = "_".join([rclass, cpd_2, cpd_1])
-            if key_1 in atom_mappings:
-                this_atom_mappings.extend(atom_mappings[key_1])
-            elif key_2 in atom_mappings:
-                this_atom_mappings.extend(atom_mappings[key_2])
+            splits = line.split()
+            rclass = splits[0]
+            compound_pairs = splits[1:]
+            for compound_pair in compound_pairs:
+                cpd_1, cpd_2 = compound_pair.split("_")
+                key_1 = "_".join([rclass, cpd_1, cpd_2])
+                key_2 = "_".join([rclass, cpd_2, cpd_1])
+                if key_1 in atom_mappings:
+                    this_atom_mappings.extend(atom_mappings[key_1])
+                elif key_2 in atom_mappings:
+                    this_atom_mappings.extend(atom_mappings[key_2])
+        print(reaction_name, this_atom_mappings)
         reactions.append(reaction.Reaction(reaction_name, one_side_compounds, the_other_side_compounds, ecs,
                                            this_atom_mappings, one_side_coefficients))
     return reactions
@@ -722,15 +746,17 @@ def compound_pair_mappings(rclass_name, rclass_definitions, one_compound, the_ot
     :return: the compound pair name and the its atom mappings.
     :rtype: :py:class:`str` and :py:class:`list`.
     """
+    print(rclass_name, " just started!")
     atom_mappings = []
     try:
         one_mappings = RpairParser(rclass_name, rclass_definitions, one_compound, the_other_compound).generate_atom_mappings()
         the_other_mappings = RpairParser(rclass_name, rclass_definitions, the_other_compound, one_compound).generate_atom_mappings()
         atom_mappings = one_mappings if len(one_mappings) > len(the_other_mappings) else the_other_mappings
     except Exception:
-        print(rclass_name + "_" + one_compound.compound_name[4:] + "_" + the_other_compound.compound_name[4:] + "can hardly be parsed.")
+        print(rclass_name + "_" + one_compound.compound_name + "_" + the_other_compound.compound_name + "can hardly be parsed.")
         pass
-    return one_compound.compound_name[4:] + "_" + the_other_compound.compound_name[4:], atom_mappings
+    print(rclass_name, atom_mappings, " has been completed!")
+    return one_compound.compound_name + "_" + the_other_compound.compound_name, atom_mappings
 
 def create_atom_mappings(rclass_directory, compounds):
     """
@@ -754,8 +780,8 @@ def create_atom_mappings(rclass_directory, compounds):
             tokens = line.split()
             for token in tokens:
                 one_compound_name, the_other_compound_name = token.split("_")
-                if "cpd:" + one_compound_name in compounds and "cpd:" + the_other_compound_name in compounds:
-                    compound_pairs.append((compounds["cpd:" + one_compound_name], compounds["cpd:" + the_other_compound_name]))
+                if one_compound_name in compounds and the_other_compound_name in compounds:
+                    compound_pairs.append((compounds[one_compound_name], compounds[the_other_compound_name]))
 
         with multiprocessing.Pool() as pool:
             results = pool.starmap(compound_pair_mappings, ((rclass_name, rclass_definitions, one_compound, the_other_compound)

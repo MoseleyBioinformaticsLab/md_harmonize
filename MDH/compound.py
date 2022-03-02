@@ -378,8 +378,9 @@ class Compound:
             bonds = [ Bond(bond['first_atom_number'], bond['second_atom_number'], bond['bond_type'], bond['bond_stereo'],
                            bond['bond_topology'], bond['reacting_center_status']) for bond in ct_object.bonds ]
             return Compound(compound_name, atoms, bonds)
-        except:
-            print(compound_name + "cannot not be converted to ctifle object")
+        except Exception as e:
+            print(e)
+            print(compound_name + " cannot not be converted to ctifle object")
             return None
 
     @property

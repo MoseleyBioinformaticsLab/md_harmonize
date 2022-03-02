@@ -66,20 +66,25 @@ def generate_one_to_one_mappings(from_side, to_side, indices):
     """
     n = len(indices)
     from_index_dict = {}
+    mappings = [int(num) for num in indices.split(" ") if num != ""]
+    
     for cpd_name in from_side:
-        start_index, end_index = from_side[cpd_name][0]
-        for i in range(start_index, end_index+1):
-            atom_index = i - start_index
-            from_index_dict[i] = (cpd_name, atom_index)
+        for (start_index, end_index) in from_side[cpd_name]:
+            for i in range(start_index, end_index+1):
+                atom_index = i - start_index
+                from_index_dict[i] = (cpd_name, atom_index)
     to_index_dict = {}
+    
     for cpd_name in to_side:
-        start_index, end_index = to_side[cpd_name][0]
-        for i in range(start_index, end_index+1):
-            atom_index = i - start_index
-            to_index_dict[i] = (cpd_name, atom_index)
+        for (start_index, end_index) in to_side[cpd_name]:
+            for i in range(start_index, end_index+1):
+                atom_index = i - start_index
+                to_index_dict[i] = (cpd_name, atom_index)
     one_to_one_mappings = []
-    for to_index, from_index in enumerate(indices):
+    
+    for to_index, from_index in enumerate(mappings):
         one_to_one_mappings.append((from_index_dict[from_index], to_index_dict[to_index]))
+    print("parsed", one_to_one_mappings)
     return one_to_one_mappings
 
 def atom_mappings_parser(atom_mapping_text):
@@ -109,12 +114,13 @@ def atom_mappings_parser(atom_mapping_text):
         if line.startswith("#"):
             continue
         elif line.startswith("//"):
-            reaction_dicts["ONE_TO_ONE_MAPPINGS"] = generate_one_to_one_mappings(current_reaction["FROM-SIDE"], current_reaction["TO-SIDE"],
-                                                                                 current_reaction["INDICES"])
             reaction_dicts[current_reaction['REACTION']] = copy.deepcopy(current_reaction)
+            reaction_dicts[current_reaction['REACTION']]["ONE_TO_ONE_MAPPINGS"] = generate_one_to_one_mappings(current_reaction["FROM-SIDE"], current_reaction["TO-SIDE"],
+                                                                                 current_reaction["INDICES"])
             current_reaction = {}
         else:
-            key, value = line.split(" - ")
+            key = line.split(" - ")[0]
+            value = " - ".join(line.split(" - ")[1:])
             if key == "FROM-SIDE" or key == "TO-SIDE":
                 current_reaction[key] = reaction_side_parser(value)
             else:
@@ -161,7 +167,7 @@ def reaction_parser(reaction_text):
     for line in reaction_text:
         if line.startswith("#"):
             continue
-        elif line.startswith("//"):
+        if line.startswith("//"):
             while len(current_reaction["^COEFFICIENT"]) < count_left + count_right:
                 current_reaction["^COEFFICIENT"].append(" ")
             while len(current_reaction["^COMPARTMENT"]) < count_left + count_right:
@@ -169,19 +175,21 @@ def reaction_parser(reaction_text):
             reaction_dicts[current_reaction['UNIQUE-ID'][0]] = copy.deepcopy(current_reaction)
             current_reaction = collections.defaultdict(list)
             count_left, count_right, previous_key = 0, 0, ""
-        elif line.startswith('/'):
+        if line.startswith('/'):
             current_reaction[previous_key].append(line)
+            continue
+        key = line.split(" - ")[0]
+        value = " - ".join(line.split(" - ")[1:])
+        if key == 'LEFT':
+            count_left += 1
+        elif key == 'RIGHT':
+            count_right += 1
         else:
-            key, value = line.split(" - ")
-            if key == 'LEFT':
-                count_left += 1
-            if key == 'RIGHT':
-                count_right += 1
             if key == "^COEFFICIENT" or key == "^COMPARTMENT":
                 while len(current_reaction[key]) < count_left + count_right - 1:
                     current_reaction[key].append(" ")
-                current_reaction[key].append(value)
-                previous_key = key
+            current_reaction[key].append(value)
+        previous_key = key
     return reaction_dicts
 
 def create_reactions(reaction_file, atom_mapping_file, compounds):
@@ -197,10 +205,12 @@ def create_reactions(reaction_file, atom_mapping_file, compounds):
     :return: the constructed `~MDH.reaction.Reaction` entities.
     :rtype: :py:class:`list`.
     """
-    reaction_dict = reaction_parser(tools.open_text(reaction_file).split("\n"))
+    reaction_dict = reaction_parser(tools.open_text(reaction_file, encoding='cp1252').split("\n"))
     atom_mappings = atom_mappings_parser(tools.open_text(atom_mapping_file).split("\n"))
+    print(atom_mappings)
     reactions = []
     for reaction_name in reaction_dict:
+        print(reaction_name)
         this_reaction = reaction_dict[reaction_name]
         coefficient_list = collections.deque(this_reaction["^COEFFICIENT"])
         coefficients = {}
@@ -225,7 +235,9 @@ def create_reactions(reaction_file, atom_mapping_file, compounds):
                 else:
                     numbers = ec[4:-1].split(".")
                     ecs[len(numbers)].append(ec[4:-1])
+        this_mappings = atom_mappings[reaction_name]["ONE_TO_ONE_MAPPINGS"] if reaction_name in atom_mappings and "ONE_TO_ONE_MAPPINGS" in atom_mappings[reaction_name] else []
+        print(this_mappings)
         reactions.append(reaction.Reaction(reaction_name, one_side_compounds, the_other_side_compounds, ecs,
-                                           atom_mappings[reaction_name]["ONE_TO_ONE_MAPPINGS"], coefficients))
+                                           this_mappings, coefficients))
     return reactions
 

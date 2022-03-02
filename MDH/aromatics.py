@@ -9,8 +9,8 @@ This module provides the :class:`~MDH.aromatics.AromaticManager` class entity.
 """
 
 from . import compound
-#from . import BASS
-from . import BASS_test
+from . import BASS
+#from . import BASS_test
 import multiprocessing
 from indigo import *
 
@@ -70,10 +70,10 @@ class AromaticManager:
             flag = False
             for aromatic_substructure in self.aromatic_substructures:
                 if all(aromatic_substructure.composition[key] == substructure.composition[key] for key in substructure.composition):
-                    #mapping_matrix = BASS.make_mapping_matrix(aromatic_substructure, substructure, True, True, False)
-                    mapping_matrix = BASS_test.make_mapping_matrix(aromatic_substructure, substructure, True, True)
+                    mapping_matrix = BASS.make_mapping_matrix(aromatic_substructure, substructure, True, True, False)
+                    #mapping_matrix = BASS_test.make_mapping_matrix(aromatic_substructure, substructure, True, True)
                     if mapping_matrix is not None:
-                        isomorphs = BASS_test.find_mappings(aromatic_substructure.structure_matrix(resonance=False),
+                        isomorphs = BASS.find_mappings(aromatic_substructure.structure_matrix(resonance=False),
                                                        aromatic_substructure.distance_matrix, substructure.structure_matrix(resonance=False),
                                                        substructure.distance_matrix, mapping_matrix)
                         if isomorphs != [] and isomorphs is not None:
@@ -185,12 +185,12 @@ class AromaticManager:
                 #print("atom color tuple")
                 #for atom in aromatic.atoms:
                 #    print(atom.color_tuple)
-                #mapping_matrix = BASS.make_mapping_matrix(aromatic, cpd, True, True, False)
-                mapping_matrix = BASS_test.make_mapping_matrix(aromatic, cpd, True, True)
+                mapping_matrix = BASS.make_mapping_matrix(aromatic, cpd, True, True, False)
+                #mapping_matrix = BASS_test.make_mapping_matrix(aromatic, cpd, True, True)
                 #print("mapping matrix")
                 #print(mapping_matrix)
                 if mapping_matrix is not None:
-                    for assignment in BASS_test.find_mappings(aromatic.structure_matrix(resonance=False), aromatic.distance_matrix,
+                    for assignment in BASS.find_mappings(aromatic.structure_matrix(resonance=False), aromatic.distance_matrix,
                                                          cpd.structure_matrix(resonance=False), cpd.distance_matrix, mapping_matrix):
                         for bond in aromatic.bonds:
                             if aromatic.atoms[bond.first_atom_number].in_cycle and aromatic.atoms[bond.second_atom_number].in_cycle:

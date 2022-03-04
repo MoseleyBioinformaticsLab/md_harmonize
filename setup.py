@@ -9,7 +9,7 @@ import numpy
 
 
 def find_version():
-    with open('MDH/__init__.py', 'r') as fd:
+    with open('mdh/__init__.py', 'r') as fd:
         version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
                             fd.read(), re.MULTILINE).group(1)
         if not version:
@@ -34,7 +34,7 @@ REQUIRES = [
 
 
 EXTENSIONS = [
-    Extension("MDH.BASS_test",sources=["MDH/BASS_test.pyx"], extra_compile_args=['-O3'], include_dirs=[numpy.get_include()])
+    Extension("mdh.BASS_test",sources=["mdh/BASS_test.pyx"], extra_compile_args=['-O3'], include_dirs=[numpy.get_include()])
 ]
 
 setup(

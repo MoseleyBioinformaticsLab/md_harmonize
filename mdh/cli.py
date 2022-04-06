@@ -15,6 +15,9 @@ Usage:
     mdh test2
     mdh test3    
     mdh test4 <database_names> <working_directory>
+    mdh aromatic_test
+    mdh test5
+    mdh test6
 
 Options:
     -h, --help          Show this screen.
@@ -199,9 +202,10 @@ def cli(args):
                 atom_order_check(kcf_compounds, original_compounds)
                 atom_order_check(original_compounds, compound_dict)
                 if args['--kegg_atom_mappings']:
-                    atom_mappings = tools.open_json(args['--kegg_atom_mappings'])
+                    atom_mappings = tools.open_jsonpickle(args['--kegg_atom_mappings'])
                 else:
                     atom_mappings = parser.create_atom_mappings(rclass_directory, kcf_compounds)
+                    tools.save_to_jsonpickle(atom_mappings, working_directory + "/kegg_atom_mappings.json")
                 
                 # from kcf atom mappings to mol file atom mappings.
                 atom_mappings = KEGG_atom_mapping_correction(KEGG_atom_index_mapping(kcf_compounds, compound_dict), atom_mappings)
@@ -220,7 +224,6 @@ def cli(args):
             for cpd_name in compound_dict:
                 cpd = compound_dict[cpd_name]
                 # aromatic substructure dection
-                print("aromatic substructure dection: ", cpd_name)
                 aromatic_manager.detect_aromatic_substructures(cpd)
                 cpd.define_bond_stereochemistry()
                 cpd.curate_invalid_n()
@@ -319,7 +322,7 @@ def cli(args):
         compound_harmonization_manager = harmonization.harmonize_compound_list(compound_dict)
         save_directory = working_directory + "/harmonized/"
         os.makedirs(save_directory, exist_ok=True)
-        tools.save_to_jsonpickle(compound_harmonization_manager, working_directory + "{0}.json".format("_".join(database_names)))
+        tools.save_to_json(compound_harmonization_manager.save_manager(), working_directory + "{0}.json".format("_".join(database_names)))
     
     elif args["test3"]:
         compound_file = "/mlab/data/hji236/projects/MDH_test/initialized/MetaCyc/compounds.json"
@@ -389,4 +392,70 @@ def cli(args):
                 aromatic_manager.detect_aromatic_substructures(cpd)
                 cpd.define_bond_stereochemistry()
                 cpd.curate_invalid_n()
+    
+    elif args['aromatic_test']:
+        #aromatic_manager_file = "/scratch/hji236/MDH_test/aromatic_manager.json"
+        #aromatic_manager = aromatics.AromaticManager.decode(tools.open_jsonpickle(aromatic_manager_file))
+        #kegg_molfiles = glob.glob("/scratch/hji236/MDH_test/aromatics_test/KEGG_more/*")
+        #kegg_dict = compound_construct_multiprocess(kegg_molfiles, construct_cpd)
+        #for cpd_name in kegg_dict:
+        #    cpd = kegg_dict[cpd_name]
+            # aromatic substructure dection
+        #    if cpd.contains_r_groups():
+        #        print("has R group ", cpd.compound_name)
+        #    aromatic_manager.detect_aromatic_substructures(cpd)
+        metacyc_molfiles = glob.glob("/scratch/hji236/MDH_test/aromatics_test/MetaCyc_more/*")
+        metacyc_dict = compound_construct_multiprocess(metacyc_molfiles, construct_cpd)
+        pairs = tools.open_json("/scratch/hji236/MDH_test/kegg_metacyc_more.json")
+        for cpd_name in metacyc_dict:
+            cpd = metacyc_dict[cpd_name]
+            if not cpd.contains_r_groups():
+                for kegg in pairs[cpd_name]:
+                    if int(kegg[1:]) < 22199:         
+                        print("does not have R group ", cpd.compound_name)
+                        break
+            # aromatic substructure dection
+            #aromatic_manager.detect_aromatic_substructures(cpd)
 
+    elif args['test5']:
+        kegg_molfiles = glob.glob("/scratch/hji236/MDH_test/kegg_hmd_analysis/KEGG/*")
+        kegg_dict = compound_construct_multiprocess(kegg_molfiles, construct_cpd)
+        print("KEGG compounds constructed", len(kegg_dict))
+        pairs = tools.open_json("/scratch/hji236/MDH_test/hmdb_dict.json")
+        hmd_molfiles = glob.glob("/scratch/hji236/MDH_test/kegg_hmd_analysis/HMD/*")
+        hmd_dict = compound_construct_multiprocess(hmd_molfiles, construct_cpd)
+        print("HMD compounds constructed", len(hmd_dict))
+
+        formula_issues = {}
+        structure_issues = {}
+        further_check = {}
+        for hmd_name in hmd_dict:
+            kegg_name = pairs[hmd_name]["kegg_id"]
+            print("start ", hmd_name, kegg_name)
+            if kegg_name and "cpd:"+kegg_name in kegg_dict:
+                hmd_compound = hmd_dict[hmd_name]
+                kegg_compound = kegg_dict["cpd:"+kegg_name]
+                if hmd_compound.formula != kegg_compound.formula:
+                    formula_issues[hmd_name] = kegg_name
+                else:
+                    if not hmd_compound.find_mappings(kegg_compound,resonance=True):
+                        structure_issues[hmd_name] = kegg_name
+                    else:
+                        further_check[hmd_name] = kegg_name
+        print("formula issues", len(formula_issues))
+        print("structure issues", len(structure_issues))
+        print("further check", len(further_check))
+
+        tools.save_to_json(formula_issues, "/scratch/hji236/MDH_test/kegg_hmd_analysis/formula_issues.json")
+        tools.save_to_json(structure_issues, "/scratch/hji236/MDH_test/kegg_hmd_analysis/structure_issues.json")
+        tools.save_to_json(further_check, "/scratch/hji236/MDH_test/kegg_hmd_analysis/further_check.json")
+
+    elif args['test6']:
+        filename = "/scratch/hji236/MDH_test/r_test/cpd:C03892.mol"
+        cpd = compound.Compound.create(filename)
+        cpd.color_compound()
+        print(cpd.r_groups)
+        print(cpd.composition)
+        print(cpd.color_groups())
+        for i, atom in enumerate(cpd.atoms):
+            print(i, atom.atom_symbol, atom.color_layers)

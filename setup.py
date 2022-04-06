@@ -34,7 +34,7 @@ REQUIRES = [
 
 
 EXTENSIONS = [
-    Extension("mdh.BASS_test",sources=["mdh/BASS_test.pyx"], extra_compile_args=['-O3'], include_dirs=[numpy.get_include()])
+    Extension("mdh.BASS",sources=["mdh/BASS.pyx"], extra_compile_args=['-O3'], include_dirs=[numpy.get_include()])
 ]
 
 setup(

@@ -27,7 +27,7 @@ def standardize_molfile(molfile, to_path):
         with open(molfile, "r", encoding='cp1252') as infile:
             ct_object = ctfile.load(infile)
             ct_object.write(open(tofile, "w"), "ctfile")
-    os.system("obabel {0} -O {0} -h".format(tofile))
+    os.system("obabel {0} -O {0} -h -b".format(tofile))
     
                   
 

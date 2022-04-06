@@ -155,6 +155,11 @@ class HarmonizationManager(abc.ABC):
         HarmonizationManager initializer.
         """
         self.harmonized_edges = {}
+    
+    def save_manager(self):
+        
+        edges = list(self.harmonized_edges.keys())
+        return edges
 
     @staticmethod
     def create_key(name_1, name_2):

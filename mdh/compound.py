@@ -16,6 +16,7 @@ import heapq
 from pathlib import Path
 import ctfile
 from . import BASS
+import itertools 
 from .supplement import not_r_groups
 from .supplement import standard_bond_counts
 from .supplement import atomic_weights
@@ -556,44 +557,44 @@ class Compound:
     #             metals[atom.default_symbol].append(index)
     #     return metals
 
-    # def update_aromatic_bond_type(self, cycles):
-    #     """
-    #     Update the aromatic bond types.
-    #     Two cases: 1) change the bond in the aromatic ring to aromatic bond (bond type = 4)
-    #            2) change the double bond connecting to the aromatic ring to single bond.
-    #     :param list cycles: the list of cycles of aromatic atom index.
-    #
-    #     :return:
-    #     """
-    #     atom_in_cycle = [atom for cycle in cycles for atom in cycle]
-    #     for cycle in cycles:
-    #         aromatic_bonds = self.extract_aromatic_bonds(cycle)
-    #         for bond in aromatic_bonds:
-    #             bond.update_bond_type("4")
-    #     bond_out_of_cycle = self.extract_double_bond_connecting_cycle(atom_in_cycle)
-    #     for bond in bond_out_of_cycle:
-    #         bond.update_bond_type("1")
-
-    def update_aromatic_bond(self, aromatic_bonds, aromatic_atoms):
+    def update_aromatic_bond_type(self, cycles):
         """
-        To update the bond type of aromatic bonds in the compound.
-        Two steps are involved:
-            1) Update the bond in the aromatic ring to type "4".
-            2) Update the double bond connecting to the aromatic ring to "1".
+        Update the aromatic bond types.
+        Two cases: 1) change the bond in the aromatic ring to aromatic bond (bond type = 4)
+               2) change the double bond connecting to the aromatic ring to single bond.
+        :param list cycles: the list of cycles of aromatic atom index.
 
-        :param aromatic_bonds: a list of aromatic bonds in the compound (represented by the first and second atom number).
-        :type aromatic_bonds: :py:class:`list`.
-        :param aromatic_atoms: a list of aromatic atoms in the aromatic ring.
-        :type aromatic_atoms: :py:class:`list`.
-        :return: None.
-        :rtype: :py:obj:`None`.
+        :return:
         """
-
-        for atom_i, atom_j in aromatic_bonds:
-            self.bond_lookup[(atom_i, atom_j)].update_bond_type("4")
-        bond_out_of_cycle = self.extract_double_bond_connecting_cycle(aromatic_atoms)
+        atom_in_cycle = [atom for cycle in cycles for atom in cycle]
+        for cycle in cycles:
+            aromatic_bonds = self.extract_aromatic_bonds(cycle)
+            for bond in aromatic_bonds:
+                bond.update_bond_type("4")
+        bond_out_of_cycle = self.extract_double_bond_connecting_cycle(atom_in_cycle)
         for bond in bond_out_of_cycle:
             bond.update_bond_type("1")
+
+    #def update_aromatic_bond(self, aromatic_bonds, aromatic_atoms):
+    #    """
+    #    To update the bond type of aromatic bonds in the compound.
+    #    Two steps are involved:
+    #        1) Update the bond in the aromatic ring to type "4".
+    #        2) Update the double bond connecting to the aromatic ring to "1".
+
+    #    :param aromatic_bonds: a list of aromatic bonds in the compound (represented by the first and second atom number).
+    #    :type aromatic_bonds: :py:class:`list`.
+    #    :param aromatic_atoms: a list of aromatic atoms in the aromatic ring.
+    #    :type aromatic_atoms: :py:class:`list`.
+    #    :return: None.
+    #    :rtype: :py:obj:`None`.
+    #    """
+
+    #    for atom_i, atom_j in aromatic_bonds:
+    #        self.bond_lookup[(atom_i, atom_j)].update_bond_type("4")
+    #    bond_out_of_cycle = self.extract_double_bond_connecting_cycle(aromatic_atoms)
+    #    for bond in bond_out_of_cycle:
+    #        bond.update_bond_type("1")
 
     def extract_double_bond_connecting_cycle(self, atom_in_cycle):
         """
@@ -612,22 +613,22 @@ class Compound:
                         double_bond_connecting_cycle.append(self.bond_lookup[(atom_index, neighbor_index)])
         return double_bond_connecting_cycle
 
-    # def extract_aromatic_bonds(self, cycle):
-    #     """
-    #     Extract the aromatic bonds based on the atom indexes in the cycle.
-    #     :param list cycle: the
-    #
-    #     :return: the list of aromatic bond.
-    # 	"""
-    #     aromatic_bonds = []
-    #     all_pairs = list(itertools.combinations(cycle, 2))
-    #     visited = set()
-    #     for pair in all_pairs:
-    #         if (pair[0], pair[1]) not in visited and (pair[0], pair[1]) in self.bond_lookup:
-    #             aromatic_bonds.append(self.bond_lookup[(pair[0], pair[1])])
-    #             visited.add((pair[0], pair[1]))
-    #             visited.add((pair[1], pair[1]))
-    #     return aromatic_bonds
+    def extract_aromatic_bonds(self, cycle):
+        """
+        Extract the aromatic bonds based on the atom indexes in the cycle.
+        :param list cycle: the
+    
+        :return: the list of aromatic bond.
+ 	"""
+        aromatic_bonds = []
+        all_pairs = list(itertools.combinations(cycle, 2))
+        visited = set()
+        for pair in all_pairs:
+            if (pair[0], pair[1]) not in visited and (pair[0], pair[1]) in self.bond_lookup:
+                aromatic_bonds.append(self.bond_lookup[(pair[0], pair[1])])
+                visited.add((pair[0], pair[1]))
+                visited.add((pair[1], pair[1]))
+        return aromatic_bonds
 
     def separate_connected_components(self, bonds):
         """
@@ -1163,7 +1164,7 @@ class Compound:
         :rtype: :py:obj:`None`.
     	"""
         excluded_index = self.metal_index + self.h_index
-        excluded_index += self.r_groups if r_groups else []
+        excluded_index += self.r_groups if not r_groups else []
         atoms_to_color = [i for i in range(len(self.atoms)) if i not in excluded_index]
         self.reset_color()
         self.generate_atom_zero_layer_color(isotope_resolved=isotope_resolved, charge=charge, atom_stereo=atom_stereo)

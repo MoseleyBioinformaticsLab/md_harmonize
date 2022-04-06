@@ -55,6 +55,7 @@ class AromaticManager:
         :return: the constructed AromaticManager.
         :rtype: :class:`~MDH.aromatics.AromaticManager`.
         """
+        
         return AromaticManager([compound.Compound(sub[0], sub[1], sub[2]) for sub in aromatic_structures])
 
     def add_aromatic_substructures(self, substructures):
@@ -172,40 +173,27 @@ class AromaticManager:
         aromatic_bonds = set()
         aromatic_atoms = set()
         cpd.update_color_tuple()
-        #print("atoms in cycles", [atom.atom_number for atom in cpd.atoms if atom.in_cycle])
-        #print("atom color tuple")
-        #for atom in cpd.atoms:
-            #if atom.default_symbol != "H":
-                #print(atom.color_tuple)
+        cycles = []
+        print("detect aromatic substructures for compound: ", cpd.compound_name)
         for aromatic in self.aromatic_substructures:
-
             if all(aromatic.composition[key] <= cpd.composition[key] for key in aromatic.composition):
-                #print("aromatic name:", aromatic.compound_name)
-                #print("atoms in cycle:", [atom.atom_number for atom in aromatic.atoms if atom.in_cycle])
-                #print("atom color tuple")
-                #for atom in aromatic.atoms:
-                #    print(atom.color_tuple)
                 mapping_matrix = BASS.make_mapping_matrix(aromatic, cpd, True, True, False)
-                #mapping_matrix = BASS_test.make_mapping_matrix(aromatic, cpd, True, True)
-                #print("mapping matrix")
-                #print(mapping_matrix)
                 if mapping_matrix is not None:
+                    
                     for assignment in BASS.find_mappings(aromatic.structure_matrix(resonance=False), aromatic.distance_matrix,
                                                          cpd.structure_matrix(resonance=False), cpd.distance_matrix, mapping_matrix):
+                        cycle = set()
                         for bond in aromatic.bonds:
                             if aromatic.atoms[bond.first_atom_number].in_cycle and aromatic.atoms[bond.second_atom_number].in_cycle:
                                 first_atom_number = cpd.heavy_atoms[assignment[bond.first_atom_number]].atom_number
                                 second_atom_number = cpd.heavy_atoms[assignment[bond.second_atom_number]].atom_number
-                                bond_index = (min(first_atom_number, second_atom_number), max(first_atom_number, second_atom_number))
-                                aromatic_bonds.add(bond_index)
-                                aromatic_atoms.add(first_atom_number)
-                                aromatic_atoms.add(second_atom_number)
-            #else:
-                #print("aromatic name not valid", aromatic.compound_name)
-        #print(aromatic_bonds)
-        #print(aromatic_atoms)
-        cpd.update_aromatic_bond(aromatic_bonds, aromatic_atoms)
-        #print("finish aromatic detection: ", cpd.compound_name)
+                                cycle.add(first_atom_number)
+                                cycle.add(second_atom_number)
+                        cycles.append(cycle)
+                        print("find one from ", aromatic.compound_name, cycle)
+        fused_cycles = self.fuse_cycles(cycles)
+        cpd.update_aromatic_bond_type(fused_cycles)
+        return 
 
     @staticmethod
     def construct_aromatic_entity(cpd, aromatic_cycles):

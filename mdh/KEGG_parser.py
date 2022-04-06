@@ -730,7 +730,7 @@ def create_reactions(reaction_directory, compounds, atom_mappings):
                                            this_atom_mappings, one_side_coefficients))
     return reactions
 
-@timeout_decorator.timeout(200)
+@timeout_decorator.timeout(20)
 def compound_pair_mappings(rclass_name, rclass_definitions, one_compound, the_other_compound):
     """
     To get the atom mappings between two compounds based on the rclass definitions.

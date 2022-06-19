@@ -15,6 +15,7 @@ import numpy
 import heapq
 from pathlib import Path
 import ctfile
+import timeout_decorator
 from . import BASS
 import itertools 
 from .supplement import not_r_groups
@@ -722,7 +723,17 @@ class Compound:
             for i, dist in enumerate(distance_matrix):
                 self.heavy_atoms[i].distance_to_r = dist
 
+    @timeout_decorator.timeout(200)
     def find_cycles(self, short_circuit=False, cutoff=40):
+
+        try: 
+            self.find_cycles_helper(short_circuit=short_circuit, cutoff=cutoff)
+        except: 
+            print("Cycles in compound {0} can hardly be detected.".format(self.compound_name))
+            pass
+        return []
+    
+    def find_cycles_helper(self, short_circuit=False, cutoff=40):
         """
         Find the cycles in the compound.
 

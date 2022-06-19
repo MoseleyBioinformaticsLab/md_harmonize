@@ -8,6 +8,7 @@ This module provides the :class:`~MDH.aromatics.AromaticManager` class entity.
 
 """
 
+import timeout_decorator
 from . import compound
 from . import BASS
 #from . import BASS_test
@@ -161,6 +162,16 @@ class AromaticManager:
                 break
         return cycles
     
+    @timeout_decorator.timeout(200)
+    def detect_aromatic_substructures_timeout(self, cpd):
+
+        try:
+            self.detect_aromatic_substructures(cpd)
+        except:
+            print("Aromatic substructures in compound {0} can hardly be detected.".format(cpd.compound_name))
+            pass
+        return
+
     def detect_aromatic_substructures(self, cpd):
         """
         Detect all the aromatic substructures in the cpd, and update the bond type of aromatic bonds.
@@ -174,7 +185,6 @@ class AromaticManager:
         aromatic_atoms = set()
         cpd.update_color_tuple()
         cycles = []
-        print("detect aromatic substructures for compound: ", cpd.compound_name)
         for aromatic in self.aromatic_substructures:
             if all(aromatic.composition[key] <= cpd.composition[key] for key in aromatic.composition):
                 mapping_matrix = BASS.make_mapping_matrix(aromatic, cpd, True, True, False)
@@ -190,7 +200,7 @@ class AromaticManager:
                                 cycle.add(first_atom_number)
                                 cycle.add(second_atom_number)
                         cycles.append(cycle)
-                        print("find one from ", aromatic.compound_name, cycle)
+                        #print("find one from ", aromatic.compound_name, cycle)
         fused_cycles = self.fuse_cycles(cycles)
         cpd.update_aromatic_bond_type(fused_cycles)
         return 

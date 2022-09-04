@@ -28,8 +28,7 @@ REQUIRES = [
         "cython",
         "epam.indigo",
         "ctfile",
-        "timeout-decorator",
-        "cython"
+        "timeout-decorator"
 ]
 
 

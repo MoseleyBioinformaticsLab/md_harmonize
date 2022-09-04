@@ -54,7 +54,6 @@ def compound_construct_multiprocess(entities, function):
 def construct_cpd_components(compound_components):
     return compound.Compound(compound_components[0], compound_components[1], compound_components[2])
 
-
 def atom_order_check(compound_dict1, compound_dict2):
     # the compound name for kcf compound does not contain "cpd:".
     for compound_name in compound_dict1:
@@ -163,7 +162,6 @@ def cli(args):
         database_names = args['<database_names>'].split(",")
         working_directory = args['<working_directory>']
         aromatic_manager = aromatics.AromaticManager.decode(tools.open_jsonpickle(args['<aromatic_manager_file>']))
-        print("count of aromatic substructures,", len(aromatic_manager.aromatic_substructures))
         to_directory = working_directory + "/initialized"
         for database_name in database_names:
             from_path =  working_directory + "standardized/{0}/molfile".format(database_name)

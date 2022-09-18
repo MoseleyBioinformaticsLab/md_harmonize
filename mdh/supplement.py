@@ -1,7 +1,6 @@
 #!/urs/bin/python3
 
 import os
-
 from . import tools
 
 this_directory = os.path.abspath(os.path.dirname(__file__))

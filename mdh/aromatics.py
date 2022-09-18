@@ -4,16 +4,15 @@
 MDH.aromatics
 ~~~~~~~~~~~~~
 
-This module provides the :class:`~MDH.aromatics.AromaticManager` class entity.
+This module provides the :class:`~mdh.aromatics.AromaticManager` class entity.
 
 """
 
 import timeout_decorator
 from . import compound
 from . import BASS
-#from . import BASS_test
-import multiprocessing
 from indigo import *
+
 
 class AromaticManager:
 
@@ -24,94 +23,83 @@ class AromaticManager:
     2) Detect the aromatic substructures in any given compound, and update the bond type of the detected aromatic bonds.
     """
 
-    def __init__(self, aromatic_substructures=None):
+    def __init__(self, aromatic_substructures: list = None) -> None:
         """
         AromaticManager initializer.
 
         :param aromatic_substructures: a list of aromatic substructures.
-        :type aromatic_substructures: :py:class:`list`.
         """
         self.aromatic_substructures = aromatic_substructures if aromatic_substructures else []
         self.indigo = Indigo()
         for substructure in self.aromatic_substructures:
             substructure.update_color_tuple()
 
-    def encode(self):
+    def encode(self) -> list:
         """
-        To encode the aromatic substructures in the aromatic manager. (Get error when try to jsonpickle the AromaticManager:
-        the cythonized entities cannot be pickled.)
+        To encode the aromatic substructures in the aromatic manager. (Get error when try to jsonpickle the
+        AromaticManager: the cythonized entities cannot be pickled.)
 
         :return: the list of aromatic substructures.
-        :rtype: :py:class:`list`.
         """
         return [cpd.encode() for cpd in self.aromatic_substructures]
 
     @staticmethod
-    def decode(aromatic_structures):
+    def decode(aromatic_structures: list) -> AromaticManager:
         """
         To construct the AromaticManager based on the components of aromatic substructures.
 
         :param aromatic_structures: the list of components of aromatic substructures.
-        :type aromatic_structures: :py:class:`list`.
         :return: the constructed AromaticManager.
-        :rtype: :class:`~MDH.aromatics.AromaticManager`.
         """
-        
         return AromaticManager([compound.Compound(sub[0], sub[1], sub[2]) for sub in aromatic_structures])
 
-    def add_aromatic_substructures(self, substructures):
+    def add_aromatic_substructures(self, substructures: list) -> None:
         """
         Add newly detected aromatic structures to the manager. Make sure no duplicates in the aromatic substructures.
 
         :param substructures: a list of aromatic substructures.
-        :type substructures: :py:class:`list`.
         :return: None.
-        :rtype: :py:obj:`None`.
         """
         for substructure in substructures:
             flag = False
             for aromatic_substructure in self.aromatic_substructures:
-                if all(aromatic_substructure.composition[key] == substructure.composition[key] for key in substructure.composition):
+                if all(aromatic_substructure.composition[key] == substructure.composition[key] for key in
+                       substructure.composition):
                     mapping_matrix = BASS.make_mapping_matrix(aromatic_substructure, substructure, True, True, False)
-                    #mapping_matrix = BASS_test.make_mapping_matrix(aromatic_substructure, substructure, True, True)
+                    # mapping_matrix = BASS_test.make_mapping_matrix(aromatic_substructure, substructure, True, True)
                     if mapping_matrix is not None:
                         isomorphs = BASS.find_mappings(aromatic_substructure.structure_matrix(resonance=False),
-                                                       aromatic_substructure.distance_matrix, substructure.structure_matrix(resonance=False),
+                                                       aromatic_substructure.distance_matrix,
+                                                       substructure.structure_matrix(resonance=False),
                                                        substructure.distance_matrix, mapping_matrix)
                         if isomorphs != [] and isomorphs is not None:
                             flag = True
                             break
             if not flag:
-                print(substructure.compound_name, len(substructure.atoms))
                 substructure.update_color_tuple()
                 self.aromatic_substructures.append(substructure)
         return
 
-    def kegg_aromatize(self, kcf_cpd):
+    def kegg_aromatize(self, kcf_cpd: compound.Compound) -> None:
         """
-        To extract aromatic substructures based on kegg atom type in KEGG compound parsed from KCF file, and add the newly
-        detected aromatic substructures to the AromaticManger.
+        To extract aromatic substructures based on KEGG atom type in KEGG compound parsed from KCF file, and add the
+        newly detected aromatic substructures to the AromaticManger.
 
         :param kcf_cpd: the KEGG compound entity derived from KCF file.
-        :type kcf_cpd: :class:`~MDH.compound.Compound`.
         :return: None.
-        :rtype: :py:obj:`None`.
         """
-
         cycles = self.extract_aromatic_substructures(kcf_cpd)
         aromatic_substructures = self.construct_aromatic_entity(kcf_cpd, cycles)
         self.add_aromatic_substructures(aromatic_substructures)
 
-    def indigo_aromatize(self, molfile):
+    def indigo_aromatize(self, molfile: str) -> None:
         """
-        To extract aromatic substructures via Indigo, and add the newly detected aromatic substructures to the AromaticManger.
+        To extract aromatic substructures via Indigo, and add the newly detected aromatic substructures to the
+        AromaticManger.
 
         :param molfile: the filename of the molfile.
-        :type molfile: :py:class:`str`.
         :return: None.
-        :rtype: :py:obj:`None`.
         """
-
         cpd = compound.Compound.create(molfile)
         if cpd:
             aromatic_bonds = self.indigo_aromatic_bonds(molfile)
@@ -119,14 +107,12 @@ class AromaticManager:
             aromatic_substructures = self.construct_aromatic_entity(cpd, cycles)
             self.add_aromatic_substructures(aromatic_substructures)
 
-    def indigo_aromatic_bonds(self, molfile):
+    def indigo_aromatic_bonds(self, molfile: str) -> set:
         """
         To detect the aromatic bonds in the compound via Indigo method.
 
         :param molfile: the filename of the molfile.
-        :type molfile: :py:class:`str`.
         :return: the set of aromatic bonds represented by first_atom_number and second_atom_number of the bond.
-        :rtype: :py:class:`set`.
         """
         aromatic_bonds = set()
         try:
@@ -141,14 +127,12 @@ class AromaticManager:
         return aromatic_bonds
 
     @staticmethod
-    def fuse_cycles(cycles):
+    def fuse_cycles(cycles: list) -> list:
         """
         To fuse the cycles with shared atoms.
 
         :param cycles: the list of individual cycles represented by atom numbers.
-        :type cycles: :py:class:`list`.
         :return: the list of fused cycles.
-        :rtype: :py:class:`list`.
         """
         # to remove the cycle that is contained in another cycle.
         index_set = set(index for cycle in cycles for index in cycle)
@@ -163,7 +147,12 @@ class AromaticManager:
         return cycles
     
     @timeout_decorator.timeout(200)
-    def detect_aromatic_substructures_timeout(self, cpd):
+    def detect_aromatic_substructures_timeout(self, cpd: compound.Compound) -> None:
+        """
+        To detect the aromatic substructures in the compound and stop the search on timeout.
+        :param cpd: the :class:`~mdh.compound.Compound` entity.
+        :return: None.
+        """
 
         try:
             self.detect_aromatic_substructures(cpd)
@@ -172,17 +161,13 @@ class AromaticManager:
             pass
         return
 
-    def detect_aromatic_substructures(self, cpd):
+    def detect_aromatic_substructures(self, cpd: compound.Compound) -> None:
         """
         Detect all the aromatic substructures in the cpd, and update the bond type of aromatic bonds.
 
-        :param cpd: the :class:`~MDH.compound.Compound` entity.
-        :type cpd: :class:`~MDH.compound.Compound`.
+        :param cpd: the :class:`~mdh.compound.Compound` entity.
         :return: None.
-        :rtype: :py:obj:`None`.
         """
-        aromatic_bonds = set()
-        aromatic_atoms = set()
         cpd.update_color_tuple()
         cycles = []
         for aromatic in self.aromatic_substructures:
@@ -190,38 +175,38 @@ class AromaticManager:
                 mapping_matrix = BASS.make_mapping_matrix(aromatic, cpd, True, True, False)
                 if mapping_matrix is not None:
                     
-                    for assignment in BASS.find_mappings(aromatic.structure_matrix(resonance=False), aromatic.distance_matrix,
-                                                         cpd.structure_matrix(resonance=False), cpd.distance_matrix, mapping_matrix):
+                    for assignment in BASS.find_mappings(aromatic.structure_matrix(resonance=False),
+                                                         aromatic.distance_matrix,
+                                                         cpd.structure_matrix(resonance=False),
+                                                         cpd.distance_matrix, mapping_matrix):
                         cycle = set()
                         for bond in aromatic.bonds:
-                            if aromatic.atoms[bond.first_atom_number].in_cycle and aromatic.atoms[bond.second_atom_number].in_cycle:
+                            if aromatic.atoms[bond.first_atom_number].in_cycle and \
+                                    aromatic.atoms[bond.second_atom_number].in_cycle:
                                 first_atom_number = cpd.heavy_atoms[assignment[bond.first_atom_number]].atom_number
                                 second_atom_number = cpd.heavy_atoms[assignment[bond.second_atom_number]].atom_number
                                 cycle.add(first_atom_number)
                                 cycle.add(second_atom_number)
                         cycles.append(cycle)
-                        #print("find one from ", aromatic.compound_name, cycle)
         fused_cycles = self.fuse_cycles(cycles)
         cpd.update_aromatic_bond_type(fused_cycles)
         return 
 
     @staticmethod
-    def construct_aromatic_entity(cpd, aromatic_cycles):
+    def construct_aromatic_entity(cpd: compound.Compound, aromatic_cycles: list) -> list:
         """
         To construct the aromatic substructure entity based on the aromatic atoms.
         Here, we also include outside atoms that are connected to aromatic rings with double bonds.
 
-        :param cpd: the :class:`~MDH.compound.Compound` entity.
-        :type cpd: :class:`~MDH.compound.Compound`.
+        :param cpd: the :class:`~mdh.compound.Compound` entity.
         :param aromatic_cycles: the list of aromatic cycles represented by atom numbers in the compound.
-        :type aromatic_cycles: :py:class:`list`.
         :return: the list of constructed aromatic substructures.
-        :rtype: :py:class:`list`.
         """
         count = 0
         aromatic_substructures = []
         for cycle in aromatic_cycles:
-            bonds = [bond.clone() for bond in cpd.bonds if bond.first_atom_number in cycle and bond.second_atom_number in cycle]
+            bonds = [bond.clone() for bond in cpd.bonds if bond.first_atom_number in cycle and bond.second_atom_number
+                     in cycle]
             seen_atoms = set(cycle)
             for atom_index in cycle:
                 atom = cpd.atoms[atom_index]
@@ -245,21 +230,20 @@ class AromaticManager:
             count += 1
         return aromatic_substructures
 
-    def extract_aromatic_substructures(self, cpd):
+    def extract_aromatic_substructures(self, cpd: compound.Compound) -> list:
         """
         To detect the aromatic substructures in a compound based on the aromatic atoms. This is just for KEGG kcf file.
 
-        :param cpd: the :class:`~MDH.compound.Compound` entity.
-        :type cpd: :class:`~MDH.compound.Compound`.
+        :param cpd: the :class:`~mdh.compound.Compound` entity.
         :return: the list of aromatic cycles represented by atom numbers.
-        :rtype: :py:class:`list`.
         """
         aromatic_elements = ["C", "N"]
         aromatic_types = ["C8x", "C8y", "N4x", "N4y", "N5x", "N5y"]
         aromatic_cycles = []
         for cycle in cpd.cycles:
-            aromatic_atoms = [cpd.atoms[index] for index in cycle if cpd.atoms[index].default_symbol in aromatic_elements]
-            is_aromatic = [ atom.kat in aromatic_types for atom in aromatic_atoms ].count(True) == len(aromatic_atoms)
+            aromatic_atoms = [cpd.atoms[index] for index in cycle if cpd.atoms[index].default_symbol in
+                              aromatic_elements]
+            is_aromatic = [atom.kat in aromatic_types for atom in aromatic_atoms].count(True) == len(aromatic_atoms)
             oxygen_count = [cpd.atoms[index].default_symbol for index in cycle].count("O")
             # see the middle in KEGG compound C03861.
             if not is_aromatic or (oxygen_count >= 2 and len(cycle) >= 6):

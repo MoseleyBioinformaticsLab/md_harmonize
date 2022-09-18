@@ -33,26 +33,32 @@ from . import compound
 from . import openbabel_utils
 from . import harmonization
 
+
 scraper_dict = {"KEGG": KEGG_database_scraper}
 parser_dict = {"KEGG": KEGG_parser, "MetaCyc": MetaCyc_parser}
+
 
 def construct_cpd(molfile):
     if os.path.getsize(molfile) != 0:
         return compound.Compound.create(molfile)
     return None
 
+
 def construct_kcf(file):
     if os.path.getsize(file) != 0:
         return parser_dict['KEGG'].create_compound_kcf(file)
     return None
+
 
 def compound_construct_multiprocess(entities, function):
     with multiprocessing.Pool() as pool:
         results = pool.map(function, entities)
     return {cpd.compound_name: cpd for cpd in results if cpd}
 
+
 def construct_cpd_components(compound_components):
     return compound.Compound(compound_components[0], compound_components[1], compound_components[2])
+
 
 def atom_order_check(compound_dict1, compound_dict2):
     # the compound name for kcf compound does not contain "cpd:".
@@ -68,6 +74,7 @@ def atom_order_check(compound_dict1, compound_dict2):
                 break
     return
 
+
 def KEGG_atom_mapping_correction(atom_index_mappings, atom_mappings):
     
     new_atom_mappings = {}
@@ -80,6 +87,7 @@ def KEGG_atom_mapping_correction(atom_index_mappings, atom_mappings):
                 this_mapping.append(((from_cpd, atom_index_mappings[from_cpd][from_idx]), (to_cpd, atom_index_mappings[to_cpd][to_idx])))
             new_atom_mappings[name] = this_mapping
     return new_atom_mappings
+
 
 def KEGG_atom_index_mapping(kcf_compounds, mol_compounds):
 
@@ -101,6 +109,7 @@ def KEGG_atom_index_mapping(kcf_compounds, mol_compounds):
             else:
                 atom_index_mappings[cpd_name] = mappings
     return atom_index_mappings
+
 
 def cli(args):
 
@@ -164,7 +173,7 @@ def cli(args):
         aromatic_manager = aromatics.AromaticManager.decode(tools.open_jsonpickle(args['<aromatic_manager_file>']))
         to_directory = working_directory + "/initialized"
         for database_name in database_names:
-            from_path =  working_directory + "standardized/{0}/molfile".format(database_name)
+            from_path = working_directory + "standardized/{0}/molfile".format(database_name)
             if not os.path.exists(from_path):
                 raise OSError("The directory {0} does not exist.".format(from_path))
             parser = parser_dict.get(database_name, None)
@@ -217,7 +226,7 @@ def cli(args):
                 # update compound
             for cpd_name in compound_dict:
                 cpd = compound_dict[cpd_name]
-                # aromatic substructure dection
+                # aromatic substructure detection
                 aromatic_manager.detect_aromatic_substructures(cpd)
                 cpd.define_bond_stereochemistry()
                 cpd.curate_invalid_n()
@@ -253,7 +262,6 @@ def cli(args):
         os.makedirs(save_directory, exist_ok=True)
         tools.save_to_jsonpickle(reaction_harmonization_manager, save_directory + "/{0}.json".format("_".join(database_names)))
 
-    
     elif args["test4"]:
         database_names = args['<database_names>'].split(",")
         ks = args['<ks>'].split(",")
@@ -277,7 +285,8 @@ def cli(args):
         compound_harmonization_manager = harmonization.harmonize_compound_list(compound_dict)
         save_directory = working_directory + "/harmonized/"
         os.makedirs(save_directory, exist_ok=True)
-        tools.save_to_json(compound_harmonization_manager.save_manager(), working_directory + "{0}_{1}.json".format("_".join(database_names), "_".join(ks)))
+        tools.save_to_json(compound_harmonization_manager.save_manager(), working_directory +
+                           "{0}_{1}.json".format("_".join(database_names), "_".join(ks)))
         
        
     #construct compounds in MDH, sub group
@@ -296,12 +305,13 @@ def cli(args):
             compound_dict[compound.compound_name] = compound
         for cpd_name in compound_dict:
             cpd = compound_dict[cpd_name]
-            # aromatic substructure dection
+            # aromatic substructure detection
             print(cpd_name)
             aromatic_manager.detect_aromatic_substructures(cpd)
             cpd.define_bond_stereochemistry()
             cpd.curate_invalid_n()
-        tools.save_to_jsonpickle({name: compound_dict[name].encode() for name in compound_dict}, to_directory + "/compounds_{0}.json".format(k))
+        tools.save_to_jsonpickle({name: compound_dict[name].encode() for name in compound_dict},
+                                 to_directory + "/compounds_{0}.json".format(k))
 
 
     

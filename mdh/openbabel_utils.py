@@ -5,16 +5,14 @@ import ctfile
 from pathlib import Path
 import os
 
-def standardize_molfile(molfile, to_path):
+
+def standardize_molfile(molfile: str, to_path: str) -> None:
     """
     To standardize molfile using openbabel.
 
     :param molfile: the filename to the original molfile.
-    :type molfile: :py:class:`str`.
     :param to_path: the path to store the standardized molfile.
-    :type to_path: :py:class:`str`.
     :return: None.
-    :rtype: :py:obj:`None`.
     """
     compound_name = Path(molfile).stem
     tofile = "{0}/{1}.mol".format(to_path, compound_name)
@@ -28,7 +26,3 @@ def standardize_molfile(molfile, to_path):
             ct_object = ctfile.load(infile)
             ct_object.write(open(tofile, "w"), "ctfile")
     os.system("obabel {0} -O {0} -h -b".format(tofile))
-    
-                  
-
-

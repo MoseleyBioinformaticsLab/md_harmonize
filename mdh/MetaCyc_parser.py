@@ -13,7 +13,8 @@ import copy
 from . import tools
 from . import reaction
 
-def reaction_side_parser(reaction_side):
+
+def reaction_side_parser(reaction_side: str) -> dict:
     """
      This is to parse FROM_SIDE or TO_SIDE in the reaction.
 
@@ -23,9 +24,7 @@ def reaction_side_parser(reaction_side):
     The order of the atoms are the orders in the compound molfile.
 
     :param reaction_side: the text description of reaction side.
-    :type reaction_side: :py:class:`str`.
     :return: the dictionary of compounds and the corresponding start and end atom index in the atom mappings.
-    :rtype: :py:class:`dict`.
     """
     i = 0
     compounds = collections.defaultdict(list)
@@ -51,20 +50,16 @@ def reaction_side_parser(reaction_side):
         i += 1
     return compounds
 
-def generate_one_to_one_mappings(from_side, to_side, indices):
+
+def generate_one_to_one_mappings(from_side: dict, to_side: dict, indices: str) -> list:
     """
     To generate the one to one atom mappings between two the sides of metabolic reaction.
 
-    :param from_side: the dictionary of compounds with their corresponding start and end atom index in the from side.
-    :type from_side: :py:class:`dict`.
-    :param to_side: the dictionary of compounds with their corresponding start and end atom index in the to side.
-    :type to_side: :py:class:`dict`.
+    :param from_side: the dictionary of compounds with their corresponding start and end atom index in the from_side.
+    :param to_side: the dictionary of compounds with their corresponding start and end atom index in the to_side.
     :param indices: the list of mapped atoms.
-    :type indices: :py:class:`list`.
     :return: the list of mapped atoms between the two sides.
-    :rtype: :py:class:`list`.
     """
-    n = len(indices)
     from_index_dict = {}
     mappings = [int(num) for num in indices.split(" ") if num != ""]
     
@@ -84,10 +79,10 @@ def generate_one_to_one_mappings(from_side, to_side, indices):
     
     for to_index, from_index in enumerate(mappings):
         one_to_one_mappings.append((from_index_dict[from_index], to_index_dict[to_index]))
-    print("parsed", one_to_one_mappings)
     return one_to_one_mappings
 
-def atom_mappings_parser(atom_mapping_text):
+
+def atom_mappings_parser(atom_mapping_text: list) -> dict:
     """
     This is to parse the MetaCyc reaction with atom mappings.
 
@@ -104,9 +99,7 @@ def atom_mappings_parser(atom_mapping_text):
     Pay attention to the direction!
 
     :param atom_mapping_text: the text descriptions of reactions with atom mappings.
-    :type atom_mapping_text: :py:class:`str`.
     :return: the dictionary of reactions with atom mappings.
-    :rtype: :py:class:`dict`.
     """
     reaction_dicts = {}
     current_reaction = {}
@@ -115,8 +108,9 @@ def atom_mappings_parser(atom_mapping_text):
             continue
         elif line.startswith("//"):
             reaction_dicts[current_reaction['REACTION']] = copy.deepcopy(current_reaction)
-            reaction_dicts[current_reaction['REACTION']]["ONE_TO_ONE_MAPPINGS"] = generate_one_to_one_mappings(current_reaction["FROM-SIDE"], current_reaction["TO-SIDE"],
-                                                                                 current_reaction["INDICES"])
+            reaction_dicts[current_reaction['REACTION']]["ONE_TO_ONE_MAPPINGS"] = \
+                generate_one_to_one_mappings(current_reaction["FROM-SIDE"], current_reaction["TO-SIDE"],
+                                             current_reaction["INDICES"])
             current_reaction = {}
         else:
             key = line.split(" - ")[0]
@@ -127,7 +121,8 @@ def atom_mappings_parser(atom_mapping_text):
                 current_reaction[key] = value
     return reaction_dicts
 
-def reaction_parser(reaction_text):
+
+def reaction_parser(reaction_text: list) -> dict:
     """
     This is used to parse MetaCyc reaction.
 
@@ -192,25 +187,20 @@ def reaction_parser(reaction_text):
         previous_key = key
     return reaction_dicts
 
-def create_reactions(reaction_file, atom_mapping_file, compounds):
+
+def create_reactions(reaction_file: str, atom_mapping_file: str, compounds: dict) -> list:
     """
     To create MetaCyc reaction entities.
 
     :param reaction_file: the filename of the reaction file.
-    :type reaction_file: :py:class:`str`.
     :param atom_mapping_file: the filename of the atom mapping file.
-    :type atom_mapping_file: :py:class:`str`.
-    :param compounds: a dictionary of :class:`~MDH.compound.Compound` entities.
-    :type compounds: :py:class:`dict`.
-    :return: the constructed `~MDH.reaction.Reaction` entities.
-    :rtype: :py:class:`list`.
+    :param compounds: a dictionary of :class:`~mdh.compound.Compound` entities.
+    :return: the constructed `~mdh.reaction.Reaction` entities.
     """
     reaction_dict = reaction_parser(tools.open_text(reaction_file, encoding='cp1252').split("\n"))
     atom_mappings = atom_mappings_parser(tools.open_text(atom_mapping_file).split("\n"))
-    print(atom_mappings)
     reactions = []
     for reaction_name in reaction_dict:
-        print(reaction_name)
         this_reaction = reaction_dict[reaction_name]
         coefficient_list = collections.deque(this_reaction["^COEFFICIENT"])
         coefficients = {}
@@ -235,8 +225,9 @@ def create_reactions(reaction_file, atom_mapping_file, compounds):
                 else:
                     numbers = ec[4:-1].split(".")
                     ecs[len(numbers)].append(ec[4:-1])
-        this_mappings = atom_mappings[reaction_name]["ONE_TO_ONE_MAPPINGS"] if reaction_name in atom_mappings and "ONE_TO_ONE_MAPPINGS" in atom_mappings[reaction_name] else []
-        print(this_mappings)
+        this_mappings = atom_mappings[reaction_name]["ONE_TO_ONE_MAPPINGS"] if reaction_name in atom_mappings and \
+                                                                               "ONE_TO_ONE_MAPPINGS" in \
+                                                                               atom_mappings[reaction_name] else []
         reactions.append(reaction.Reaction(reaction_name, one_side_compounds, the_other_side_compounds, ecs,
                                            this_mappings, coefficients))
     return reactions

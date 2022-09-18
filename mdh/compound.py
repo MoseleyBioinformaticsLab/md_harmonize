@@ -179,7 +179,7 @@ class Atom:
         self.kat = kat
         return self.kat
 
-    def clone(self) -> Atom:
+    def clone(self) -> object:
         """
         To clone the atom.
 
@@ -259,7 +259,7 @@ class Bond:
         self.second_atom_number = index
         return self.second_atom_number
 
-    def clone(self) -> Bond:
+    def clone(self) -> object:
         """
         To clone the bond.
 
@@ -300,7 +300,7 @@ class Compound:
         self.calculate_distance_to_r_groups()
         self._distance_matrix = None
 
-    def encode(self) -> Compound:
+    def encode(self) -> tuple:
         """
         To clone the compound.
 
@@ -318,7 +318,7 @@ class Compound:
         return self.compound_name
 
     @staticmethod
-    def create(molfile: str) -> Compound:
+    def create(molfile: str) -> object:
         """
         Create the compound entity based on the molfile representation.
 

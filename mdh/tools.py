@@ -24,7 +24,7 @@ def save_to_text(data: str, filename: str) -> None:
         outfile.write(data)
 
 
-def save_to_jsonpickle(data: object, filename: str) -> None:
+def save_to_jsonpickle(data, filename: str) -> None:
     """
     To save the data via jsonpickle.
 
@@ -36,7 +36,7 @@ def save_to_jsonpickle(data: object, filename: str) -> None:
         outfile.write(jsonpickle.encode(data, keys=True))
 
 
-def save_to_json(data: object, filename: str) -> None:
+def save_to_json(data, filename: str) -> None:
     """
     To save the data into json.
 
@@ -61,7 +61,7 @@ def open_text(filename: str, encoding: str = 'utf-8') -> str:
     return data
 
 
-def open_jsonpickle(filename: str) -> object:
+def open_jsonpickle(filename: str):
     """
     To load data via jsonpickle.
 
@@ -73,7 +73,7 @@ def open_jsonpickle(filename: str) -> object:
     return data
 
 
-def open_json(filename: str) -> object:
+def open_json(filename: str):
     """
     To load data via json.
 

@@ -44,7 +44,7 @@ class AromaticManager:
         return [cpd.encode() for cpd in self.aromatic_substructures]
 
     @staticmethod
-    def decode(aromatic_structures: list) -> AromaticManager:
+    def decode(aromatic_structures: list):
         """
         To construct the AromaticManager based on the components of aromatic substructures.
 

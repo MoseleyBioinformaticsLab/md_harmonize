@@ -179,7 +179,7 @@ class Atom:
         self.kat = kat
         return self.kat
 
-    def clone(self) -> object:
+    def clone(self):
         """
         To clone the atom.
 
@@ -259,7 +259,7 @@ class Bond:
         self.second_atom_number = index
         return self.second_atom_number
 
-    def clone(self) -> object:
+    def clone(self):
         """
         To clone the bond.
 
@@ -318,7 +318,7 @@ class Compound:
         return self.compound_name
 
     @staticmethod
-    def create(molfile: str) -> object:
+    def create(molfile: str):
         """
         Create the compound entity based on the molfile representation.
 
@@ -736,7 +736,7 @@ class Compound:
             self.has_cycle = True
         return [list(x) for x in set(tuple(x) for x in [sorted(i[:-1]) for l in all_cycles for i in l])]
 
-    def structure_matrix(self, resonance: bool = False, backbone: bool = False) -> numpy.ndarry:
+    def structure_matrix(self, resonance: bool = False, backbone: bool = False) -> numpy.ndarray:
         """
          To construct graph structural matrix of this compound.
          matrix[i][j] = 0 suggests the two atoms are not connected directly.
@@ -760,7 +760,7 @@ class Compound:
         return matrix
 
     @property
-    def distance_matrix(self) -> numpy.ndarry:
+    def distance_matrix(self) -> numpy.ndarray:
         """
         To construct the distance matrix of the compound. (using the Floyd Warshall Algorithm)
         distance[i][j] suggests the distance between atom i and j.
@@ -810,7 +810,7 @@ class Compound:
                 atom.color_tuple = (elements["C"], elements["N"], elements["S"], elements["O"], bond_types["1"],
                                     bond_types["2"])
     
-    def find_mappings(self, the_other: Compound, resonance: bool = True, r_distance: bool = False,
+    def find_mappings(self, the_other, resonance: bool = True, r_distance: bool = False,
                       backbone: bool = False) -> list:
         """
         Find the one to one atom mappings between two compounds using BASS algorithm.
@@ -841,7 +841,7 @@ class Compound:
             one_to_one_mappings.append(cur_mappings)
         return one_to_one_mappings
 
-    def map_resonance(self, the_other: Compound, r_distance: bool = False) -> list:
+    def map_resonance(self, the_other, r_distance: bool = False) -> list:
         """
         Check if the resonant mappings are valid between the two compound structures. If the mapped atoms don't share
         the same local coloring identifier, we check if the difference is caused by the position of double bonds.
@@ -1286,7 +1286,7 @@ class Compound:
                                                                                  visited[atom_index],
                                                                                  excluded=excluded_index)
                             current_layer[atom_index] = next_layer_neighbors
-                        # pruning check, to see if the have the same number of next layer's neighbors.
+                        # pruning check, to see if they have the same number of next layer's neighbors.
                         target_length = len(current_layer[target_index])
                         for atom_index in current_layer.keys():
                             if len(current_layer[atom_index]) != target_length:
@@ -1479,7 +1479,7 @@ class Compound:
         elif the_other_more:
             return -1, len(the_other_more) # the_other_compound is more specific than one_compound
 
-    def same_structure_relationship(self, the_other_compound: Compound) -> (int, dict):
+    def same_structure_relationship(self, the_other_compound) -> (int, dict):
         """
         To determine the relationship of two compounds with the same structure.
 
@@ -1491,7 +1491,7 @@ class Compound:
         # return relationship and atom mappings.
         return relationship, self.generate_atom_mapping_by_atom_color(the_other_compound)
 
-    def generate_atom_mapping_by_atom_color(self, the_other_compound: Compound) -> dict:
+    def generate_atom_mapping_by_atom_color(self, the_other_compound) -> dict:
         """
         To generate the atom mappings between the two compounds.
         Assume the two compounds have the same structure, so we can achieve atom mappings through atom colors.
@@ -1506,7 +1506,7 @@ class Compound:
                     one_to_one_mappings[idx].append(the_other_idx)
         return one_to_one_mappings
 
-    def optimal_resonant_mapping(self, the_other_compound: Compound, mappings: list) -> (int, dict):
+    def optimal_resonant_mapping(self, the_other_compound, mappings: list) -> (int, dict):
         """
         To find the optimal atom mappings for compound pairs that are resonant type.
 
@@ -1562,7 +1562,7 @@ class Compound:
             return 1
         return 2
 
-    def circular_pair_relationship(self, the_other_compound: Compound) -> tuple:
+    def circular_pair_relationship(self, the_other_compound) -> tuple:
         """
         To determine the relationship of two compounds with interchangeable circular and linear representations.
         We first find the critical atoms that involve in the formation of ring. There can be several possibilities.
@@ -1662,7 +1662,7 @@ class Compound:
         for i in index:
             self.atoms[i].update_symbol(updated_symbol)
 
-    def validate_mapping_with_r(self, the_other_compound: Compound, one_rs: list, mapping: dict) -> bool:
+    def validate_mapping_with_r(self, the_other_compound, one_rs: list, mapping: dict) -> bool:
         """
         To validate the atom mappings with r groups. 
         Here are two things we need to pay attention to:
@@ -1710,7 +1710,7 @@ class Compound:
             return True
         return False
 
-    def compare_chemical_details_with_mapping(self, the_other_compound: Compound, mapping: dict) -> tuple:
+    def compare_chemical_details_with_mapping(self, the_other_compound, mapping: dict) -> tuple:
         """
         To compare the chemical details of mapped atoms of the two compounds.
         This part targets compound pairs with resonance or r_group type.
@@ -1752,7 +1752,7 @@ class Compound:
                     the_other_stereo_counts += 1
         return one_stereo_counts, the_other_stereo_counts
 
-    def optimal_mapping_with_r(self, the_other_compound: Compound, one_rs: list, mappings: list) -> tuple:
+    def optimal_mapping_with_r(self, the_other_compound, one_rs: list, mappings: list) -> tuple:
         """
         To find the optimal mappings of compound pairs belonging to r_group type. In this case, multiple valid mappings
         can exist. We need to find the optimal one. The standard is the mappings with minimal unmapped chemical details.
@@ -1784,7 +1784,7 @@ class Compound:
         else:
             return None, None
 
-    def with_r_pair_relationship(self, the_other_compound: Compound) -> tuple:
+    def with_r_pair_relationship(self, the_other_compound) -> tuple:
         """
         To find the relationship and the atom mappings between the two compounds that has r_groups type.
         Several steps are involved:
@@ -1825,7 +1825,7 @@ class Compound:
             return relationship, self.map_r_correspondents(one_rs, the_other_compound, optimal_mappings)
         return None, None
 
-    def map_r_correspondents(self, one_rs: list, the_other_compound: Compound, mappings: dict) -> dict:
+    def map_r_correspondents(self, one_rs: list, the_other_compound, mappings: dict) -> dict:
         # again, the self compound is substructure, we need to figure out the R group atom in self compound and its
         # corresponding atoms in the other compound.
         """ 

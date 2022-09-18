@@ -597,13 +597,13 @@ def harmonize_compound_list(compound_list: list) -> CompoundHarmonizationManager
     return compound_harmonization_manager
 
 
-def harmonize_reaction_list(reaction_list, compound_harmonization_manager):
+def harmonize_reaction_list(reaction_list: list, compound_harmonization_manager: CompoundHarmonizationManager) -> \
+        ReactionHarmonizationManager:
     """
     To harmonize reactions across different sources based on the harmonized compounds. At the same time, this also
     harmonizes compound pairs with resonance, linear-circular, r group types.
 
     :param reaction_list: a list of :class:`~mdh.reaction.Reaction` list from different sources.
-    :type reaction_list: :py:class:`list`.
     :param compound_harmonization_manager: a :class:`~mdh.harmonization.CompoundHarmonizationManager` containing
     harmonized compound pairs with the same structure.
     :return: :class:`~mdh.harmonization.ReactionHarmonizationManager`

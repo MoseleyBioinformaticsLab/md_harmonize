@@ -61,6 +61,7 @@ def construct_compound_via_kcf(file: str) -> Optional[compound.Compound]:
         return parser_dict['KEGG'].create_compound_kcf(file)
     return None
 
+
 def construct_compound_via_components(compound_components: list) -> compound.Compound:
     """
     To construct compound based on the compound components.
@@ -70,13 +71,26 @@ def construct_compound_via_components(compound_components: list) -> compound.Com
     return compound.Compound(compound_components[0], compound_components[1], compound_components[2])
 
 
-def compound_construct_multiprocess(entities, function):
+def compound_construct_multiprocess(entities: list, function) -> dict:
+    """
+    To construct compounds with multiprocessing.
+    :param entities: the list of entities used for constructing compounds.
+    :param function: the function used to construct compounds.
+    :return: the dict of compounds.
+    """
     with multiprocessing.Pool() as pool:
         results = pool.map(function, entities)
     return {cpd.compound_name: cpd for cpd in results if cpd}
 
 
-def atom_order_check(compound_dict1, compound_dict2) -> None:
+def atom_order_check(compound_dict1: dict, compound_dict2:dict) -> None:
+    """
+    Here, we want to check if the order of the heavy atoms in the KEGG molfile and kcf representations is the same.
+    Quality check.
+    :param compound_dict1: one dict of compounds
+    :param compound_dict2: the other dict of compounds.
+    :return: None
+    """
     # the compound name for kcf compound does not contain "cpd:".
     for compound_name in compound_dict1:
         compound1 = compound_dict1[compound_name]
@@ -92,8 +106,13 @@ def atom_order_check(compound_dict1, compound_dict2) -> None:
     return None
 
 
-def KEGG_atom_mapping_correction(atom_index_mappings, atom_mappings):
-    
+def KEGG_atom_mapping_correction(atom_index_mappings: dict, atom_mappings: dict) -> dict:
+    """
+    The corrected atom mappings between KEGG compounds composed of molfile representations.
+    :param atom_index_mappings: the dict of atom index mappings between kcf and molfile representations.
+    :param atom_mappings: the dict of atom mappings between compounds derived from kcf representations.
+    :return: the dict of atom mappings corrected for molfile representations.
+    """
     new_atom_mappings = {}
     for name in atom_mappings:
         rlcass, cpd1, cpd2 = name.split("_")
@@ -107,8 +126,13 @@ def KEGG_atom_mapping_correction(atom_index_mappings, atom_mappings):
     return new_atom_mappings
 
 
-def KEGG_atom_index_mapping(kcf_compounds, mol_compounds):
-
+def KEGG_atom_index_mapping(kcf_compounds: dict, mol_compounds: dict) -> dict:
+    """
+    To map the atom index between kcf and molfile representations for KEGG compounds.
+    :param kcf_compounds: the dict of compounds composed of kcf representations.
+    :param mol_compounds:the dict of compounds composed of molfile representations.
+    :return: the dict of atom index mappings.
+    """
     atom_index_mappings = {}
     for cpd_name in kcf_compounds:
         kcf_cpd = kcf_compounds[cpd_name]
@@ -300,10 +324,17 @@ def cli(args):
         print("start reaction harmonization")
         reaction_harmonization_manager = harmonization.harmonize_reaction_list(reaction_list,
                                                                                compound_harmonization_manager)
+        # let's just save the list of harmonized names first.
+        harmonized_compounds = reaction_harmonization_manager.compound_harmonization_manager.save_manager()
+        harmonized_reactions = reaction_harmonization_manager.save_manager()
+
         save_directory = working_directory + "/harmonized"
         os.makedirs(save_directory, exist_ok=True)
-        tools.save_to_jsonpickle(reaction_harmonization_manager, save_directory + "/{0}.json".format("_".join(
-            database_names)))
+
+        tools.save_to_jsonpickle(harmonized_compounds, save_directory + "/{0}_harmonized_compounds.json".
+                                 format("_".join(database_names)))
+        tools.save_to_jsonpickle(harmonized_reactions, save_directory + "/{0}_harmonized_reactions.json".
+                                 format("_".join(database_names)))
 
 
     # elif args["test4"]:

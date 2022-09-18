@@ -663,7 +663,7 @@ class Compound:
             for i, dist in enumerate(distance_matrix):
                 self.heavy_atoms[i].distance_to_r = dist
 
-    @timeout_decorator.timeout(200)
+    @timeout_decorator.timeout(500)
     def find_cycles(self, short_circuit: bool = False, cutoff: int = 40) -> list:
         """
         To find the cycles in the compound.

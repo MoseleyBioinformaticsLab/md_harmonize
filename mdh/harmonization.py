@@ -10,8 +10,8 @@ and the :class:`~mdh.harmonization.HarmonizedReactionEdge` class .
 """
 import collections
 import abc
-import compound
-import reaction
+from . import compound
+from . import reaction
 from typing import *
 
 

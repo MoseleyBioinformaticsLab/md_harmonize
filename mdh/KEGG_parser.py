@@ -706,7 +706,7 @@ def create_reactions(reaction_directory: str, compounds: dict, atom_mappings: di
     return reactions
 
 
-@timeout_decorator.timeout(20)
+@timeout_decorator.timeout(200)
 def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compound: compound.Compound,
                            the_other_compound: compound.Compound) -> tuple:
     """
@@ -740,9 +740,11 @@ def create_atom_mappings(rclass_directory: str, compounds: dict) -> dict:
     :param compounds: a dictionary of :class:`~mdh.compound.Compound` entities.
     :return: the atom mappings of compound pairs.
     """
+    print("start atom mappings of kegg")
     rclass_files = glob.glob(rclass_directory + "*")
     atom_mappings = collections.defaultdict(dict)
     for rclass_file in rclass_files:
+        print("current parse this rclass ", rclass_file)
         this_rclass = kegg_data_parser(tools.open_text(rclass_file).split("\n"))
         rclass_definitions = this_rclass["DEFINITION"]
         rclass_name = this_rclass["ENTRY"][0].split()[0]

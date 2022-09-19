@@ -239,8 +239,10 @@ def cli(args):
                 # construct KEGG compound via KEGG kcf files. This is used for atom mappings
                 kcf_files = glob.glob(working_directory + "/sources/KEGG/kcf/*")
                 kcf_compounds = compound_construct_multiprocess(kcf_files, construct_compound_via_kcf)
+                print("count of original kegg compound files ", len(kcf_compounds))
                 original_files = glob.glob(working_directory + "/sources/KEGG/molfile/*")
                 original_compounds = compound_construct_multiprocess(original_files, construct_compound_via_molfile)
+                print("count of original kegg compound files ", len(original_compounds))
                 atom_order_check(kcf_compounds, original_compounds)
                 atom_order_check(original_compounds, compound_dict)
                 atom_mappings = parser.create_atom_mappings(rclass_directory, kcf_compounds)
@@ -248,17 +250,17 @@ def cli(args):
                                                              atom_mappings)
                 tools.save_to_jsonpickle(atom_mappings, working_directory + "/kegg_atom_mappings.json")
 
-            for cpd_name in compound_dict:
-                cpd = compound_dict[cpd_name]
-                # aromatic substructure detection
-                aromatic_manager.detect_aromatic_substructures(cpd)
-                cpd.define_bond_stereochemistry()
-                cpd.curate_invalid_n()
-
-            save_directory = to_directory + "/{0}".format(database_name)
-            os.makedirs(save_directory, exist_ok=True)
-            tools.save_to_jsonpickle({name: compound_dict[name].encode() for name in compound_dict}, save_directory +
-                                     "/compounds.json")
+            # for cpd_name in compound_dict:
+            #     cpd = compound_dict[cpd_name]
+            #     # aromatic substructure detection
+            #     aromatic_manager.detect_aromatic_substructures(cpd)
+            #     cpd.define_bond_stereochemistry()
+            #     cpd.curate_invalid_n()
+            #
+            # save_directory = to_directory + "/{0}".format(database_name)
+            # os.makedirs(save_directory, exist_ok=True)
+            # tools.save_to_jsonpickle({name: compound_dict[name].encode() for name in compound_dict}, save_directory +
+            #                          "/compounds.json")
 
     elif args['initialize_reaction']:
 

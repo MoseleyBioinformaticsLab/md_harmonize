@@ -92,6 +92,7 @@ def atom_order_check(compound_dict1: dict, compound_dict2:dict) -> None:
     :return: None
     """
     # the compound name for kcf compound does not contain "cpd:".
+    count = 0
     for compound_name in compound_dict1:
         compound1 = compound_dict1[compound_name]
         if compound_name not in compound_dict2 and "cpd:"+compound_name not in compound_dict2:
@@ -101,8 +102,10 @@ def atom_order_check(compound_dict1: dict, compound_dict2:dict) -> None:
         k = min(len(compound1.atoms), len(compound2.atoms))
         for i in range(k):
             if compound1.atoms[i].x != compound2.atoms[i].x or compound1.atoms[i].y != compound2.atoms[i].y:
+                count += 1
                 print("{0} file has changed!".format(compound_name))
                 break
+        print(count)
     return None
 
 
@@ -243,7 +246,9 @@ def cli(args):
                 original_files = glob.glob(working_directory + "/sources/KEGG/molfile/*")
                 original_compounds = compound_construct_multiprocess(original_files, construct_compound_via_molfile)
                 print("count of original kegg compound files ", len(original_compounds))
+                print("comparison of kcf and original")
                 atom_order_check(kcf_compounds, original_compounds)
+                print("comparison of standard and original")
                 atom_order_check(original_compounds, compound_dict)
                 atom_mappings = parser.create_atom_mappings(rclass_directory, kcf_compounds)
                 atom_mappings = KEGG_atom_mapping_correction(KEGG_atom_index_mapping(kcf_compounds, compound_dict),

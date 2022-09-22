@@ -706,7 +706,7 @@ def create_reactions(reaction_directory: str, compounds: dict, atom_mappings: di
     return reactions
 
 
-@timeout_decorator.timeout(200)
+@timeout_decorator.timeout(20)
 def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compound: compound.Compound,
                            the_other_compound: compound.Compound) -> tuple:
     """

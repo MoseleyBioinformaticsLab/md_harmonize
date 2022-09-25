@@ -415,8 +415,8 @@ class RpairParser:
         one_to_one_mappings = []
         for from_idx in optimal_atom_mappings:
             to_idx = optimal_atom_mappings[from_idx]
-            one_to_one_mappings.append(((self.one_compound.compound_name, from_idx),
-                                        (self.the_other_compound.compound_name, to_idx)))
+            one_to_one_mappings.append(((self.one_compound.name, from_idx),
+                                        (self.the_other_compound.name, to_idx)))
         return one_to_one_mappings
 
     @staticmethod
@@ -726,10 +726,10 @@ def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compo
             generate_atom_mappings()
         atom_mappings = one_mappings if len(one_mappings) > len(the_other_mappings) else the_other_mappings
     except Exception as e:
-        print(rclass_name + "_" + one_compound.compound_name + "_" + the_other_compound.compound_name +
+        print(rclass_name + "_" + one_compound.name + "_" + the_other_compound.name +
               "can hardly be parsed.")
         pass
-    return one_compound.compound_name + "_" + the_other_compound.compound_name, atom_mappings
+    return one_compound.name + "_" + the_other_compound.name, atom_mappings
 
 
 def create_atom_mappings(rclass_directory: str, compounds: dict) -> dict:

@@ -25,7 +25,7 @@ class Reaction:
         :param atom_mappings: the list of atom mappings between two sides of the reaction.
         :param coefficients: the dictionary of compound names and their corresponding coefficients in the reaction.
         """
-        self.reaction_name = reaction_name
+        self.name = reaction_name
         self.one_side = one_side
         self.the_other_side = the_other_side
         self.ecs = ecs
@@ -39,4 +39,4 @@ class Reaction:
 
         :return: the reaction name.
         """
-        return self.reaction_name
+        return self.name

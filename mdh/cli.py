@@ -80,7 +80,7 @@ def compound_construct_multiprocess(entities: list, function) -> dict:
     """
     with multiprocessing.Pool() as pool:
         results = pool.map(function, entities)
-    return {cpd.compound_name: cpd for cpd in results if cpd}
+    return {cpd.name: cpd for cpd in results if cpd}
 
 
 def atom_order_check(compound_dict1: dict, compound_dict2:dict) -> None:
@@ -329,12 +329,18 @@ def cli(args):
             reaction_list.append(tools.open_jsonpickle(from_directory + "reactions.json"))
         print("start compound harmonization")
         if os.path.exists(save_directory + "/{0}_initial_harmonized_compounds.json".format("_".join(database_names))):
-            compound_harmonization_manager = CompoundHarmonizationManager()
+            print("we find the initial_harmonized_compounds")
+            initial_harmonized_compounds = tools.open_jsonpickle(save_directory +
+                                                                 "/{0}_initial_harmonized_compounds.json".
+                                                                 format("_".join(database_names)))
+            compound_harmonization_manager = harmonization.CompoundHarmonizationManager.\
+                create_manager(compound_dict, initial_harmonized_compounds)
 
         else:
             compound_harmonization_manager = harmonization.harmonize_compound_list(compound_dict)
-            tools.save_to_jsonpickle(initial_harmonized_compounds, save_directory + "/{0}_initial_harmonized_compounds.json".
-                                 format("_".join(database_names)))
+            initial_harmonized_compounds = compound_harmonization_manager.save_manager()
+            tools.save_to_jsonpickle(initial_harmonized_compounds, save_directory +
+                                     "/{0}_initial_harmonized_compounds.json".format("_".join(database_names)))
         # while we do reaction harmonization, we need to pay attention to compound harmonization without same structural
         # representations.
         # this includes: R group, linear-circular-transformation, resonance.

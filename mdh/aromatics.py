@@ -157,7 +157,7 @@ class AromaticManager:
         try:
             self.detect_aromatic_substructures(cpd)
         except:
-            print("Aromatic substructures in compound {0} can hardly be detected.".format(cpd.compound_name))
+            print("Aromatic substructures in compound {0} can hardly be detected.".format(cpd.name))
             pass
         return
 
@@ -226,7 +226,7 @@ class AromaticManager:
                 atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
                 bond.update_first_atom(idx_dict[atom_1])
                 bond.update_second_atom(idx_dict[atom_2])
-            aromatic_substructures.append(compound.Compound(cpd.compound_name + "_" + str(count), atoms, bonds))
+            aromatic_substructures.append(compound.Compound(cpd.name + "_" + str(count), atoms, bonds))
             count += 1
         return aromatic_substructures
 

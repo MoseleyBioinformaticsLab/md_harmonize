@@ -223,8 +223,38 @@ class CompoundHarmonizationManager(HarmonizationManager):
         self.visited = set()
     
     @staticmethod
-    def create_manager(compound_dict, compound_pairs):
-
+    def find_compound(compound_dict, compound_name):
+        """
+        
+        :param compound_dict: 
+        :param compound_name: 
+        :return: 
+        """
+        for sub_dict in compound_dict:
+            if compound_name in sub_dict:
+                return sub_dict[compound_name]
+        return None
+    
+    @staticmethod
+    def create_manager(compound_dict: list, compound_pairs: list):
+        """
+        
+        :param compound_dict: 
+        :param compound_pairs: 
+        :return: 
+        """
+        compound_harmonization_manager = CompoundHarmonizationManager()
+        for pair in compound_pairs:
+            compound_name1, compound_name2 = pair.split("@")
+            compound1 = CompoundHarmonizationManager.find_compound(compound_dict, compound_name1)
+            compound2 = CompoundHarmonizationManager.find_compound(compound_dict, compound_name2)
+            if compound1 and compound2:
+                relationship, atom_mappings = compound1.same_structure_relationship(compound2)
+                harmonized_compound_edge = HarmonizedCompoundEdge(compound1, compound2, relationship, "same_structure", 
+                                                                  atom_mappings)
+                compound_harmonization_manager.add_edge(harmonized_compound_edge)
+        return compound_harmonization_manager
+                
     def add_edge(self, edge: HarmonizedCompoundEdge) -> bool:
         """
         To add a newly detected edge to the manager, and update the occurrences of compound in the harmonized edges.
@@ -417,9 +447,10 @@ class ReactionHarmonizationManager(HarmonizationManager):
         mappings = collections.defaultdict(dict)
         for one_compound in one_compounds:
             for the_other_compound in the_other_compounds:
-                harmonized_edge = self.compound_harmonization_manager.search(one_compound, the_other_compound)
+                harmonized_edge = self.compound_harmonization_manager.search(one_compound.name, the_other_compound.name)
                 if harmonized_edge:
-                    mappings[one_compound.name][the_other_compound.name] = harmonized_edge.pair_relationship(one_compound.name)
+                    mappings[one_compound.name][the_other_compound.name] = \
+                        harmonized_edge.pair_relationship(one_compound.name)
         return mappings
 
     def unmapped_compounds(self, one_compounds: list, the_other_compounds: list, mappings: dict) -> tuple:
@@ -459,7 +490,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
                     resonant_mappings = one_cpd.map_resonance(the_other_cpd, r_distance=False)
                     if resonant_mappings:
                         # here both atom_mappings and relationship should be returned.
-                        print("find harmonized compound relationship with resonance relationship: ", the_other_cpd.compound_name, one_cpd.compound_name)
+                        print("find harmonized compound relationship with resonance relationship: ", the_other_cpd.name, one_cpd.name)
                         relationship, atom_mappings = one_cpd.optimal_resonant_mapping(the_other_cpd, resonant_mappings)
                         harmonized_compound_edge = HarmonizedCompoundEdge(one_cpd, the_other_cpd, relationship,
                                                                           "resonance", atom_mappings)
@@ -469,14 +500,14 @@ class ReactionHarmonizationManager(HarmonizationManager):
                         # check if they have circular and linear interchangeable formats.
                         relationship, atom_mappings = one_cpd.circular_pair_relationship(the_other_cpd)
                         if atom_mappings:
-                            print("find harmonized compound relationship with circular relationship: ", the_other_cpd.compound_name, one_cpd.compound_name)
+                            print("find harmonized compound relationship with circular relationship: ", the_other_cpd.name, one_cpd.name)
                             harmonized_compound_edge = HarmonizedCompoundEdge(one_cpd, the_other_cpd, relationship,
                                                                               "circular", atom_mappings)
                             self.compound_harmonization_manager.add_edge(harmonized_compound_edge)
                         else:
                             relationship, atom_mappings = the_other_cpd.circular_pair_relationship(one_cpd)
                             if atom_mappings:
-                                print("find harmonized compound relationship with circular relationship: ", the_other_cpd.compound_name, one_cpd.compound_name)
+                                print("find harmonized compound relationship with circular relationship: ", the_other_cpd.name, one_cpd.name)
                                 harmonized_compound_edge = HarmonizedCompoundEdge(the_other_cpd, one_cpd, relationship,
                                                                                   "circular", atom_mappings)
                                 self.compound_harmonization_manager.add_edge(harmonized_compound_edge)
@@ -486,7 +517,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
                     # check if one cpd is more generic
                     relationship, atom_mappings = one_cpd.with_r_pair_relationship(the_other_cpd)
                     if atom_mappings:
-                        print("find harmonized compound relationship with r group: ", the_other_cpd.compound_name, one_cpd.compound_name)
+                        print("find harmonized compound relationship with r group: ", the_other_cpd.name, one_cpd.name)
                         harmonized_compound_edge = HarmonizedCompoundEdge(the_other_cpd, one_cpd, relationship,
                                                                           "r_group", atom_mappings)
                         self.compound_harmonization_manager.add_edge(harmonized_compound_edge)
@@ -496,7 +527,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
                     # check if the other cpd is more generic.
                     relationship, atom_mappings = the_other_cpd.circular_pair_relationship(one_cpd)
                     if atom_mappings:
-                        print("find harmonized compound relationship with r group: ", the_other_cpd.compound_name, one_cpd.compound_name)
+                        print("find harmonized compound relationship with r group: ", the_other_cpd.name, one_cpd.name)
                         harmonized_compound_edge = HarmonizedCompoundEdge(the_other_cpd, one_cpd, relationship,
                                                                           "r_group", atom_mappings)
                         self.compound_harmonization_manager.add_edge(harmonized_compound_edge)

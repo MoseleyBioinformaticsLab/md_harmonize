@@ -281,7 +281,7 @@ class Compound:
         :param atoms: a list of :class:`~mdh.compound.Atom` entities in the compound.
         :param bonds: a list of :class:`~mdh.compound.Bond` entities in the compound.
     """
-        self.compound_name = compound_name
+        self.name = compound_name
         self.atoms = atoms
         self.bonds = bonds
         self.bond_lookup = {}
@@ -306,7 +306,7 @@ class Compound:
 
         :return: the cloned compound.
     """
-        return self.compound_name, [atom.clone() for atom in self.atoms], [bond.clone() for bond in self.bonds]
+        return self.name, [atom.clone() for atom in self.atoms], [bond.clone() for bond in self.bonds]
 
     @property
     def name(self) -> str:
@@ -315,7 +315,7 @@ class Compound:
         To get the compound name.
         :return: the compound name.
     """
-        return self.compound_name
+        return self.name
 
     @staticmethod
     def create(molfile: str):
@@ -673,7 +673,7 @@ class Compound:
         try:
             self.find_cycles_helper(short_circuit=short_circuit, cutoff=cutoff)
         except Exception as e:
-            print("Cycles in compound {0} can hardly be detected: {1}".format(self.compound_name, e))
+            print("Cycles in compound {0} can hardly be detected: {1}".format(self.name, e))
             pass
         return []
     
@@ -1470,7 +1470,7 @@ class Compound:
         one_more.extend(one_chemical_details)
         the_other_more.extend(the_other_chemical_details)
         if not one_more and not the_other_more:
-           return 0, 0
+            return 0, 0
         elif one_more and the_other_more:
             return 2, len(one_more) + len(the_other_more)
         elif one_more:

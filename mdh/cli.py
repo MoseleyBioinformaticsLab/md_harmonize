@@ -315,6 +315,8 @@ def cli(args):
         working_directory = args['<working_directory>']
         compound_dict = []
         reaction_list = []
+        save_directory = working_directory + "/harmonized"
+        os.makedirs(save_directory, exist_ok=True)
         for database_name in database_names:
             from_directory = working_directory + "/initialized/{0}/".format(database_name)
             if not os.path.exists(from_directory + "compounds.json"):
@@ -326,7 +328,13 @@ def cli(args):
                                   for name in compounds})
             reaction_list.append(tools.open_jsonpickle(from_directory + "reactions.json"))
         print("start compound harmonization")
-        compound_harmonization_manager = harmonization.harmonize_compound_list(compound_dict)
+        if os.path.exists(save_directory + "/{0}_initial_harmonized_compounds.json".format("_".join(database_names))):
+            compound_harmonization_manager = CompoundHarmonizationManager()
+
+        else:
+            compound_harmonization_manager = harmonization.harmonize_compound_list(compound_dict)
+            tools.save_to_jsonpickle(initial_harmonized_compounds, save_directory + "/{0}_initial_harmonized_compounds.json".
+                                 format("_".join(database_names)))
         # while we do reaction harmonization, we need to pay attention to compound harmonization without same structural
         # representations.
         # this includes: R group, linear-circular-transformation, resonance.
@@ -336,9 +344,6 @@ def cli(args):
         # let's just save the list of harmonized names first.
         harmonized_compounds = reaction_harmonization_manager.compound_harmonization_manager.save_manager()
         harmonized_reactions = reaction_harmonization_manager.save_manager()
-
-        save_directory = working_directory + "/harmonized"
-        os.makedirs(save_directory, exist_ok=True)
 
         tools.save_to_jsonpickle(harmonized_compounds, save_directory + "/{0}_harmonized_compounds.json".
                                  format("_".join(database_names)))

@@ -281,7 +281,7 @@ class Compound:
         :param atoms: a list of :class:`~mdh.compound.Atom` entities in the compound.
         :param bonds: a list of :class:`~mdh.compound.Bond` entities in the compound.
     """
-        self.name = compound_name
+        self.compound_name = compound_name
         self.atoms = atoms
         self.bonds = bonds
         self.bond_lookup = {}
@@ -315,7 +315,7 @@ class Compound:
         To get the compound name.
         :return: the compound name.
     """
-        return self.name
+        return self.compound_name
 
     @staticmethod
     def create(molfile: str):

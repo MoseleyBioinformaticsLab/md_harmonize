@@ -80,7 +80,7 @@ def compound_construct_multiprocess(entities: list, function) -> dict:
     """
     with multiprocessing.Pool() as pool:
         results = pool.map(function, entities)
-    return {cpd.name: cpd for cpd in results if cpd}
+    return {cpd.compound_name: cpd for cpd in results if cpd}
 
 
 def atom_order_check(compound_dict1: dict, compound_dict2:dict) -> None:
@@ -257,17 +257,17 @@ def cli(args):
                                                              atom_mappings)
                 tools.save_to_jsonpickle(atom_mappings, working_directory + "/kegg_atom_mappings_IC.json")
 
-            # for cpd_name in compound_dict:
-            #     cpd = compound_dict[cpd_name]
-            #     # aromatic substructure detection
-            #     aromatic_manager.detect_aromatic_substructures(cpd)
-            #     cpd.define_bond_stereochemistry()
-            #     cpd.curate_invalid_n()
-            #
-            # save_directory = to_directory + "/{0}".format(database_name)
-            # os.makedirs(save_directory, exist_ok=True)
-            # tools.save_to_jsonpickle({name: compound_dict[name].encode() for name in compound_dict}, save_directory +
-            #                          "/compounds.json")
+            for cpd_name in compound_dict:
+                cpd = compound_dict[cpd_name]
+                # aromatic substructure detection
+                aromatic_manager.detect_aromatic_substructures(cpd)
+                cpd.define_bond_stereochemistry()
+                cpd.curate_invalid_n()
+
+            save_directory = to_directory + "/{0}".format(database_name)
+            os.makedirs(save_directory, exist_ok=True)
+            tools.save_to_jsonpickle({name: compound_dict[name].encode() for name in compound_dict}, save_directory +
+                                     "/compounds.json")
 
     elif args['initialize_reaction']:
 

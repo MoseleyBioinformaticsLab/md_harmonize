@@ -82,9 +82,9 @@ def parse_equation(equation: str) -> (dict, dict):
     for token in equation.split():
         if re.search(compound_pattern, token):
             last_compound = token
-            current_side[last_compound] = 1
+            current_side[last_compound] = "1"
         elif token.isdigit():
-            current_side[last_compound] = int(token)
+            current_side[last_compound] = token
         elif token == "<=>":
             current_side = the_other_side_coefficients
     return one_side_coefficients, the_other_side_coefficients

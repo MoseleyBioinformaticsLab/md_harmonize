@@ -177,13 +177,12 @@ def reaction_parser(reaction_text: list) -> dict:
         value = " - ".join(line.split(" - ")[1:])
         if key == 'LEFT':
             count_left += 1
-        elif key == 'RIGHT':
+        if key == 'RIGHT':
             count_right += 1
-        else:
-            if key == "^COEFFICIENT" or key == "^COMPARTMENT":
-                while len(current_reaction[key]) < count_left + count_right - 1:
-                    current_reaction[key].append(" ")
-            current_reaction[key].append(value)
+        if key == "^COEFFICIENT" or key == "^COMPARTMENT":
+            while len(current_reaction[key]) < count_left + count_right - 1:
+                current_reaction[key].append(" ")
+        current_reaction[key].append(value)
         previous_key = key
     return reaction_dicts
 
@@ -205,17 +204,19 @@ def create_reactions(reaction_file: str, atom_mapping_file: str, compounds: dict
         coefficient_list = collections.deque(this_reaction["^COEFFICIENT"])
         coefficients = {}
         one_side_compounds = []
+        if not all(cpd_name in compounds for cpd_name in this_reaction["LEFT"]) or not all(cpd_name in compounds for cpd_name in this_reaction["RIGHT"]):
+            continue
         if "LEFT" in this_reaction:
             for cpd_name in this_reaction["LEFT"]:
                 cpd_coefficient = coefficient_list.popleft()
                 one_side_compounds.append(compounds[cpd_name])
-                coefficients[cpd_name] = int(cpd_coefficient) if cpd_coefficient != " " else 1
+                coefficients[cpd_name] = cpd_coefficient if cpd_coefficient != " " else "1"
         the_other_side_compounds = []
         if "RIGHT" in this_reaction:
             for cpd_name in this_reaction["RIGHT"]:
                 cpd_coefficient = coefficient_list.popleft()
                 the_other_side_compounds.append(compounds[cpd_name])
-                coefficients[cpd_name] = int(cpd_coefficient) if cpd_coefficient != " " else 1
+                coefficients[cpd_name] = cpd_coefficient if cpd_coefficient != " " else "1"
         ecs = collections.defaultdict(list)
         if "EC-NUMBER" in this_reaction:
             for ec in this_reaction["EC-NUMBER"]:

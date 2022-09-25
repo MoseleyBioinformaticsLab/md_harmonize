@@ -250,8 +250,9 @@ def cli(args):
                 atom_order_check(kcf_compounds, original_compounds)
                 print("comparison of standard and original")
                 atom_order_check(original_compounds, compound_dict)
-                atom_mappings = parser.create_atom_mappings(rclass_directory, kcf_compounds)
-                tools.save_to_jsonpickle(atom_mappings, working_directory + "/kegg_atom_mappings.json")
+                #atom_mappings = parser.create_atom_mappings(rclass_directory, kcf_compounds)
+                atom_mappings = tools.open_jsonpickle(working_directory + "/kegg_atom_mappings.json")
+                #tools.save_to_jsonpickle(atom_mappings, working_directory + "/kegg_atom_mappings.json")
                 atom_mappings = KEGG_atom_mapping_correction(KEGG_atom_index_mapping(kcf_compounds, compound_dict),
                                                              atom_mappings)
                 tools.save_to_jsonpickle(atom_mappings, working_directory + "/kegg_atom_mappings_IC.json")

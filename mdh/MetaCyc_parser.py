@@ -170,9 +170,10 @@ def reaction_parser(reaction_text: list) -> dict:
             reaction_dicts[current_reaction['UNIQUE-ID'][0]] = copy.deepcopy(current_reaction)
             current_reaction = collections.defaultdict(list)
             count_left, count_right, previous_key = 0, 0, ""
-        if line.startswith('/'):
-            current_reaction[previous_key].append(line)
             continue
+        # if line.startswith('/'):
+        #     current_reaction[previous_key].append(line)
+        #     continue
         key = line.split(" - ")[0]
         value = " - ".join(line.split(" - ")[1:])
         if key == 'LEFT':

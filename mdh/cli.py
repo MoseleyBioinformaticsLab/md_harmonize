@@ -362,6 +362,7 @@ def cli(args):
         from_directory = working_directory + "/initialized/{0}/".format(database_name)
         reactions = tools.open_jsonpickle(from_directory + "reactions.json")
         for reaction in reactions[:10]:
+            print(reaction.reaction_name)
             for cpd in reaction.one_side:
                 print(cpd)
                 print(type(cpd))

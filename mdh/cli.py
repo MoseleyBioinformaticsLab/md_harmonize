@@ -11,7 +11,7 @@ Usage:
     mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom]
     mdh initialize_reaction <database_names> <working_directory>
     mdh harmonize <database_names> <working_directory>
-    mdh test4 <database_names> <ks> <working_directory> 
+    mdh test4 <database_names> <working_directory>
     mdh test7 <k>
     
 
@@ -356,8 +356,16 @@ def cli(args):
         tools.save_to_jsonpickle(harmonized_reactions, save_directory + "/{0}_harmonized_reactions.json".
                                  format("_".join(database_names)))
 
+    elif args["test4"]:
+        database_name = args['<database_names>']
+        working_directory = args['<working_directory>']
+        from_directory = working_directory + "/initialized/{0}/".format(database_name)
+        reactions = tools.open_jsonpickle(from_directory + "reactions.json")
+        for reaction in reactions[:10]:
+            for cpd in reaction.one_side:
+                print(cpd)
+                print(type(cpd))
 
-    # elif args["test4"]:
 
     #     database_names = args['<database_names>'].split(",")
     #     ks = args['<ks>'].split(",")

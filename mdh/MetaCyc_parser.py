@@ -235,6 +235,7 @@ def create_reactions(reaction_file: str, atom_mapping_file: str, compounds: dict
         this_mappings = atom_mappings[reaction_name]["ONE_TO_ONE_MAPPINGS"] if reaction_name in atom_mappings and \
                                                                                "ONE_TO_ONE_MAPPINGS" in \
                                                                                atom_mappings[reaction_name] else []
+        print(reaction_name)
         print("one side of compounds:", one_side_compounds)
         print("the other side of compounds:", the_other_side_compounds)
         reactions.append(reaction.Reaction(reaction_name, one_side_compounds, the_other_side_compounds, ecs,

@@ -157,6 +157,14 @@ def KEGG_atom_index_mapping(kcf_compounds: dict, mol_compounds: dict) -> dict:
     return atom_index_mappings
 
 
+def parse_reactions(compounds: dict, reactions: list) -> list:
+
+    for reaction in reactions:
+        reaction["one_side"] = [compounds[name] for name in reaction["one_side"] if name in compounds]
+        reaction["the_other_side"] = [compounds[name] for name in reaction["the_other_side"] if name in compounds]
+    return reactions
+
+
 def cli(args):
 
     if args['download']:
@@ -324,9 +332,12 @@ def cli(args):
             if not os.path.exists(from_directory + "reactions.json"):
                 raise OSError("The file {0} does not exist.".format(from_directory + "reactions.json"))
             compounds = tools.open_jsonpickle(from_directory + "compounds.json")
-            compound_dict.append({name: compound.Compound(compounds[name][0], compounds[name][1], compounds[name][2])
-                                  for name in compounds})
-            reaction_list.append(tools.open_jsonpickle(from_directory + "reactions.json"))
+            compound_parsed = { name: compound.Compound(compounds[name][0], compounds[name][1], compounds[name][2]) for
+                                name in compounds }
+            compound_dict.append(compound_parsed)
+            reactions = tools.open_jsonpickle(from_directory + "reactions.json")
+            reaction_parsed = parse_reactions(compound_parsed, reactions)
+            reaction_list.append(reaction_parsed)
         print("start compound harmonization")
         if os.path.exists(save_directory + "/{0}_initial_harmonized_compounds.json".format("_".join(database_names))):
             print("we find the initial_harmonized_compounds")

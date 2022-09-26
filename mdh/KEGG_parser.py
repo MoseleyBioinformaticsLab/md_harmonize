@@ -660,8 +660,8 @@ def create_reactions(reaction_directory: str, compounds: dict, atom_mappings: di
                 all("cpd:" + compound_name in compounds for compound_name in the_other_side_coefficients):
             # here, we don't include the reactions that have unspecified compounds.
             continue
-        one_side_compounds = [compounds["cpd:" + compound_name] for compound_name in one_side_coefficients]
-        the_other_side_compounds = [compounds["cpd:" + compound_name] for compound_name in the_other_side_coefficients]
+        one_side_compounds = ["cpd:" + compound_name for compound_name in one_side_coefficients]
+        the_other_side_compounds = ["cpd:" + compound_name for compound_name in the_other_side_coefficients]
         one_side_coefficients.update(the_other_side_coefficients)
 
         raw_ecs = this_reaction["ENZYME"] if "ENZYME" in this_reaction else []

@@ -205,23 +205,13 @@ def create_reactions(reaction_file: str, atom_mapping_file: str, compounds: dict
         this_reaction = reaction_dict[reaction_name]
         coefficient_list = collections.deque(this_reaction["^COEFFICIENT"])
         coefficients = {}
-        one_side_compounds = []
         if "LEFT" in this_reaction:
             for cpd_name in this_reaction["LEFT"]:
                 cpd_coefficient = coefficient_list.popleft()
-                if cpd_name in compounds:
-                    one_side_compounds.append(compounds[cpd_name])
-                else:
-                    one_side_compounds.append(cpd_name)
                 coefficients[cpd_name] = cpd_coefficient if cpd_coefficient != " " else "1"
-        the_other_side_compounds = []
         if "RIGHT" in this_reaction:
             for cpd_name in this_reaction["RIGHT"]:
                 cpd_coefficient = coefficient_list.popleft()
-                if cpd_name in compounds:
-                    the_other_side_compounds.append(compounds[cpd_name])
-                else:
-                    the_other_side_compounds.append(cpd_name)
                 coefficients[cpd_name] = cpd_coefficient if cpd_coefficient != " " else "1"
         ecs = collections.defaultdict(list)
         if "EC-NUMBER" in this_reaction:
@@ -235,10 +225,7 @@ def create_reactions(reaction_file: str, atom_mapping_file: str, compounds: dict
         this_mappings = atom_mappings[reaction_name]["ONE_TO_ONE_MAPPINGS"] if reaction_name in atom_mappings and \
                                                                                "ONE_TO_ONE_MAPPINGS" in \
                                                                                atom_mappings[reaction_name] else []
-        print(reaction_name)
-        print("one side of compounds:", one_side_compounds)
-        print("the other side of compounds:", the_other_side_compounds)
-        reactions.append(reaction.Reaction(reaction_name, one_side_compounds, the_other_side_compounds, ecs,
+        reactions.append(reaction.Reaction(reaction_name, this_reaction["LEFT"], this_reaction["RIGHT"], ecs,
                                            this_mappings, coefficients))
     return reactions
 

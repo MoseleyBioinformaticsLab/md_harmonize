@@ -1836,9 +1836,13 @@ class Compound:
         :param mappings: the atom mappings of the mapped parts of the two compounds.
         :return: the full atom mappings between the two compounds.
     """
+        print("mapping r correspondents: ", self.compound_name, the_other_compound.compound_name)
+        print("r index:", one_rs)
+        print("atom mappings between the matched parts: ", mappings)
         full_mappings = collections.defaultdict(list)
         for idx in one_rs:
             r_atom = self.atoms[idx]
+            # it starts from R
             visited = set(mappings[neighbor_index] for neighbor_index in r_atom.neighbors)
             r_correspondents = [neighbor_index for index in visited for neighbor_index in
                                 the_other_compound.atoms[index].neighbors if neighbor_index not in mappings.values()]

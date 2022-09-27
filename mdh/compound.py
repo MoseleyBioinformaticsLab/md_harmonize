@@ -1805,7 +1805,7 @@ class Compound:
         self.update_atom_symbol(one_rs, "H")
         the_other_compound.update_atom_symbol(the_other_rs, "H")
         self.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
-        the_other_compound.color(r_groups=True, atom_stereo=False, bond_stereo=False)
+        the_other_compound.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
         one_to_one_mappings = self.find_mappings(the_other_compound, resonance=False, r_distance=True)
         # here we need to consider the r_distance atom color identifier, so we need to color compounds.
         relationship, optimal_mappings = self.optimal_mapping_with_r(the_other_compound, one_rs, one_to_one_mappings)

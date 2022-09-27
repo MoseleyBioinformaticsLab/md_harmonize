@@ -160,8 +160,8 @@ def KEGG_atom_index_mapping(kcf_compounds: dict, mol_compounds: dict) -> dict:
 def parse_reactions(compounds: dict, reactions: list) -> list:
 
     for reaction in reactions:
-        reaction["one_side"] = [compounds[name] for name in reaction["one_side"] if name in compounds]
-        reaction["the_other_side"] = [compounds[name] for name in reaction["the_other_side"] if name in compounds]
+        reaction.one_side = [compounds[name] for name in reaction.one_side if name in compounds]
+        reaction.the_other_side = [compounds[name] for name in reaction.the_other_side if name in compounds]
     return reactions
 
 

@@ -371,8 +371,8 @@ def cli(args):
         database_name = args['<database_names>']
         working_directory = args['<working_directory>']
         # from_directory = working_directory + "/initialized/"
-        kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C15535.mol"
-        metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/N-ACETYL-SEROTONIN.mol"
+        kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C01025.mol"
+        metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-8678.mol"
 
         # kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C04618.mol"
         # metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-13230.mol"

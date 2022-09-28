@@ -429,7 +429,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
             elif max_score >= 0.3:
                 # determine if there is missed compound harmonized edge. This threshold can be adjusted.
                 one_unmapped_compounds = self.unmapped_compounds(one_side_pairs[0], one_side_pairs[1], mappings[0])
-                self.match_unmapped_compounds(one_unmapped_compounds[0], one_side_pairs[1])
+                self.match_unmapped_compounds(one_unmapped_compounds[0], one_unmapped_compounds[1])
 
                 the_other_unmapped_compounds = self.unmapped_compounds(the_other_side_pairs[0],
                                                                        the_other_side_pairs[1], mappings[1])
@@ -447,7 +447,8 @@ class ReactionHarmonizationManager(HarmonizationManager):
         mappings = collections.defaultdict(dict)
         for one_compound in one_compounds:
             for the_other_compound in the_other_compounds:
-                harmonized_edge = self.compound_harmonization_manager.search(one_compound.compound_name, the_other_compound.compound_name)
+                harmonized_edge = self.compound_harmonization_manager.search(one_compound.compound_name,
+                                                                             the_other_compound.compound_name)
                 if harmonized_edge:
                     mappings[one_compound.compound_name][the_other_compound.compound_name] = \
                         harmonized_edge.pair_relationship(one_compound.compound_name)

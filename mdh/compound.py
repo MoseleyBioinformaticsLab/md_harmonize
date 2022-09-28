@@ -1705,7 +1705,8 @@ class Compound:
                             neighbor_index not in mapping.values():
                         bond = the_other_compound.bond_lookup[(idx, neighbor_index)]
                         the_other_r_linkages["{0}-{1}".format(idx, bond.bond_type)] += 1
-
+        print("r linkages in self: ", one_r_linkages)
+        print("r linkages in the other compound, ", the_other_r_linkages)
         if all(one_r_linkages[x] >= the_other_r_linkages[x] for x in the_other_r_linkages):
             return True
         return False
@@ -1807,6 +1808,7 @@ class Compound:
         self.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
         the_other_compound.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
         one_to_one_mappings = self.find_mappings(the_other_compound, resonance=False, r_distance=True)
+        print("one to one mappings between ", self.compound_name, the_other_compound.compound_name, one_to_one_mappings)
         # here we need to consider the r_distance atom color identifier, so we need to color compounds.
         relationship, optimal_mappings = self.optimal_mapping_with_r(the_other_compound, one_rs, one_to_one_mappings)
         if optimal_mappings:
@@ -1818,6 +1820,7 @@ class Compound:
         self.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=True)
         the_other_compound.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=True)
         one_to_one_mappings = self.find_mappings(the_other_compound, resonance=True, r_distance=True)
+        print("one to one mappings between ",  the_other_compound.compound_name, self.compound_name, one_to_one_mappings)
         relationship, optimal_mappings = self.optimal_mapping_with_r(the_other_compound, one_rs, one_to_one_mappings)
         self.update_atom_symbol(one_rs, "R")
         the_other_compound.update_atom_symbol(the_other_rs, "R")

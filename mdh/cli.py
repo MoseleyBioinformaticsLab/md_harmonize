@@ -370,15 +370,19 @@ def cli(args):
     elif args["test4"]:
         database_name = args['<database_names>']
         working_directory = args['<working_directory>']
-        from_directory = working_directory + "/initialized/"
-        compounds = tools.open_jsonpickle(from_directory + "KEGG/compounds.json")
-        kegg_compound_parsed = { name: compound.Compound(compounds[name][0], compounds[name][1], compounds[name][2]) for
-                                name in compounds }
-        compounds = tools.open_jsonpickle(from_directory + "MetaCyc/compounds.json")
-        metacyc_compound_parsed = {name: compound.Compound(compounds[name][0], compounds[name][1], compounds[name][2]) for
-                                name in compounds}
-        kegg_compound = kegg_compound_parsed["cpd:C04618"]
-        metacyc_compound = metacyc_compound_parsed["CPD-13230"]
+        # from_directory = working_directory + "/initialized/"
+        kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C04618.mol"
+        metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-13230.mol"
+        kegg_compound = construct_compound_via_molfile(kegg_compound_file)
+        metacyc_compound = construct_compound_via_molfile(metacyc_compound_file)
+        # compounds = tools.open_jsonpickle(from_directory + "KEGG/compounds.json")
+        # kegg_compound_parsed = { name: compound.Compound(compounds[name][0], compounds[name][1], compounds[name][2]) for
+        #                         name in compounds }
+        # compounds = tools.open_jsonpickle(from_directory + "MetaCyc/compounds.json")
+        # metacyc_compound_parsed = {name: compound.Compound(compounds[name][0], compounds[name][1], compounds[name][2]) for
+        #                         name in compounds}
+        # kegg_compound = kegg_compound_parsed["cpd:C04618"]
+        # metacyc_compound = metacyc_compound_parsed["CPD-13230"]
         relationship, mapping = kegg_compound.with_r_pair_relationship(metacyc_compound)
         print(relationship, mapping)
 

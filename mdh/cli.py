@@ -398,6 +398,15 @@ def cli(args):
             relationship, atom_mappings = kegg_compound.optimal_resonant_mapping(metacyc_compound, resonant_mappings)
             print(atom_mappings)
 
+        # linear circular testing
+        kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C05345.mol"
+        metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-15709.mol"
+        kegg_compound = construct_compound_via_molfile(kegg_compound_file)
+        metacyc_compound = construct_compound_via_molfile(metacyc_compound_file)
+        relationship, atom_mappings = kegg_compound.circular_pair_relationship(metacyc_compound)
+        print(relationship, atom_mappings)
+
+
 
     # kegg_compound = construct_compound_via_molfile(kegg_compound_file)
     # metacyc_compound = construct_compound_via_molfile(metacyc_compound_file)

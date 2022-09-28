@@ -370,12 +370,17 @@ def cli(args):
     elif args["test4"]:
         database_name = args['<database_names>']
         working_directory = args['<working_directory>']
-        from_directory = working_directory + "/initialized/{0}/".format(database_name)
-        reactions = tools.open_jsonpickle(from_directory + "reactions.json")
-        for reaction in reactions[:100]:
-            print(reaction.reaction_name)
-            print(reaction.one_side)
-            print(reaction.the_other_side)
+        from_directory = working_directory + "/initialized/"
+        compounds = tools.open_jsonpickle(from_directory + "KEGG/compounds.json")
+        kegg_compound_parsed = { name: compound.Compound(compounds[name][0], compounds[name][1], compounds[name][2]) for
+                                name in compounds }
+        compounds = tools.open_jsonpickle(from_directory + "MetaCyc/compounds.json")
+        metacyc_compound_parsed = {name: compound.Compound(compounds[name][0], compounds[name][1], compounds[name][2]) for
+                                name in compounds}
+        kegg_compound = kegg_compound_parsed["cpd:C04618"]
+        metacyc_compound = metacyc_compound_parsed["CPD-13230"]
+        relationship, mapping = kegg_compound.with_r_pair_relationship(metacyc_compound)
+        print(relationship, mapping)
 
 
 

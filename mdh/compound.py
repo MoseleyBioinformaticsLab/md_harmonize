@@ -856,7 +856,7 @@ class Compound:
         the_other.update_color_tuple(resonance=resonance)
         mappings = []
         mapping_matrix = BASS.make_mapping_matrix(self, the_other, True, True, r_distance)
-
+        print("mapping matrix, ", mapping_matrix)
         if mapping_matrix is not None:
             mappings = BASS.find_mappings(self.structure_matrix(resonance=resonance, backbone=backbone),
                                           self.distance_matrix,
@@ -1840,9 +1840,9 @@ class Compound:
         self.update_atom_symbol(one_rs, "H")
         the_other_compound.update_atom_symbol(the_other_rs, "H")
 
-        # if len([atom for atom in self.atoms if atom.atom_symbol != "H"]) > \
-        #         len([atom for atom in the_other_compound.atoms if atom.atom_symbol != "H"]):
-        #     return None, None
+        if len([atom for atom in self.atoms if atom.atom_symbol != "H"]) > \
+                len([atom for atom in the_other_compound.atoms if atom.atom_symbol != "H"]):
+            return None, None
 
         self.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
         the_other_compound.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)

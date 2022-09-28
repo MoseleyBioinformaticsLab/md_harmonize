@@ -1808,9 +1808,9 @@ class Compound:
         self.update_atom_symbol(one_rs, "H")
         the_other_compound.update_atom_symbol(the_other_rs, "H")
 
-        if len([atom for atom in self.atoms if atom.atom_symbol != "H"]) > \
-                len([atom for atom in the_other_compound.atoms if atom.atom_symbol != "H"]):
-            return None, None
+        # if len([atom for atom in self.atoms if atom.atom_symbol != "H"]) > \
+        #         len([atom for atom in the_other_compound.atoms if atom.atom_symbol != "H"]):
+        #     return None, None
 
         self.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
         the_other_compound.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)

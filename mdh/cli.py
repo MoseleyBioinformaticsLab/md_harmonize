@@ -383,7 +383,7 @@ def cli(args):
         #                         name in compounds}
         # kegg_compound = kegg_compound_parsed["cpd:C04618"]
         # metacyc_compound = metacyc_compound_parsed["CPD-13230"]
-        relationship, mapping = kegg_compound.with_r_pair_relationship(metacyc_compound)
+        relationship, mapping = metacyc_compound.with_r_pair_relationship(kegg_compound)
         print(relationship, mapping)
 
 

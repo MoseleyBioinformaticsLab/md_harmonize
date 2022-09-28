@@ -371,25 +371,42 @@ def cli(args):
         database_name = args['<database_names>']
         working_directory = args['<working_directory>']
         # from_directory = working_directory + "/initialized/"
-        kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C01025.mol"
-        metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-8678.mol"
 
-        # kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C04618.mol"
-        # metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-13230.mol"
+        # r group testing
+        # kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C01025.mol"
+        # metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-8678.mol"
+
+        # kegg_compound = construct_compound_via_molfile(kegg_compound_file)
+        # metacyc_compound = construct_compound_via_molfile(metacyc_compound_file)
+        #
+        # # kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C04618.mol"
+        # # metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-13230.mol"
+
+        # # kegg_compound = kegg_compound_parsed["cpd:C04618"]
+        # # metacyc_compound = metacyc_compound_parsed["CPD-13230"]
+        # relationship, mapping = metacyc_compound.with_r_pair_relationship(kegg_compound)
+        # print(relationship, mapping)
+
+
+        # resonance testing
+        kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C11821.mol"
+        metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/5-HYDROXYISOURATE.mol"
         kegg_compound = construct_compound_via_molfile(kegg_compound_file)
         metacyc_compound = construct_compound_via_molfile(metacyc_compound_file)
-        # compounds = tools.open_jsonpickle(from_directory + "KEGG/compounds.json")
-        # kegg_compound_parsed = { name: compound.Compound(compounds[name][0], compounds[name][1], compounds[name][2]) for
-        #                         name in compounds }
-        # compounds = tools.open_jsonpickle(from_directory + "MetaCyc/compounds.json")
-        # metacyc_compound_parsed = {name: compound.Compound(compounds[name][0], compounds[name][1], compounds[name][2]) for
-        #                         name in compounds}
-        # kegg_compound = kegg_compound_parsed["cpd:C04618"]
-        # metacyc_compound = metacyc_compound_parsed["CPD-13230"]
-        relationship, mapping = metacyc_compound.with_r_pair_relationship(kegg_compound)
-        print(relationship, mapping)
+        resonant_mappings = kegg_compound.map_resonance(metacyc_compound, r_distance=False)
+        if resonant_mappings:
+            relationship, atom_mappings = kegg_compound.optimal_resonant_mapping(metacyc_compound, resonant_mappings)
+            print(atom_mappings)
 
 
+    # kegg_compound = construct_compound_via_molfile(kegg_compound_file)
+    # metacyc_compound = construct_compound_via_molfile(metacyc_compound_file)
+    # # compounds = tools.open_jsonpickle(from_directory + "KEGG/compounds.json")
+    # # kegg_compound_parsed = { name: compound.Compound(compounds[name][0], compounds[name][1], compounds[name][2]) for
+    # #                         name in compounds }
+    # # compounds = tools.open_jsonpickle(from_directory + "MetaCyc/compounds.json")
+    # # metacyc_compound_parsed = {name: compound.Compound(compounds[name][0], compounds[name][1], compounds[name][2]) for
+    # #                         name in compounds}
 
     #     database_names = args['<database_names>'].split(",")
     #     ks = args['<ks>'].split(",")

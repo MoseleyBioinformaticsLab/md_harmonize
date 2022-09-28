@@ -1800,11 +1800,18 @@ class Compound:
         :param the_other_compound: the other :class:`~mdh.compound.Compound` entity.
         :return: the relationship and the atom mappings between the two compounds.
     """
-        # self is the substructure, more generic, contain less chemical details.
+        # self is the substructure, more generic, contain less chemical details. Apart from R groups, self is supposed
+        # to contain less atoms, too.
+
         one_rs = list(self.r_groups)
         the_other_rs = list(the_other_compound.r_groups)
         self.update_atom_symbol(one_rs, "H")
         the_other_compound.update_atom_symbol(the_other_rs, "H")
+
+        if len([atom for atom in self.atoms if atom.atom_symbol != "H"]) > \
+                len([atom for atom in the_other_compound.atoms if atom.atom_symbol != "H"]):
+            return None, None
+
         self.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
         the_other_compound.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
         one_to_one_mappings = self.find_mappings(the_other_compound, resonance=False, r_distance=True)

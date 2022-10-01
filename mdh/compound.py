@@ -813,7 +813,8 @@ class Compound:
     def find_mappings(self, the_other, resonance: bool = True, r_distance: bool = False,
                       backbone: bool = False) -> list:
         """
-        Find the one to one atom mappings between two compounds using BASS algorithm.
+        Find the one to one atom mappings between two compounds using BASS algorithm. The other compound  is supposed be
+        contained in the self compound.
 
         :param the_other: the mappings compound entity.
         :param resonance: whether to ignore the difference between single and double bonds.
@@ -844,7 +845,8 @@ class Compound:
     def find_mappings_reversed(self, the_other, resonance: bool = True, r_distance: bool = False,
                                backbone: bool = False) -> list:
         """
-        Find the one to one atom mappings between two compounds using BASS algorithm.
+        Find the one to one atom mappings between two compounds using BASS algorithm. The self compound is supposed to
+        be contained in the other compound.
 
         :param the_other: the mappings compound entity.
         :param resonance: whether to ignore the difference between single and double bonds.
@@ -856,7 +858,6 @@ class Compound:
         the_other.update_color_tuple(resonance=resonance)
         mappings = []
         mapping_matrix = BASS.make_mapping_matrix(self, the_other, True, True, r_distance)
-        print("mapping matrix, ", mapping_matrix)
         if mapping_matrix is not None:
             mappings = BASS.find_mappings(self.structure_matrix(resonance=resonance, backbone=backbone),
                                           self.distance_matrix,
@@ -887,6 +888,7 @@ class Compound:
         :return: the list of valid atom mappings between the two compound structures.
     """
         one_to_one_mappings = self.find_mappings(the_other, resonance=True, r_distance=r_distance)
+        print("resonant mappings: ", one_to_one_mappings)
         valid_mappings = []
         for cur_mappings in one_to_one_mappings:
             flag = True
@@ -1795,7 +1797,7 @@ class Compound:
         To find the optimal mappings of compound pairs belonging to r_group type. In this case, multiple valid mappings
         can exist. We need to find the optimal one. The standard is the mappings with minimal unmapped chemical details.
         And the unmapped chemical details can exist in both compounds (generic or specific).
-        Also the unmapped chemical details will determine the relationship of the compound pair.
+        The unmapped chemical details will determine the relationship of the compound pair.
         The priority: generic-specific, loose. 
         Here the relationship cannot be equivalent.
 
@@ -1838,22 +1840,21 @@ class Compound:
         :return: the relationship and the atom mappings between the two compounds.
     """
         # self is the substructure, more generic, contain less chemical details. Apart from R groups, self is supposed
-        # to contain less atoms, too.
+        # to contain smaller atoms, too.
 
         one_rs = list(self.r_groups)
         the_other_rs = list(the_other_compound.r_groups)
         self.update_atom_symbol(one_rs, "H")
         the_other_compound.update_atom_symbol(the_other_rs, "H")
 
-        print("this atoms in the compound: ", [atom.default_symbol for atom in self.atoms])
-        # if len([atom for atom in self.atoms if atom.atom_symbol != "H"]) > \
-        #         len([atom for atom in the_other_compound.atoms if atom.atom_symbol != "H"]):
-        #     return None, None
+        if len([atom for atom in self.atoms if atom.atom_symbol != "H"]) > \
+                len([atom for atom in the_other_compound.atoms if atom.atom_symbol != "H"]):
+            return None, None
 
         self.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
         the_other_compound.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
         one_to_one_mappings = self.find_mappings_reversed(the_other_compound, resonance=False, r_distance=True)
-        print("one to one mappings between ", self.compound_name, the_other_compound.compound_name, one_to_one_mappings)
+
         # here we need to consider the r_distance atom color identifier, so we need to color compounds.
         relationship, optimal_mappings = self.optimal_mapping_with_r(the_other_compound, one_rs, one_to_one_mappings)
         if optimal_mappings:
@@ -1865,7 +1866,6 @@ class Compound:
         self.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=True)
         the_other_compound.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=True)
         one_to_one_mappings = self.find_mappings_reversed(the_other_compound, resonance=True, r_distance=True)
-        print("one to one mappings between ",  the_other_compound.compound_name, self.compound_name, one_to_one_mappings)
         relationship, optimal_mappings = self.optimal_mapping_with_r(the_other_compound, one_rs, one_to_one_mappings)
         self.update_atom_symbol(one_rs, "R")
         the_other_compound.update_atom_symbol(the_other_rs, "R")
@@ -1884,9 +1884,7 @@ class Compound:
         :param mappings: the atom mappings of the mapped parts of the two compounds.
         :return: the full atom mappings between the two compounds.
     """
-        print("mapping r correspondents: ", self.compound_name, the_other_compound.compound_name)
-        print("r index:", one_rs)
-        print("atom mappings between the matched parts: ", mappings)
+
         full_mappings = collections.defaultdict(list)
         for idx in one_rs:
             r_atom = self.atoms[idx]

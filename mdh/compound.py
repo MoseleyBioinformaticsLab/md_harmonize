@@ -883,6 +883,9 @@ class Compound:
                 / \\             // \
             (b) C   N (c)    (b) C   N (c)
 
+        In addition, the self compound is supposed to be more generic, which means has smaller atoms. Therefore, atom in
+        self compound can all be mapped to the other compound.
+
         :param the_other: the mappings compound entity.
         :param r_distance: to take account of position of R groups.
         :return: the list of valid atom mappings between the two compound structures.
@@ -901,45 +904,54 @@ class Compound:
                 if 1 in self.atoms[from_index].color_layers and 1 in the_other.atoms[to_index].color_layers and \
                         self.atoms[from_index].color_layers[1] == the_other.atoms[to_index].color_layers[1]:
                     continue
-                
+                print("need to find the three atoms, from index: ", from_index, "to index is: ", to_index)
                 three = {from_index}
                 from_dbond_atom_index = self.find_double_bond_linked_atom(from_index)
                 to_dbond_atom_index = the_other.find_double_bond_linked_atom(to_index)
-                
+
+                print("the connect double bond index for from index is ", from_dbond_atom_index)
+                print("the connect double bond index for to index is ", to_dbond_atom_index)
+
                 # cannot find directly linked double bond.
                 if from_dbond_atom_index == -1 and to_dbond_atom_index == -1:
                     flag = False
                 # Need to conduct second search
                 # atom b in the picture
-                elif from_dbond_atom_index == -1:
+                elif from_dbond_atom_index == -1 and to_dbond_atom_index in reversed_mappings:
+                    print("from atom cannot find the double bond")
                     # here we can find the atom a
                     reversed_from_dbond_atom_index = reversed_mappings[to_dbond_atom_index]
                     three.add(reversed_from_dbond_atom_index)
                     from_next_dbond_atom_index = self.find_double_bond_linked_atom(reversed_from_dbond_atom_index) 
                     # based on atom a, we can find atom c
                     if from_next_dbond_atom_index != -1:
+                        print("find the other from index via the to double bond index", from_next_dbond_atom_index)
                         three.add(from_next_dbond_atom_index)
 
                 # atom c in the picture
-                elif to_dbond_atom_index == -1 and from_dbond_atom_index in cur_mappings:
+                elif to_dbond_atom_index == -1:
+                    print("to atom cannot find the double bond")
                     three.add(from_dbond_atom_index) # here we find atom a
                     reversed_to_dbond_atom_index = cur_mappings[from_dbond_atom_index]
                     # based on atom a find atom b in the other compound.
                     to_next_dbond_atom_index = the_other.find_double_bond_linked_atom(reversed_to_dbond_atom_index)
-                    if to_next_dbond_atom_index != -1:
+                    if to_next_dbond_atom_index != -1 and to_next_dbond_atom_index in reversed_mappings:
                         three.add(reversed_mappings[to_next_dbond_atom_index])
 
                 # atom a in the picture
                 # find the other two atoms directly.
-                elif from_dbond_atom_index != -1 and to_dbond_atom_index != -1:
+                elif from_dbond_atom_index != -1 and to_dbond_atom_index != -1 and to_dbond_atom_index in reversed_mappings:
+                    print("lucky to find two together")
                     three.add(from_dbond_atom_index)
                     three.add(reversed_mappings[to_dbond_atom_index])
 
                 if len(three) < 3:
+                    print("could not find 3 atoms")
                     flag = False
                 else:
                     k = [self.atoms[i].default_symbol for i in three].count("C")
                     if k == 3:
+                        print("all three are carbons")
                         flag = False
 
                 if not flag:

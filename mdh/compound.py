@@ -837,7 +837,7 @@ class Compound:
         for sub in mappings:
             cur_mappings = {}
             for from_index, to_index in enumerate(sub):
-                cur_mappings[the_other.heavy_atoms[from_index].atom_number] = self.heavy_atoms[to_index].atom_number
+                cur_mappings[self.heavy_atoms[to_index].atom_number] = the_other.heavy_atoms[from_index].atom_number
             one_to_one_mappings.append(cur_mappings)
         return one_to_one_mappings
 
@@ -869,7 +869,7 @@ class Compound:
         for sub in mappings:
             cur_mappings = {}
             for from_index, to_index in enumerate(sub):
-                cur_mappings[self.heavy_atoms[from_index].atom_number] = the_other.heavy_atoms[to_index].atom_number
+                cur_mappings[the_other.heavy_atoms[to_index].atom_number] = self.heavy_atoms[from_index].atom_number
             one_to_one_mappings.append(cur_mappings)
         return one_to_one_mappings
 

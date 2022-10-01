@@ -1617,16 +1617,22 @@ class Compound:
         # default one compound should have a cycle.
         self.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
         the_other_compound.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
+        print("if has cycle: ", self.has_cycle)
 
         optimal_mappings = {1: None, -1: None, 2: None, 0: None}
         min_count = {1: float("inf"), -1: float("inf"), 2: float("inf"), 0: float("inf")}
         critical_atom_list = self.find_critical_atom_in_cycle()
+        print("critical atoms in in the cycle: ", critical_atom_list)
         the_other_color = the_other_compound.backbone_color_identifier(r_groups=True) + \
                           the_other_compound.metal_color_identifier(details=False)
         for critical_atoms in critical_atom_list:
+            print("current critical atoms ", critical_atoms)
             self.break_cycle(critical_atoms)
+            self.find_cycles()
+            print("to check if break the cycle successfully", self.has_cycle)
             this_color = self.backbone_color_identifier(r_groups=True) + self.metal_color_identifier(details=False)
             if this_color == the_other_color:
+                print("find the same color")
                 atom_mappings = self.generate_atom_mapping_by_atom_color(the_other_compound)
                 excluded_atoms_the_other = list(set(itertools.chain([atom_mappings[i] for i in critical_atoms])))
                 one_chemical_details = self.get_chemical_details(critical_atoms)
@@ -1636,6 +1642,8 @@ class Compound:
                     min_count[relationship] = mis_count
                     optimal_mappings[relationship] = atom_mappings
             self.restore_cycle(critical_atoms)
+            self.find_cycles()
+            print("to check if bond the cycle successfully", self.has_cycle)
         if min(min_count.values()) < float("inf"):
             relationship = self.determine_relationship(min_count)
             return relationship, optimal_mappings[relationship]

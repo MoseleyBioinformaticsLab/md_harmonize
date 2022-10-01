@@ -869,7 +869,7 @@ class Compound:
         for sub in mappings:
             cur_mappings = {}
             for from_index, to_index in enumerate(sub):
-                cur_mappings[the_other.heavy_atoms[to_index].atom_number] = self.heavy_atoms[from_index].atom_number
+                cur_mappings[self.heavy_atoms[from_index].atom_number] = the_other.heavy_atoms[to_index].atom_number
             one_to_one_mappings.append(cur_mappings)
         return one_to_one_mappings
 
@@ -1729,14 +1729,14 @@ class Compound:
             for neighbor_index in r_atom.neighbors:
                 bond = self.bond_lookup[(idx, neighbor_index)]
                 # find the R group bonded atom.
-                one_r_linkages["{0}-{1}".format(reverse_index[neighbor_index], bond.bond_type)] += 1
+                one_r_linkages["{0}-{1}".format(mapping[neighbor_index], bond.bond_type)] += 1
 
         the_other_r_linkages = collections.Counter()
         for idx, atom in enumerate(the_other_compound.atoms):
-            if idx in mapping.keys():
+            if idx in mapping.values():
                 for neighbor_index in atom.neighbors:
                     if the_other_compound.atoms[neighbor_index].default_symbol != "H" and \
-                            neighbor_index not in mapping.keys():
+                            neighbor_index not in mapping.values():
                         bond = the_other_compound.bond_lookup[(idx, neighbor_index)]
                         the_other_r_linkages["{0}-{1}".format(idx, bond.bond_type)] += 1
         print("r linkages in self: ", one_r_linkages)

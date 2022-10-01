@@ -1721,8 +1721,10 @@ class Compound:
         # self is the more generic one, which suggests it should have more linkages.
         # self is the subset.
         reverse_index = { mapping[key]: key for key in mapping }
+        print("reverse_index: ", reverse_index)
         one_r_linkages = collections.Counter()
         for idx in one_rs:
+            print("index in self: ", idx)
             r_atom = self.atoms[idx]
             for neighbor_index in r_atom.neighbors:
                 bond = self.bond_lookup[(idx, neighbor_index)]
@@ -1731,7 +1733,7 @@ class Compound:
 
         the_other_r_linkages = collections.Counter()
         for idx, atom in enumerate(the_other_compound.atoms):
-            if idx in mapping.values():
+            if idx in mapping.keys():
                 for neighbor_index in atom.neighbors:
                     if the_other_compound.atoms[neighbor_index].default_symbol != "H" and \
                             neighbor_index not in mapping.values():

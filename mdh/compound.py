@@ -1589,7 +1589,7 @@ class Compound:
         if unmapped_count[-1] < unmapped_count[1]:
             return -1
         elif unmapped_count[-1] > unmapped_count[1]:
-            return -1
+            return 1
         elif unmapped_count[-1] == unmapped_count[1] and unmapped_count[-1] != float("inf"):
             return 1
         return 2

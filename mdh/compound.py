@@ -1736,7 +1736,7 @@ class Compound:
             if idx in mapping.keys():
                 for neighbor_index in atom.neighbors:
                     if the_other_compound.atoms[neighbor_index].default_symbol != "H" and \
-                            neighbor_index not in mapping.values():
+                            neighbor_index not in mapping.keys():
                         bond = the_other_compound.bond_lookup[(idx, neighbor_index)]
                         the_other_r_linkages["{0}-{1}".format(idx, bond.bond_type)] += 1
         print("r linkages in self: ", one_r_linkages)

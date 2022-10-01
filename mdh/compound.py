@@ -1507,9 +1507,9 @@ class Compound:
             return 2, len(one_more) + len(the_other_more)
         elif one_more:
             # one_compound is more specific than the_other_compound
-            return 1, len(one_more)
+            return -1, len(one_more)
         elif the_other_more:
-            return -1, len(the_other_more) # the_other_compound is more specific than one_compound
+            return 1, len(the_other_more) # the_other_compound is more specific than one_compound
 
     def same_structure_relationship(self, the_other_compound) -> (int, dict):
         """
@@ -1555,11 +1555,11 @@ class Compound:
                 optimal_index[0] = i
                 min_count[0] = 0
             if not one_stereo_counts:
-                if one_stereo_counts < min_count[1]:
-                    optimal_index[1] = i
+                if the_other_stereo_counts < min_count[1]:
+                    optimal_index[-1] = i
                     min_count[1] = one_stereo_counts
             elif not the_other_stereo_counts:
-                if the_other_stereo_counts < min_count[-1]:
+                if one_stereo_counts < min_count[-1]:
                     optimal_index[-1] = i
                     min_count[-1] = the_other_stereo_counts
             else:
@@ -1579,6 +1579,9 @@ class Compound:
         """
         To determine the relationship between two compounds when there are multiple possible atom mappings.
         We try to map as many details as possible. In other words, try to minimize the unmapped details.
+
+        0: equivalent; 1: self is more generic than the other compound; -1: the other compound is more generic than self;
+        2: either has chemical detail(s) that the other compound does not have.
 
         :param unmapped_count: the dictionary of relationship to the count of unmapped details.
         :return: the relationship between the two compounds.
@@ -1807,9 +1810,9 @@ class Compound:
             if self.validate_mapping_with_r(the_other_compound, one_rs, mm):
                 one_stereo_counts, the_other_stereo_counts = self.compare_chemical_details_with_mapping(
                     the_other_compound, mm)
-                if one_stereo_counts == 0 and the_other_stereo_counts < min_count[-1]:
-                    min_count[-1] = the_other_stereo_counts
-                    optimal_index[-1] = i
+                if one_stereo_counts == 0 and the_other_stereo_counts < min_count[1]:
+                    min_count[1] = the_other_stereo_counts
+                    optimal_index[1] = i
                 elif one_stereo_counts != 0 and one_stereo_counts + the_other_stereo_counts < min_count[2]:
                     min_count[2] = one_stereo_counts + the_other_stereo_counts
                     optimal_index[2] = i

@@ -890,6 +890,9 @@ class Compound:
         :param r_distance: to take account of position of R groups.
         :return: the list of valid atom mappings between the two compound structures.
     """
+        self.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
+        the_other.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
+        
         one_to_one_mappings = self.find_mappings(the_other, resonance=True, r_distance=r_distance)
         print("resonant mappings: ", one_to_one_mappings)
         valid_mappings = []
@@ -1874,15 +1877,6 @@ class Compound:
             the_other_compound.update_atom_symbol(the_other_rs, "R")
             return relationship, self.map_r_correspondents(one_rs, the_other_compound, optimal_mappings)
 
-        # resonant match.
-        self.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=True)
-        the_other_compound.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=True)
-        one_to_one_mappings = self.find_mappings_reversed(the_other_compound, resonance=True, r_distance=True)
-        relationship, optimal_mappings = self.optimal_mapping_with_r(the_other_compound, one_rs, one_to_one_mappings)
-        self.update_atom_symbol(one_rs, "R")
-        the_other_compound.update_atom_symbol(the_other_rs, "R")
-        if optimal_mappings:
-            return relationship, self.map_r_correspondents(one_rs, the_other_compound, optimal_mappings)
         return None, None
 
     def map_r_correspondents(self, one_rs: list, the_other_compound, mappings: dict) -> dict:

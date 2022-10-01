@@ -92,7 +92,7 @@ class Atom:
         :param symbol: the updated atom symbol.
         :return: the updated atom_symbol.
     """
-        self.atom_symbol = symbol
+        self.atom_symbol = self.default_symbol = symbol
         return self.atom_symbol
 
     def update_atom_number(self, index: int) -> int:

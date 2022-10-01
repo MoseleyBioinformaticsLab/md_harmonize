@@ -373,38 +373,38 @@ def cli(args):
         # from_directory = working_directory + "/initialized/"
 
         # r group testing
-        # kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C01025.mol"
-        # metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-8678.mol"
+        kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C01025.mol"
+        metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-8678.mol"
 
-        # kegg_compound = construct_compound_via_molfile(kegg_compound_file)
-        # metacyc_compound = construct_compound_via_molfile(metacyc_compound_file)
+        kegg_compound = construct_compound_via_molfile(kegg_compound_file)
+        metacyc_compound = construct_compound_via_molfile(metacyc_compound_file)
         #
         # # kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C04618.mol"
         # # metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-13230.mol"
 
-        # # kegg_compound = kegg_compound_parsed["cpd:C04618"]
-        # # metacyc_compound = metacyc_compound_parsed["CPD-13230"]
-        # relationship, mapping = metacyc_compound.with_r_pair_relationship(kegg_compound)
-        # print(relationship, mapping)
+        # kegg_compound = kegg_compound_parsed["cpd:C04618"]
+        # metacyc_compound = metacyc_compound_parsed["CPD-13230"]
+        relationship, mapping = metacyc_compound.with_r_pair_relationship(kegg_compound)
+        print(relationship, mapping)
 
 
         # resonance testing
-        kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C11821.mol"
-        metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/5-HYDROXYISOURATE.mol"
-        kegg_compound = construct_compound_via_molfile(kegg_compound_file)
-        metacyc_compound = construct_compound_via_molfile(metacyc_compound_file)
-        resonant_mappings = kegg_compound.map_resonance(metacyc_compound, r_distance=False)
-        if resonant_mappings:
-            relationship, atom_mappings = kegg_compound.optimal_resonant_mapping(metacyc_compound, resonant_mappings)
-            print(atom_mappings)
+        # kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C11821.mol"
+        # metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/5-HYDROXYISOURATE.mol"
+        # kegg_compound = construct_compound_via_molfile(kegg_compound_file)
+        # metacyc_compound = construct_compound_via_molfile(metacyc_compound_file)
+        # resonant_mappings = kegg_compound.map_resonance(metacyc_compound, r_distance=False)
+        # if resonant_mappings:
+        #     relationship, atom_mappings = kegg_compound.optimal_resonant_mapping(metacyc_compound, resonant_mappings)
+        #     print(atom_mappings)
 
         # linear circular testing
-        kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C05345.mol"
-        metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-15709.mol"
-        kegg_compound = construct_compound_via_molfile(kegg_compound_file)
-        metacyc_compound = construct_compound_via_molfile(metacyc_compound_file)
-        relationship, atom_mappings = kegg_compound.circular_pair_relationship(metacyc_compound)
-        print(relationship, atom_mappings)
+        # kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C05345.mol"
+        # metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-15709.mol"
+        # kegg_compound = construct_compound_via_molfile(kegg_compound_file)
+        # metacyc_compound = construct_compound_via_molfile(metacyc_compound_file)
+        # relationship, atom_mappings = kegg_compound.circular_pair_relationship(metacyc_compound)
+        # print(relationship, atom_mappings)
 
 
 

@@ -1838,6 +1838,7 @@ class Compound:
         one_rs = list(self.r_groups)
         the_other_rs = list(the_other_compound.r_groups)
         self.update_atom_symbol(one_rs, "H")
+        print("atoms in this compoound: ", [atom.atom_symbol for atom in self.atoms])
         the_other_compound.update_atom_symbol(the_other_rs, "H")
 
         # if len([atom for atom in self.atoms if atom.atom_symbol != "H"]) > \

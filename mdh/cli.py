@@ -373,14 +373,16 @@ def cli(args):
         # from_directory = working_directory + "/initialized/"
 
         # r group testing
-        kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C01025.mol"
-        metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-8678.mol"
+        # kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C01025.mol"
+        # metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-8678.mol"
+
+
+        #
+        kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C04618.mol"
+        metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-13230.mol"
 
         kegg_compound = construct_compound_via_molfile(kegg_compound_file)
         metacyc_compound = construct_compound_via_molfile(metacyc_compound_file)
-        #
-        # # kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C04618.mol"
-        # # metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-13230.mol"
 
         # kegg_compound = kegg_compound_parsed["cpd:C04618"]
         # metacyc_compound = metacyc_compound_parsed["CPD-13230"]

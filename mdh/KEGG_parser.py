@@ -377,7 +377,6 @@ class RpairParser:
                     removed_bonds = removed_bonds_update
         return removed_bonds
 
-    @timeout_decorator.timeout(20)
     def generate_atom_mappings(self) -> list:
         """
         To generate the one to one atom mappings of the compound pair.
@@ -707,7 +706,7 @@ def create_reactions(reaction_directory: str, compounds: dict, atom_mappings: di
     return reactions
 
 
-
+@timeout_decorator.timeout(20)
 def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compound: compound.Compound,
                            the_other_compound: compound.Compound) -> tuple:
     """
@@ -761,6 +760,8 @@ def create_atom_mappings(rclass_directory: str, compounds: dict) -> dict:
                     compound_pairs.append((compounds[one_compound_name], compounds[the_other_compound_name]))
 
         with multiprocessing.Pool() as pool:
+            print("start with multiprocessing")
+            print(compound_pairs)
             results = pool.starmap(compound_pair_mappings, ((rclass_name, rclass_definitions, one_compound,
                                                              the_other_compound) for one_compound, the_other_compound in
                                                             compound_pairs))

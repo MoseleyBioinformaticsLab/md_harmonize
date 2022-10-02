@@ -1538,10 +1538,10 @@ class Compound:
         :return: the atom mappings between the two compounds.
     """
         one_to_one_mappings = collections.defaultdict(list)
-        for idx, atom in enumerate(self.atoms):
+        for atom in self.heavy_atoms:
             for the_other_idx, the_other_atom in enumerate(the_other_compound.atoms):
                 if atom.color == the_other_atom.color:
-                    one_to_one_mappings[idx].append(the_other_idx)
+                    one_to_one_mappings[atom.atom_number].append(the_other_idx)
         return one_to_one_mappings
 
     def optimal_resonant_mapping(self, the_other_compound, mappings: list) -> (int, dict):

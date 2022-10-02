@@ -758,13 +758,16 @@ def create_atom_mappings(rclass_directory: str, compounds: dict) -> dict:
                 if one_compound_name in compounds and the_other_compound_name in compounds:
                     print("add compound: ", one_compound_name, the_other_compound_name)
                     compound_pairs.append((compounds[one_compound_name], compounds[the_other_compound_name]))
+        if len(compound_pairs) > 1:
+            with multiprocessing.Pool() as pool:
+                print("start with multiprocessing")
+                print(compound_pairs)
+                results = pool.starmap(compound_pair_mappings, ((rclass_name, rclass_definitions, one_compound,
+                                                                 the_other_compound) for one_compound, the_other_compound in
+                                                                compound_pairs))
+        else:
+            results = [compound_pair_mappings(rclass_name, rclass_definitions, compound_pairs[0][0], compound_pairs[0][1])]
 
-        with multiprocessing.Pool() as pool:
-            print("start with multiprocessing")
-            print(compound_pairs)
-            results = pool.starmap(compound_pair_mappings, ((rclass_name, rclass_definitions, one_compound,
-                                                             the_other_compound) for one_compound, the_other_compound in
-                                                            compound_pairs))
         for name, mapping in results:
             atom_mappings[rclass_name + "_" + name] = mapping
             if not mapping:

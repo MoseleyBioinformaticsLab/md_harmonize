@@ -1633,7 +1633,7 @@ class Compound:
             this_color = self.backbone_color_identifier(r_groups=True) + self.metal_color_identifier(details=False)
             if this_color == the_other_color:
                 print("find the same color")
-                atom_mappings = self.find_mappings(the_other_compound)
+                atom_mappings = self.generate_atom_mapping_by_atom_color(the_other_compound)
                 print(atom_mappings)
                 print([atom_mappings[i] for i in critical_atoms])
                 excluded_atoms_the_other = list(set(itertools.chain.from_iterable([atom_mappings[i] for i in critical_atoms])))

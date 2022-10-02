@@ -377,6 +377,7 @@ class RpairParser:
                     removed_bonds = removed_bonds_update
         return removed_bonds
 
+    @timeout_decorator.timeout(20)
     def generate_atom_mappings(self) -> list:
         """
         To generate the one to one atom mappings of the compound pair.
@@ -706,7 +707,7 @@ def create_reactions(reaction_directory: str, compounds: dict, atom_mappings: di
     return reactions
 
 
-@timeout_decorator.timeout(20)
+
 def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compound: compound.Compound,
                            the_other_compound: compound.Compound) -> tuple:
     """
@@ -719,6 +720,7 @@ def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compo
     :return: the compound pair name and its atom mappings.
     """
     atom_mappings = []
+    print("parsing compound paris, ", rclass_name, one_compound.compound_name, the_other_compound.compound_name)
     try:
         one_mappings = RpairParser(rclass_name, rclass_definitions, one_compound, the_other_compound).\
             generate_atom_mappings()
@@ -729,6 +731,7 @@ def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compo
         print(rclass_name + "_" + one_compound.name + "_" + the_other_compound.name +
               "can hardly be parsed.")
         pass
+    print("parsing compound paris has been finished", rclass_name, one_compound.compound_name, the_other_compound.compound_name)
     return one_compound.name + "_" + the_other_compound.name, atom_mappings
 
 
@@ -754,6 +757,7 @@ def create_atom_mappings(rclass_directory: str, compounds: dict) -> dict:
             for token in tokens:
                 one_compound_name, the_other_compound_name = token.split("_")
                 if one_compound_name in compounds and the_other_compound_name in compounds:
+                    print("add compound: ", one_compound_name, the_other_compound_name)
                     compound_pairs.append((compounds[one_compound_name], compounds[the_other_compound_name]))
 
         with multiprocessing.Pool() as pool:

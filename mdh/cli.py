@@ -99,9 +99,12 @@ def atom_order_check(compound_dict1: dict, compound_dict2:dict) -> None:
             continue
         compound2 = compound_dict2[compound_name] if compound_name in compound_dict2 else \
             compound_dict2["cpd:"+compound_name]
-        k = min(len(compound1.atoms), len(compound2.atoms))
-        for i in range(k):
-            if compound1.atoms[i].x != compound2.atoms[i].x or compound1.atoms[i].y != compound2.atoms[i].y:
+        atoms1, atoms2 = compound1.heavy_atoms, compound2.heavy_atoms
+        if len(atoms1) != len(atoms2):
+            count += 1
+            continue
+        for atom1, atom2 in zip(atoms1, atoms2):
+            if atom1.x != atom2.x or atom1.y != atom2.y:
                 count += 1
                 print("{0} file has changed!".format(compound_name))
                 break
@@ -258,8 +261,8 @@ def cli(args):
                 atom_order_check(kcf_compounds, original_compounds)
                 print("comparison of standard and original")
                 atom_order_check(original_compounds, compound_dict)
-                #atom_mappings = parser.create_atom_mappings(rclass_directory, kcf_compounds)
-                atom_mappings = tools.open_jsonpickle(working_directory + "/kegg_atom_mappings_test.json")
+                atom_mappings = parser.create_atom_mappings(rclass_directory, kcf_compounds)
+                # atom_mappings = tools.open_jsonpickle(working_directory + "/kegg_atom_mappings_test.json")
                 #tools.save_to_jsonpickle(atom_mappings, working_directory + "/kegg_atom_mappings.json")
                 atom_mappings = KEGG_atom_mapping_correction(KEGG_atom_index_mapping(kcf_compounds, compound_dict),
                                                              atom_mappings)

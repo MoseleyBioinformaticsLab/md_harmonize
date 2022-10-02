@@ -700,7 +700,6 @@ def create_reactions(reaction_directory: str, compounds: dict, atom_mappings: di
                     this_atom_mappings.extend(atom_mappings[key_1])
                 elif key_2 in atom_mappings:
                     this_atom_mappings.extend(atom_mappings[key_2])
-        print(reaction_name, this_atom_mappings)
         reactions.append(reaction.Reaction(reaction_name, one_side_compounds, the_other_side_compounds, ecs,
                                            this_atom_mappings, one_side_coefficients))
     return reactions
@@ -719,7 +718,6 @@ def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compo
     :return: the compound pair name and its atom mappings.
     """
     atom_mappings = []
-    print("parsing compound paris, ", rclass_name, one_compound.compound_name, the_other_compound.compound_name)
     try:
         one_mappings = RpairParser(rclass_name, rclass_definitions, one_compound, the_other_compound).\
             generate_atom_mappings()
@@ -730,7 +728,6 @@ def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compo
         print(rclass_name + "_" + one_compound.name + "_" + the_other_compound.name +
               "can hardly be parsed.")
         pass
-    print("parsing compound paris has been finished", rclass_name, one_compound.compound_name, the_other_compound.compound_name)
     return one_compound.name + "_" + the_other_compound.name, atom_mappings
 
 
@@ -742,11 +739,9 @@ def create_atom_mappings(rclass_directory: str, compounds: dict) -> dict:
     :param compounds: a dictionary of :class:`~mdh.compound.Compound` entities.
     :return: the atom mappings of compound pairs.
     """
-    print("start atom mappings of kegg")
     rclass_files = glob.glob(rclass_directory + "*")
     atom_mappings = collections.defaultdict(dict)
     for rclass_file in rclass_files:
-        print("current parse this rclass ", rclass_file)
         this_rclass = kegg_data_parser(tools.open_text(rclass_file).split("\n"))
         rclass_definitions = this_rclass["DEFINITION"]
         rclass_name = this_rclass["ENTRY"][0].split()[0]
@@ -756,12 +751,9 @@ def create_atom_mappings(rclass_directory: str, compounds: dict) -> dict:
             for token in tokens:
                 one_compound_name, the_other_compound_name = token.split("_")
                 if one_compound_name in compounds and the_other_compound_name in compounds:
-                    print("add compound: ", one_compound_name, the_other_compound_name)
                     compound_pairs.append((compounds[one_compound_name], compounds[the_other_compound_name]))
         if len(compound_pairs) > 1:
             with multiprocessing.Pool() as pool:
-                print("start with multiprocessing")
-                print(compound_pairs)
                 results = pool.starmap(compound_pair_mappings, ((rclass_name, rclass_definitions, one_compound,
                                                                  the_other_compound) for one_compound, the_other_compound in
                                                                 compound_pairs))

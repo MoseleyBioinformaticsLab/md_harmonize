@@ -486,6 +486,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
                 if self.compound_harmonization_manager.has_visited(one_cpd.compound_name, the_other_cpd.compound_name):
                     continue
                 valid = False
+                print("current compare these two compounds: ", one_cpd.compound_name, the_other_cpd.compound_name)
                 if one_cpd.formula == the_other_cpd.formula:
                     # resonance or linear-circular type
                     resonant_mappings = one_cpd.map_resonance(the_other_cpd, r_distance=False)

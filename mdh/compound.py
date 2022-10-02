@@ -1636,7 +1636,7 @@ class Compound:
                 atom_mappings = self.generate_atom_mapping_by_atom_color(the_other_compound)
                 print(atom_mappings)
                 print([atom_mappings[i] for i in critical_atoms])
-                excluded_atoms_the_other = list(set(itertools.chain([atom_mappings[i] for i in critical_atoms])))
+                excluded_atoms_the_other = list(set(itertools.chain.from_iterable([atom_mappings[i] for i in critical_atoms])))
                 one_chemical_details = self.get_chemical_details(critical_atoms)
                 the_other_chemical_details = the_other_compound.get_chemical_details(excluded_atoms_the_other)
                 relationship, mis_count = self.compare_chemical_details(one_chemical_details, the_other_chemical_details)

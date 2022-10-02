@@ -1778,7 +1778,8 @@ class Compound:
         for one_atom_index in mapping:
             one_atom = self.atoms[one_atom_index]
             the_other_atom = the_other_compound.atoms[mapping[one_atom_index]]
-            if one_atom.color_layers[1] == the_other_atom.color_layers[1]:
+            if 1 in one_atom.color_layers and 1 in the_other_atom.color_layers and \
+                    one_atom.color_layers[1] == the_other_atom.color_layers[1]:
                 one_consistent_atoms.add(one_atom.atom_number)
                 the_other_consistent_atoms.add(the_other_atom.atom_number)
                 if one_atom.atom_stereo_parity == the_other_atom.atom_stereo_parity:

@@ -745,6 +745,8 @@ def create_atom_mappings(rclass_directory: str, compounds: dict) -> dict:
         this_rclass = kegg_data_parser(tools.open_text(rclass_file).split("\n"))
         rclass_definitions = this_rclass["DEFINITION"]
         rclass_name = this_rclass["ENTRY"][0].split()[0]
+
+        print("currently work on rclass: ", rclass_name)
         compound_pairs = []
         for line in this_rclass["RPAIR"]:
             tokens = line.split()

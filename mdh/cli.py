@@ -34,6 +34,8 @@ from . import compound
 from . import openbabel_utils
 from . import harmonization
 from typing import *
+import faulthandler
+faulthandler.enable()
 
 
 scraper_dict = {"KEGG": KEGG_database_scraper}

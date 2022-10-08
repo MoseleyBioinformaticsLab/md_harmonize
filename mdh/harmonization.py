@@ -489,7 +489,11 @@ class ReactionHarmonizationManager(HarmonizationManager):
                 print("current compare these two compounds: ", one_cpd.compound_name, the_other_cpd.compound_name)
                 if one_cpd.formula == the_other_cpd.formula:
                     # resonance or linear-circular type
-                    resonant_mappings = one_cpd.map_resonance(the_other_cpd, r_distance=False)
+                    try:
+                        resonant_mappings = one_cpd.map_resonance(the_other_cpd, r_distance=False)
+                    except:
+                        self.compound_harmonization_manager.add_invalid(one_cpd.compound_name, the_other_cpd.compound_name)
+                        continue
                     if resonant_mappings:
                         # here both atom_mappings and relationship should be returned.
                         print("find harmonized compound relationship with resonance relationship: ", the_other_cpd.compound_name, one_cpd.compound_name)
@@ -500,14 +504,23 @@ class ReactionHarmonizationManager(HarmonizationManager):
                         # check if they are resonant
                     else:
                         # check if they have circular and linear interchangeable formats.
-                        relationship, atom_mappings = one_cpd.circular_pair_relationship(the_other_cpd)
+                        try:
+                            relationship, atom_mappings = one_cpd.circular_pair_relationship(the_other_cpd)
+                        except:
+                            self.compound_harmonization_manager.add_invalid(one_cpd.compound_name,the_other_cpd.compound_name)
+                            continue
                         if atom_mappings:
                             print("find harmonized compound relationship with circular relationship: ", the_other_cpd.compound_name, one_cpd.compound_name)
                             harmonized_compound_edge = HarmonizedCompoundEdge(one_cpd, the_other_cpd, relationship,
                                                                               "circular", atom_mappings)
                             self.compound_harmonization_manager.add_edge(harmonized_compound_edge)
                         else:
-                            relationship, atom_mappings = the_other_cpd.circular_pair_relationship(one_cpd)
+                            try:
+                                relationship, atom_mappings = the_other_cpd.circular_pair_relationship(one_cpd)
+                            except:
+                                self.compound_harmonization_manager.add_invalid(one_cpd.compound_name,
+                                                                                the_other_cpd.compound_name)
+                                continue
                             if atom_mappings:
                                 print("find harmonized compound relationship with circular relationship: ", the_other_cpd.compound_name, one_cpd.compound_name)
                                 harmonized_compound_edge = HarmonizedCompoundEdge(the_other_cpd, one_cpd, relationship,
@@ -517,7 +530,13 @@ class ReactionHarmonizationManager(HarmonizationManager):
 
                 if one_cpd.contains_r_groups():
                     # check if one cpd is more generic
-                    relationship, atom_mappings = one_cpd.with_r_pair_relationship(the_other_cpd)
+                    try:
+                        relationship, atom_mappings = one_cpd.with_r_pair_relationship(the_other_cpd)
+                    except:
+                        self.compound_harmonization_manager.add_invalid(one_cpd.compound_name,
+                                                                        the_other_cpd.compound_name)
+                        continue
+
                     if atom_mappings:
                         print("find harmonized compound relationship with r group: ", the_other_cpd.compound_name, one_cpd.compound_name)
                         harmonized_compound_edge = HarmonizedCompoundEdge(the_other_cpd, one_cpd, relationship,
@@ -527,14 +546,18 @@ class ReactionHarmonizationManager(HarmonizationManager):
 
                 if the_other_cpd.contains_r_groups():
                     # check if the other cpd is more generic.
-                    relationship, atom_mappings = the_other_cpd.circular_pair_relationship(one_cpd)
+                    try:
+                        relationship, atom_mappings = the_other_cpd.circular_pair_relationship(one_cpd)
+                    except:
+                        self.compound_harmonization_manager.add_invalid(one_cpd.compound_name,
+                                                                        the_other_cpd.compound_name)
+                        continue
                     if atom_mappings:
                         print("find harmonized compound relationship with r group: ", the_other_cpd.compound_name, one_cpd.compound_name)
                         harmonized_compound_edge = HarmonizedCompoundEdge(the_other_cpd, one_cpd, relationship,
                                                                           "r_group", atom_mappings)
                         self.compound_harmonization_manager.add_edge(harmonized_compound_edge)
                         valid = True
-
                 if not valid:
                     self.compound_harmonization_manager.add_invalid(one_cpd.compound_name, the_other_cpd.compound_name)
 

@@ -748,20 +748,23 @@ def create_atom_mappings(rclass_directory: str, compounds: dict) -> dict:
         rclass_name = this_rclass["ENTRY"][0].split()[0]
 
         print("currently work on rclass: ", rclass_name)
-        compound_pairs = []
+        # compound_pairs = []
+        results = []
         for line in this_rclass["RPAIR"]:
             tokens = line.split()
             for token in tokens:
                 one_compound_name, the_other_compound_name = token.split("_")
                 if one_compound_name in compounds and the_other_compound_name in compounds:
-                    compound_pairs.append((compounds[one_compound_name], compounds[the_other_compound_name]))
-        if len(compound_pairs) > 1:
-            with multiprocessing.Pool() as pool:
-                results = pool.starmap(compound_pair_mappings, ((rclass_name, rclass_definitions, one_compound,
-                                                                 the_other_compound) for one_compound, the_other_compound in
-                                                                compound_pairs))
-        else:
-            results = [compound_pair_mappings(rclass_name, rclass_definitions, compound_pairs[0][0], compound_pairs[0][1])]
+                    results.append(compound_pair_mappings(rclass_name, rclass_definitions, compounds[one_compound_name], compounds[the_other_compound_name]))
+
+                    # compound_pairs.append((compounds[one_compound_name], compounds[the_other_compound_name]))
+        # if len(compound_pairs) > 1:
+        #     with multiprocessing.Pool() as pool:
+        #         results = pool.starmap(compound_pair_mappings, ((rclass_name, rclass_definitions, one_compound,
+        #                                                          the_other_compound) for one_compound, the_other_compound in
+        #                                                         compound_pairs))
+        # else:
+        #     results = [compound_pair_mappings(rclass_name, rclass_definitions, compound_pairs[0][0], compound_pairs[0][1])]
 
         for name, mapping in results:
             atom_mappings[rclass_name + "_" + name] = mapping

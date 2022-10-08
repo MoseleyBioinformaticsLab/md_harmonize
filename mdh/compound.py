@@ -1889,7 +1889,7 @@ class Compound:
         for idx in one_rs:
             r_atom = self.atoms[idx]
             # it starts from R
-            visited = set(mappings[neighbor_index] for neighbor_index in r_atom.neighbors)
+            visited = set(mappings[neighbor_index] for neighbor_index in r_atom.neighbors if neighbor_index in mappings)
             r_correspondents = [neighbor_index for index in visited for neighbor_index in
                                 the_other_compound.atoms[index].neighbors if neighbor_index not in mappings.values()]
             visited |= set(r_correspondents)

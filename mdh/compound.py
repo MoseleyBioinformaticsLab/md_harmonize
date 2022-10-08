@@ -1886,16 +1886,22 @@ class Compound:
     """
 
         full_mappings = collections.defaultdict(list)
-        for idx in one_rs:
-            r_atom = self.atoms[idx]
-            # it starts from R
-            visited = set(mappings[neighbor_index] for neighbor_index in r_atom.neighbors if neighbor_index in mappings)
-            r_correspondents = [neighbor_index for index in visited for neighbor_index in
-                                the_other_compound.atoms[index].neighbors if neighbor_index not in mappings.values()]
-            visited |= set(r_correspondents)
-            while r_correspondents:
-                full_mappings[idx].extend(r_correspondents)
-                r_correspondents = the_other_compound.get_next_layer_neighbors(r_correspondents, visited)
-        for idx in mappings:
-            full_mappings[idx].append(mappings[idx])
+
+        if not mappings:
+            r_index = one_rs[0]
+            for atom in the_other_compound.heavy_atoms:
+                full_mappings[r_index].append(atom.atom_number)
+        else:
+            for idx in one_rs:
+                r_atom = self.atoms[idx]
+                # it starts from R
+                visited = set(mappings[neighbor_index] for neighbor_index in r_atom.neighbors)
+                r_correspondents = [neighbor_index for index in visited for neighbor_index in
+                                    the_other_compound.atoms[index].neighbors if neighbor_index not in mappings.values()]
+                visited |= set(r_correspondents)
+                while r_correspondents:
+                    full_mappings[idx].extend(r_correspondents)
+                    r_correspondents = the_other_compound.get_next_layer_neighbors(r_correspondents, visited)
+            for idx in mappings:
+                full_mappings[idx].append(mappings[idx])
         return full_mappings

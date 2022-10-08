@@ -388,6 +388,7 @@ def cli(args):
         #
         kegg_compound = construct_compound_via_molfile(kegg_compound_file)
         metacyc_compound = construct_compound_via_molfile(metacyc_compound_file)
+        print(kegg_compound.compound_name, metacyc_compound.compound_name)
         #
         # # kegg_compound = kegg_compound_parsed["cpd:C04618"]
         # # metacyc_compound = metacyc_compound_parsed["CPD-13230"]

@@ -1865,7 +1865,7 @@ class Compound:
             # here we need to consider the r_distance atom color identifier, so we need to color compounds.
             relationship, optimal_mappings = self.optimal_mapping_with_r(the_other_compound, one_rs, one_to_one_mappings)
         else:
-            relationship, optimal_mappings = 1, collections.defaultdict(list)
+            relationship, optimal_mappings = 1, collections.defaultdict()
         if relationship:
             self.update_atom_symbol(one_rs, "R")
             the_other_compound.update_atom_symbol(the_other_rs, "R")

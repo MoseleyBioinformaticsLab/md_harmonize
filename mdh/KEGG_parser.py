@@ -719,6 +719,7 @@ def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compo
     :return: the compound pair name and its atom mappings.
     """
     atom_mappings = []
+    print("parse this pair", one_compound.compound_name, the_other_compound.compound_name)
     try:
         one_mappings = RpairParser(rclass_name, rclass_definitions, one_compound, the_other_compound).\
             generate_atom_mappings()

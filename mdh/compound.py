@@ -874,6 +874,7 @@ class Compound:
             one_to_one_mappings.append(cur_mappings)
         return one_to_one_mappings
 
+    @tools.timeout(50)
     def map_resonance(self, the_other, r_distance: bool = False) -> list:
         """
         Check if the resonant mappings are valid between the two compound structures. If the mapped atoms don't share
@@ -1603,6 +1604,7 @@ class Compound:
             return 1
         return 2
 
+    @tools.timeout(50)
     def circular_pair_relationship(self, the_other_compound) -> tuple:
         """
         To determine the relationship of two compounds with interchangeable circular and linear representations.
@@ -1830,6 +1832,7 @@ class Compound:
         else:
             return None, None
 
+    @tools.timeout(50)
     def with_r_pair_relationship(self, the_other_compound) -> tuple:
         """
         To find the relationship and the atom mappings between the two compounds that has r_groups type.

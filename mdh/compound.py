@@ -16,7 +16,6 @@ import heapq
 from typing import *
 from pathlib import Path
 import ctfile
-import timeout_decorator
 from . import BASS
 import itertools 
 from .supplement import not_r_groups
@@ -24,6 +23,7 @@ from .supplement import standard_bond_counts
 from .supplement import atomic_weights
 from .supplement import metal_symbols
 from .supplement import index_to_charge
+from . import tools
 # from .supplement import charge_to_index
 
 
@@ -663,7 +663,7 @@ class Compound:
             for i, dist in enumerate(distance_matrix):
                 self.heavy_atoms[i].distance_to_r = dist
 
-    @timeout_decorator.timeout(500)
+    @tools.timeout(50)
     def find_cycles(self, short_circuit: bool = False, cutoff: int = 40) -> list:
         """
         To find the cycles in the compound.

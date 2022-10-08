@@ -8,8 +8,33 @@ tools.py provides functions to open file or save data to file.
 
 import json
 import jsonpickle
+import errno
+import os
+import signal
+from functools import wraps
 
 jsonpickle.set_encoder_options('json', sort_keys=True, indent=4)
+
+
+class TimeoutError(Exception):
+    pass
+
+
+def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
+    def decorator(func):
+        def _handle_timeout(signum, frame):
+            raise TimeoutError(error_message)
+
+        def wrapper(*args, **kwargs):
+            signal.signal(signal.SIGALRM, _handle_timeout)
+            signal.setitimer(signal.ITIMER_REAL,seconds) #used timer instead of alarm
+            try:
+                result = func(*args, **kwargs)
+            finally:
+                signal.alarm(0)
+            return result
+        return wraps(func)(wrapper)
+    return decorator
 
 
 def save_to_text(data: str, filename: str) -> None:

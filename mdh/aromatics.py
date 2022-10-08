@@ -8,7 +8,7 @@ This module provides the :class:`~mdh.aromatics.AromaticManager` class entity.
 
 """
 
-import timeout_decorator
+from . import tools
 from . import compound
 from . import BASS
 from indigo import *
@@ -146,7 +146,7 @@ class AromaticManager:
                 break
         return cycles
     
-    @timeout_decorator.timeout(200)
+    @tools.timeout(200)
     def detect_aromatic_substructures_timeout(self, cpd: compound.Compound) -> None:
         """
         To detect the aromatic substructures in the compound and stop the search on timeout.

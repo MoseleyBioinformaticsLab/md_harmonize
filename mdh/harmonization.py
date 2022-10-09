@@ -414,11 +414,14 @@ class ReactionHarmonizationManager(HarmonizationManager):
 
             # we need to add reaction harmonized edge, at the same time, find the compound mappings and
             # determine the relationship of the edge.
-            print(max_score)
+            # print(max_score)
             if max_score == 1:
                 # To derive the one_to_one compound mappings on both sides.
+                print(one_reaction.name, the_other_reaction.name, mappings)
                 one_side_relationships, one_side_mappings = self.one_to_one_compound_mappings(mappings[0])
+                print("one side mappings of the compound:", one_side_mappings)
                 the_other_side_relationships, the_other_side_mappings = self.one_to_one_compound_mappings(mappings[1])
+                print("the other side mappings of the compound:", the_other_side_mappings)
                 if one_side_relationships and the_other_side_relationships:
                     # To combine the compound mappings together.
                     one_side_mappings.update(the_other_side_mappings)
@@ -616,6 +619,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
                     cpd_relationships.pop()
             return
         back_track(0, cpd_relationships)
+        print("back tracking to achieve one to one mapping of compounds", cpd_relationships, one_to_one_mappings)
         if len(cpd_relationships) == n:
             return cpd_relationships, one_to_one_mappings
         return None, None

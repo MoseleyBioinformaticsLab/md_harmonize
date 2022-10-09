@@ -342,8 +342,15 @@ def cli(args):
             if not os.path.exists(from_directory + "reactions.json"):
                 raise OSError("The file {0} does not exist.".format(from_directory + "reactions.json"))
             compounds = tools.open_jsonpickle(from_directory + "compounds.json")
-            compound_parsed = { name: compound.Compound(compounds[name][0], compounds[name][1], compounds[name][2]) for
-                                name in compounds }
+            compound_parsed = {}
+            for name in compounds:
+                try:
+                    this_compound = compound.Compound(compounds[name][0], compounds[name][1], compounds[name][2])
+                except:
+                    this_compound = None
+                    pass
+                if this_compound:
+                    compound_parsed[name] = this_compound
             compound_dict.append(compound_parsed)
             reactions = tools.open_jsonpickle(from_directory + "reactions.json")
             reaction_parsed = parse_reactions(compound_parsed, reactions)

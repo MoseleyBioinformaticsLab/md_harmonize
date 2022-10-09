@@ -8,34 +8,26 @@ tools.py provides functions to open file or save data to file.
 
 import json
 import jsonpickle
-import errno
-import os
-import signal
-from functools import wraps
+import multiprocessing
+import multiprocessing.pool
 
 jsonpickle.set_encoder_options('json', sort_keys=True, indent=4)
 
 
-class TimeoutError(Exception):
-    pass
-
-
-def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
+def timeout(seconds=10):
     def decorator(func):
-        def _handle_timeout(signum, frame):
-            raise TimeoutError(error_message)
-
         def wrapper(*args, **kwargs):
-            signal.signal(signal.SIGALRM, _handle_timeout)
-            signal.setitimer(signal.ITIMER_REAL,seconds) #used timer instead of alarm
+            pool = multiprocessing.pool.ThreadPool(processes=1)
+            results = pool.apply_async(func, args, kwargs)
+            pool.close()
             try:
-                result = func(*args, **kwargs)
+                return results.get(seconds)
+            except multiprocessing.TimeoutError:
+                raise OSError('Timeout expired after: %s' % seconds)
             finally:
-                signal.alarm(0)
-            return result
-        return wraps(func)(wrapper)
-    return decorator
+                pool.terminate()
 
+        return wrapper
 
 def save_to_text(data: str, filename: str) -> None:
     """

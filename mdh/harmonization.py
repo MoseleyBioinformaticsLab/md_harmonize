@@ -426,7 +426,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
                                                                       ec_comparison, one_side_mappings)
                     self.add_edge(harmonized_reaction_edge)
 
-            elif max_score >= 0.3:
+            elif max_score >= 0.8:
                 # determine if there is missed compound harmonized edge. This threshold can be adjusted.
                 one_unmapped_compounds = self.unmapped_compounds(one_side_pairs[0], one_side_pairs[1], mappings[0])
                 self.match_unmapped_compounds(one_unmapped_compounds[0], one_unmapped_compounds[1])

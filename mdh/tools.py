@@ -26,8 +26,9 @@ def timeout(seconds=10):
                 raise OSError('Timeout expired after: %s' % seconds)
             finally:
                 pool.terminate()
-
         return wrapper
+    return decorator
+
 
 def save_to_text(data: str, filename: str) -> None:
     """

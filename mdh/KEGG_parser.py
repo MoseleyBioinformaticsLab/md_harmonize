@@ -10,7 +10,7 @@ import collections
 import glob
 import re
 import multiprocessing
-
+from typing import *
 from . import compound
 from . import reaction
 from . import tools
@@ -620,7 +620,7 @@ class RpairParser:
         return count
 
 
-def create_compound_kcf(kcf_file: str) -> compound.Compound:
+def create_compound_kcf(kcf_file: str) -> Optional[compound.Compound]:
     """
     To construct compound entity based on the KEGG kcf file.
 
@@ -632,8 +632,12 @@ def create_compound_kcf(kcf_file: str) -> compound.Compound:
              atom in kcf_dict["atoms"]]
     bonds = [compound.Bond(bond["first_atom_number"], bond["second_atom_number"], bond["bond_type"]) for bond in
              kcf_dict["bonds"]]
-    
-    return compound.Compound(kcf_dict["compound_name"], atoms, bonds)
+    try:
+        this_compound = compound.Compound(kcf_dict["compound_name"], atoms, bonds)
+    except:
+        this_compound = None
+        pass
+    return this_compound
 
 
 # when we create the kegg reaction, we need to parse the atom mappings based on rclass!

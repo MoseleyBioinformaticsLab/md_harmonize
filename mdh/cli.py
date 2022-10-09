@@ -64,13 +64,18 @@ def construct_compound_via_kcf(file: str) -> Optional[compound.Compound]:
     return None
 
 
-def construct_compound_via_components(compound_components: list) -> compound.Compound:
+def construct_compound_via_components(compound_components: list) -> Optional[compound.Compound]:
     """
     To construct compound based on the compound components.
     :param compound_components:
     :return: the :class:`~mdh.compound.Compound` entity.
     """
-    return compound.Compound(compound_components[0], compound_components[1], compound_components[2])
+    try:
+        this_compound = compound.Compound(compound_components[0], compound_components[1], compound_components[2])
+    except:
+        this_compound = None
+        pass
+    return this_compound
 
 
 def compound_construct_multiprocess(entities: list, function) -> dict:

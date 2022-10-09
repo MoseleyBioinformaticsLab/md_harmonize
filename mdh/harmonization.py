@@ -414,6 +414,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
 
             # we need to add reaction harmonized edge, at the same time, find the compound mappings and
             # determine the relationship of the edge.
+            print(max_score)
             if max_score == 1:
                 # To derive the one_to_one compound mappings on both sides.
                 one_side_relationships, one_side_mappings = self.one_to_one_compound_mappings(mappings[0])
@@ -424,6 +425,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
                     relationship = self.determine_relationship(one_side_relationships + the_other_side_relationships)
                     harmonized_reaction_edge = HarmonizedReactionEdge(one_reaction, the_other_reaction, relationship,
                                                                       ec_comparison, one_side_mappings)
+                    print("find harmonized reaction: ", one_reaction.name, the_other_reaction.name)
                     self.add_edge(harmonized_reaction_edge)
 
             elif max_score >= 0.8:

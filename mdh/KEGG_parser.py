@@ -376,7 +376,7 @@ class RpairParser:
                     removed_bonds = removed_bonds_update
         return removed_bonds
 
-    @tools.timeout(10)
+    @tools.timeout(5)
     def generate_atom_mappings(self) -> list:
         """
         To generate the one to one atom mappings of the compound pair.

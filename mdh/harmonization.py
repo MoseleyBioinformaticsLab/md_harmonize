@@ -608,16 +608,16 @@ class ReactionHarmonizationManager(HarmonizationManager):
             :return: None
             """
             if i == n:
-                return
+                return True
             one_side_cpd = sorted_one_side[i]
             for the_other_cpd in mappings[one_side_cpd]:
                 if the_other_cpd not in one_to_one_mappings:
                     cpd_relationships.append(mappings[one_side_cpd][the_other_cpd])
                     one_to_one_mappings[the_other_cpd] = one_side_cpd
-                    back_track(i + 1, cpd_relationships)
-                    del one_to_one_mappings[the_other_cpd]
-                    cpd_relationships.pop()
-            return
+                    if not back_track(i + 1, cpd_relationships):
+                        del one_to_one_mappings[the_other_cpd]
+                        cpd_relationships.pop()
+            return False
         back_track(0, cpd_relationships)
         print("back tracking to achieve one to one mapping of compounds", cpd_relationships, one_to_one_mappings)
         if len(cpd_relationships) == n:

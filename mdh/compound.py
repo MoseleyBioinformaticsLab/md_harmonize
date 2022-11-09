@@ -663,7 +663,6 @@ class Compound:
             for i, dist in enumerate(distance_matrix):
                 self.heavy_atoms[i].distance_to_r = dist
 
-    @tools.timeout(50)
     def find_cycles(self, short_circuit: bool = False, cutoff: int = 40) -> list:
         """
         To find the cycles in the compound.
@@ -671,12 +670,13 @@ class Compound:
         :return: the list of cycles in the compound.
     """
         try:
-            self.find_cycles_helper(short_circuit=short_circuit, cutoff=cutoff)
+            with tools.timeout(seconds=50):
+                return self.find_cycles_helper(short_circuit=short_circuit, cutoff=cutoff)
         except Exception as e:
             print("Cycles in compound {0} can hardly be detected: {1}".format(self.name, e))
             pass
         return []
-    
+
     def find_cycles_helper(self, short_circuit: bool = False, cutoff: int = 40) -> list:
         """
         Executing function to find the cycles in the compound.
@@ -874,7 +874,6 @@ class Compound:
             one_to_one_mappings.append(cur_mappings)
         return one_to_one_mappings
 
-    @tools.timeout(10)
     def map_resonance(self, the_other, r_distance: bool = False) -> list:
         """
         Check if the resonant mappings are valid between the two compound structures. If the mapped atoms don't share
@@ -1604,8 +1603,15 @@ class Compound:
             return 1
         return 2
 
-    @tools.timeout(10)
     def circular_pair_relationship(self, the_other_compound) -> tuple:
+
+        try:
+            with tools.timeout(seconds=10):
+                return self.circular_pair_relationship_helper(the_other_compound)
+        except Exception as exception:
+            return None, None
+
+    def circular_pair_relationship_helper(self, the_other_compound) -> tuple:
         """
         To determine the relationship of two compounds with interchangeable circular and linear representations.
         We first find the critical atoms that involve in the formation of ring. There can be several possibilities.
@@ -1832,8 +1838,15 @@ class Compound:
         else:
             return None, None
 
-    @tools.timeout(10)
     def with_r_pair_relationship(self, the_other_compound) -> tuple:
+
+        try:
+            with tools.timeout(seconds=10):
+                return self.with_r_pair_relationship_helper(the_other_compound)
+        except Exception as exception:
+            return None, None
+
+    def with_r_pair_relationship_helper(self, the_other_compound) -> tuple:
         """
         To find the relationship and the atom mappings between the two compounds that has r_groups type.
         Several steps are involved:

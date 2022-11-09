@@ -512,7 +512,8 @@ class ReactionHarmonizationManager(HarmonizationManager):
                         try:
                             relationship, atom_mappings = one_cpd.circular_pair_relationship(the_other_cpd)
                         except:
-                            self.compound_harmonization_manager.add_invalid(one_cpd.compound_name,the_other_cpd.compound_name)
+                            self.compound_harmonization_manager.add_invalid(one_cpd.compound_name,
+                                                                            the_other_cpd.compound_name)
                             continue
                         if atom_mappings:
                             print("find harmonized compound relationship with circular relationship: ", the_other_cpd.compound_name, one_cpd.compound_name)

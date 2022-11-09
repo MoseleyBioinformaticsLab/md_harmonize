@@ -145,8 +145,7 @@ class AromaticManager:
             if len(cycles) == 1:
                 break
         return cycles
-    
-    @tools.timeout(200)
+
     def detect_aromatic_substructures_timeout(self, cpd: compound.Compound) -> None:
         """
         To detect the aromatic substructures in the compound and stop the search on timeout.
@@ -155,7 +154,8 @@ class AromaticManager:
         """
 
         try:
-            self.detect_aromatic_substructures(cpd)
+            with tools.timeout(seconds=200):
+                self.detect_aromatic_substructures(cpd)
         except:
             print("Aromatic substructures in compound {0} can hardly be detected.".format(cpd.name))
             pass

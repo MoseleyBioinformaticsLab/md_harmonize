@@ -376,7 +376,6 @@ class RpairParser:
                     removed_bonds = removed_bonds_update
         return removed_bonds
 
-    @tools.timeout(10)
     def generate_atom_mappings(self) -> list:
         """
         To generate the one to one atom mappings of the compound pair.
@@ -735,6 +734,15 @@ def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compo
     return one_compound.name + "_" + the_other_compound.name, atom_mappings
 
 
+def multiple_compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compound: compound.Compound,
+                                    the_other_compound: compound.Compound) -> tuple:
+    try:
+        with tools.timeout(seconds=20):
+            return compound_pair_mappings(rclass_name, rclass_definitions, one_compound, the_other_compound)
+    except Exception as exception:
+        return one_compound.name + "_" + the_other_compound.name, []
+
+
 def create_atom_mappings(rclass_directory: str, compounds: dict) -> dict:
     """
     To generate the atom mappings between compounds based on RCLASS definitions.
@@ -751,23 +759,23 @@ def create_atom_mappings(rclass_directory: str, compounds: dict) -> dict:
         rclass_name = this_rclass["ENTRY"][0].split()[0]
 
         print("currently work on rclass: ", rclass_name)
-        # compound_pairs = []
-        results = []
+        compound_pairs = []
+        # results = []
         for line in this_rclass["RPAIR"]:
             tokens = line.split()
             for token in tokens:
                 one_compound_name, the_other_compound_name = token.split("_")
                 if one_compound_name in compounds and the_other_compound_name in compounds:
-                    results.append(compound_pair_mappings(rclass_name, rclass_definitions, compounds[one_compound_name], compounds[the_other_compound_name]))
+        #             results.append(compound_pair_mappings(rclass_name, rclass_definitions, compounds[one_compound_name], compounds[the_other_compound_name]))
 
-                    # compound_pairs.append((compounds[one_compound_name], compounds[the_other_compound_name]))
-        # if len(compound_pairs) > 1:
-        #     with multiprocessing.Pool() as pool:
-        #         results = pool.starmap(compound_pair_mappings, ((rclass_name, rclass_definitions, one_compound,
-        #                                                          the_other_compound) for one_compound, the_other_compound in
-        #                                                         compound_pairs))
-        # else:
-        #     results = [compound_pair_mappings(rclass_name, rclass_definitions, compound_pairs[0][0], compound_pairs[0][1])]
+                    compound_pairs.append((compounds[one_compound_name], compounds[the_other_compound_name]))
+        if len(compound_pairs) > 1:
+            with multiprocessing.Pool() as pool:
+                results = pool.starmap(multiple_compound_pair_mappings, ((rclass_name, rclass_definitions, one_compound,
+                                                                 the_other_compound) for one_compound, the_other_compound in
+                                                                compound_pairs))
+        else:
+            results = [multiple_compound_pair_mappings(rclass_name, rclass_definitions, compound_pairs[0][0], compound_pairs[0][1])]
 
         for name, mapping in results:
             atom_mappings[rclass_name + "_" + name] = mapping

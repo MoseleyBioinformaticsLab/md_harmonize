@@ -737,7 +737,7 @@ def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compo
 def multiple_compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compound: compound.Compound,
                                     the_other_compound: compound.Compound) -> tuple:
     try:
-        with tools.timeout(seconds=20):
+        with tools.timeout(seconds=1):
             return compound_pair_mappings(rclass_name, rclass_definitions, one_compound, the_other_compound)
     except Exception as exception:
         return one_compound.name + "_" + the_other_compound.name, []

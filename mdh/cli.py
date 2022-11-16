@@ -23,8 +23,6 @@ Options:
 import glob
 import os
 import multiprocessing
-import time
-import collections
 from . import KEGG_database_scraper
 from . import KEGG_parser
 from . import MetaCyc_parser
@@ -168,6 +166,12 @@ def KEGG_atom_index_mapping(kcf_compounds: dict, mol_compounds: dict) -> dict:
 
 
 def parse_reactions(compounds: dict, reactions: list) -> list:
+    """
+    To parse the reaction by linking to the compound entities.
+    :param compounds: the dict of compound entities.
+    :param reactions: the list of reaction entities.
+    :return: the list of reaction entities.
+    """
 
     for reaction in reactions:
         reaction.one_side = [compounds[name] for name in reaction.one_side if name in compounds]
@@ -270,10 +274,10 @@ def cli(args):
                 atom_order_check(original_compounds, compound_dict)
                 atom_mappings = parser.create_atom_mappings(rclass_directory, kcf_compounds)
                 # atom_mappings = tools.open_jsonpickle(working_directory + "/kegg_atom_mappings_test.json")
-                tools.save_to_jsonpickle(atom_mappings, working_directory + "/kegg_atom_mappings_test_10.json")
+                tools.save_to_jsonpickle(atom_mappings, working_directory + "/kegg_atom_mappings_test_1.json")
                 atom_mappings = KEGG_atom_mapping_correction(KEGG_atom_index_mapping(kcf_compounds, compound_dict),
                                                              atom_mappings)
-                tools.save_to_jsonpickle(atom_mappings, working_directory + "/kegg_atom_mappings_IC_test_10.json")
+                tools.save_to_jsonpickle(atom_mappings, working_directory + "/kegg_atom_mappings_IC_test_1.json")
 
             for cpd_name in compound_dict:
                 cpd = compound_dict[cpd_name]
@@ -285,7 +289,7 @@ def cli(args):
             save_directory = to_directory + "/{0}".format(database_name)
             os.makedirs(save_directory, exist_ok=True)
             tools.save_to_jsonpickle({name: compound_dict[name].encode() for name in compound_dict}, save_directory +
-                                     "/compounds_test_10.json")
+                                     "/compounds_test_1.json")
 
     elif args['initialize_reaction']:
 

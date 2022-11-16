@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-import os
-import sys
 import re
 from setuptools import setup, find_packages, Extension
 import Cython.Build
@@ -10,11 +8,11 @@ import numpy
 
 def find_version():
     with open('mdh/__init__.py', 'r') as fd:
-        version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
-                            fd.read(), re.MULTILINE).group(1)
+        version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', fd.read(), re.MULTILINE).group(1)
         if not version:
             raise RuntimeError('Cannot find version information')
         return version
+
 
 def readme():
     with open('README.rst') as readme_file:
@@ -27,13 +25,12 @@ REQUIRES = [
         "numpy",
         "cython",
         "epam.indigo",
-        "ctfile",
-        "timeout-decorator"
+        "ctfile"
 ]
 
 
 EXTENSIONS = [
-    Extension("mdh.BASS",sources=["mdh/BASS.pyx"], extra_compile_args=['-O3'], include_dirs=[numpy.get_include()])
+    Extension("mdh.BASS", sources=["mdh/BASS.pyx"], extra_compile_args=['-O3'], include_dirs=[numpy.get_include()])
 ]
 
 setup(

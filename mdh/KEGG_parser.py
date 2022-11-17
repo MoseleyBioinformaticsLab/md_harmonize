@@ -741,6 +741,7 @@ def multiple_compound_pair_mappings(rclass_name: str, rclass_definitions: list, 
         with tools.timeout(seconds=5):
             return compound_pair_mappings(rclass_name, rclass_definitions, one_compound, the_other_compound)
     except Exception as exception:
+        print("fail to pass this due to timeout: ", rclass_name, one_compound.compound_name, the_other_compound.compound_name)
         return one_compound.name + "_" + the_other_compound.name, []
 
 

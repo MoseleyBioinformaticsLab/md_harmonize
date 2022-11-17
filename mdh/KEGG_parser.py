@@ -771,7 +771,7 @@ def create_atom_mappings(rclass_directory: str, compounds: dict) -> dict:
                     results.append(multiple_compound_pair_mappings(rclass_name, rclass_definitions, compounds[one_compound_name], compounds[the_other_compound_name]))
                     end_time = datetime.now()
                     consumed = end_time - start_time
-                    print("parsing of this {0} cost {1}".format(rclass_name, consumed.total_seconds))
+                    print("parsing of this {0} cost {1}".format(rclass_name, consumed.total_seconds()))
         #             compound_pairs.append((compounds[one_compound_name], compounds[the_other_compound_name]))
         # if len(compound_pairs) > 1:
         #     with multiprocessing.Pool() as pool:

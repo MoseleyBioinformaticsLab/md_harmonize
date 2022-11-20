@@ -1248,8 +1248,13 @@ class Compound:
         i = 0
         if depth == 5000:
             depth = len(atoms_to_color)
-
+        print("color depth")
         while i < depth and atoms_to_color:
+            print(i)
+            print("before this round of coloring")
+            for i, atom in enumerate(self.atoms):
+                print(i, atom.color)
+                
             current_layer_color_groups = collections.defaultdict(list)
             for atom_index in atoms_to_color:
                 atom = self.atoms[atom_index]

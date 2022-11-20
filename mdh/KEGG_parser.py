@@ -509,6 +509,7 @@ class RpairParser:
         print("construct the compound")
         this_compound = compound.Compound("partial_compound", atoms, bonds)
         print(this_compound)
+        print("finish constructing compounds")
         return this_compound
 
     @staticmethod

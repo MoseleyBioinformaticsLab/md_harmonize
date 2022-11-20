@@ -493,8 +493,10 @@ class RpairParser:
         """
         atoms = [this_compound.atoms[idx].clone() for idx in atom_numbers]
         idx_dict = {int(atom.atom_number): i for i, atom in enumerate(atoms)}
+
         for i, atom in enumerate(atoms):
             atom.update_atom_number(i)
+
         bonds = []
         for bond in this_compound.bonds:
             atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
@@ -504,7 +506,10 @@ class RpairParser:
                 cloned_bond.update_first_atom(idx_dict[atom_1])
                 cloned_bond.update_second_atom(idx_dict[atom_2])
                 bonds.append(cloned_bond)
-        return compound.Compound("partial_compound", atoms, bonds)
+        print("construct the compound")
+        this_compound = compound.Compound("partial_compound", atoms, bonds)
+        print(this_compound)
+        return this_compound
 
     @staticmethod
     def preliminary_atom_mappings_check(left_component: compound.Compound, right_component: compound.Compound) -> bool:

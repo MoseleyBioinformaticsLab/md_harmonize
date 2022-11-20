@@ -1253,7 +1253,7 @@ class Compound:
         for j, atom in enumerate(self.atoms):
             print(j, atom.neighbors)
         i = 0
-
+        print(depth)
         while i < depth and atoms_to_color:
             print(i)
             print("before this round of coloring")
@@ -1290,6 +1290,8 @@ class Compound:
                 atoms_to_color = atom_to_color_update
             i += 1
             print(atoms_to_color)
+        print("done coloring")
+
     
     def invalid_symmetric_atoms(self, atoms_to_color: list, excluded_index: bool = None, bond_stereo: bool = False,
                                 resonance: bool = False, backbone: bool = False) -> list:

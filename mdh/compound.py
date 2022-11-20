@@ -1377,7 +1377,7 @@ class Compound:
         :return: None.
     """
         not_valid = self.invalid_symmetric_atoms(atoms_to_color, excluded_index, bond_stereo=bond_stereo,
-                                                 resonance=resonance)
+                                                 resonance=resonance, backbone=backbone)
         print("not valid atoms", not_valid)
         while not_valid:
             atom_color_with_neighbors = self.generate_atom_color_with_neighbors(atoms_to_color, excluded=excluded_index,

@@ -547,7 +547,7 @@ class RpairParser:
         for left_component_index, right_component_index in component_pairs:
             print("left component index", left_component_index)
             print("right component index", right_component_index)
-            
+
             left_component = self.construct_component(self.one_compound, left_component_index, left_removed_bonds)
             right_component = self.construct_component(self.the_other_compound, right_component_index, right_removed_bonds)
             if not self.preliminary_atom_mappings_check(left_component, right_component):

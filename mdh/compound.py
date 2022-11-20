@@ -296,9 +296,9 @@ class Compound:
                 first_atom.bond_counts += int(bond.bond_type)
                 second_atom.neighbors.append(bond.first_atom_number)
                 second_atom.bond_counts += int(bond.bond_type)
-        print("start find cycles in the compound construction")
+        # print("start find cycles in the compound construction")
         self.cycles = self.find_cycles()
-        print("start calculate distance in the compound construction")
+        # print("start calculate distance in the compound construction")
         self.calculate_distance_to_r_groups()
         self._distance_matrix = None
 
@@ -836,7 +836,7 @@ class Compound:
         the_other.update_color_tuple(resonance=resonance)
         mappings = []
         mapping_matrix = BASS.make_mapping_matrix(the_other, self, True, True, r_distance)
-        print("mapping matrix", mapping_matrix)
+        # print("mapping matrix", mapping_matrix)
         if mapping_matrix is not None:
             mappings = BASS.find_mappings(the_other.structure_matrix(resonance=resonance, backbone=backbone),
                                           the_other.distance_matrix, self.structure_matrix(resonance=resonance,
@@ -844,7 +844,7 @@ class Compound:
                                           self.distance_matrix, mapping_matrix)
         # for the mappings, the from_idx, to_idx in enumerate(mapping), from_idx is in the_other_compound, to_idx is in
         # the self.
-        print("mapping matrix", mapping_matrix)
+        # print("mapping matrix", mapping_matrix)
         one_to_one_mappings = []
         for sub in mappings:
             cur_mappings = {}
@@ -1256,8 +1256,8 @@ class Compound:
         while i < depth and atoms_to_color:
             # print(i)
             # print("before this round of coloring")
-            for j, atom in enumerate(self.atoms):
-                print(j, atom.color)
+            # for j, atom in enumerate(self.atoms):
+            #     print(j, atom.color)
 
             current_layer_color_groups = collections.defaultdict(list)
             for atom_index in atoms_to_color:
@@ -1309,7 +1309,7 @@ class Compound:
                                                                             resonance=resonance,
                                                                             bond_stereo=bond_stereo,
                                                                             backbone=backbone)
-        print(atom_color_with_neighbors)
+        # print(atom_color_with_neighbors)
         not_valid = []
         color_groups = self.color_groups(excluded=excluded_index)
         if not excluded_index:
@@ -1378,7 +1378,7 @@ class Compound:
     """
         not_valid = self.invalid_symmetric_atoms(atoms_to_color, excluded_index, bond_stereo=bond_stereo,
                                                  resonance=resonance, backbone=backbone)
-        print("not valid atoms", not_valid)
+        # print("not valid atoms", not_valid)
         while not_valid:
             atom_color_with_neighbors = self.generate_atom_color_with_neighbors(atoms_to_color, excluded=excluded_index,
                                                                                 zero_core_color=False,

@@ -1246,13 +1246,13 @@ class Compound:
             atom_neighbors[index].append(index)
             visited[index].add(index)
             
-        i = 0
+
         if depth == 5000:
             depth = len(atoms_to_color)
         print("color depth")
         for i, atom in enumerate(self.atoms):
             print(i, atom.neighbors)
-
+        i = 0
         while i < depth and atoms_to_color:
             print(i)
             print("before this round of coloring")
@@ -1276,7 +1276,7 @@ class Compound:
                 atom_neighbors[atom.atom_number] = self.get_next_layer_neighbors(atom_neighbors[atom_index],
                                                                                  visited[atom_index],
                                                                                  excluded=excluded_index)
-                
+
                 print("new neighbors, ", atom.atom_number, atom_neighbors[atom.atom_number])
                 current_layer_color_groups[atom.color].append(atom_index)
 

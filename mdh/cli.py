@@ -400,11 +400,11 @@ def cli(args):
                                  format("_".join(database_names)))
 
     elif args["test1"]:
-        # kegg_compound_1_file = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf/cpd:C05670"
-        # kegg_compound_2_file = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf/cpd:C06114"
+        kegg_compound_1_file = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf/cpd:C05670"
+        kegg_compound_2_file = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf/cpd:C06114"
 
-        kegg_compound_1_file = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf/cpd:C01063"
-        kegg_compound_2_file = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf/cpd:C09813"
+        # kegg_compound_1_file = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf/cpd:C01063"
+        # kegg_compound_2_file = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf/cpd:C09813"
         kegg_1 = construct_compound_via_kcf(kegg_compound_1_file)
         kegg_2 = construct_compound_via_kcf(kegg_compound_2_file)
         compounds = {kegg_1.compound_name: kegg_1, kegg_2.compound_name: kegg_2}

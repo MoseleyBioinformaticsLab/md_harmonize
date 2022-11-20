@@ -519,11 +519,14 @@ class RpairParser:
         """
         left_component.color_compound(r_groups=False, bond_stereo=False, atom_stereo=False, resonance=True, backbone=True)
         right_component.color_compound(r_groups=False, bond_stereo=False, atom_stereo=False, resonance=True, backbone=True)
+        print("finish coloring")
         left, mapped = 0, 0
-        for atom_left in left_component.atoms:
+        for i, atom_left in enumerate(left_component.atoms):
+            print(i)
             if atom_left.default_symbol != "H":
                 left += 1
-                for atom_right in right_component.atoms:
+                for j, atom_right in enumerate(right_component.atoms):
+                    print("right iteration", j)
                     if atom_left.color_layers == atom_right.color_layers:
                         mapped += 1
                         break

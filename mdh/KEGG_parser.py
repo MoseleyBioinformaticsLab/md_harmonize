@@ -552,6 +552,11 @@ class RpairParser:
             right_component = self.construct_component(self.the_other_compound, right_component_index, right_removed_bonds)
             if not self.preliminary_atom_mappings_check(left_component, right_component):
                 continue
+            print("left component atoms ", [(i, atom.atom_symbol) for i, atom in enumerate(left_component.atoms)])
+            print("right component atoms ", [(i, atom.atom_symbol) for i, atom in enumerate(right_component.atoms)])
+            print("left bonds", [(bond.first_atom_number, bond.second_atom_number) for bond in left_component.bonds])
+            print("right bonds", [(bond.first_atom_number, bond.second_atom_number) for bond in right_component.bonds])
+
             one_to_one_mappings_list = left_component.find_mappings(right_component, resonance=True, r_distance=False,
                                                                     backbone=True)
             print("component mapp", one_to_one_mappings_list)

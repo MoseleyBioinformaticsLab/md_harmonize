@@ -408,7 +408,7 @@ def cli(args):
         kegg_1 = construct_compound_via_kcf(kegg_compound_1_file)
         kegg_2 = construct_compound_via_kcf(kegg_compound_2_file)
         compounds = {kegg_1.compound_name: kegg_1, kegg_2.compound_name: kegg_2}
-        rclass_dir = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/rclass_target/RC01429"
+        rclass_dir = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/rclass_target/"
         atom_mappings = parser_dict["KEGG"].create_atom_mappings(rclass_dir, compounds)
         print(atom_mappings)
 

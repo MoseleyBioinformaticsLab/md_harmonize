@@ -9,31 +9,32 @@ tools.py provides functions to open file or save data to file.
 import json
 import jsonpickle
 import signal
+import threading
 
 jsonpickle.set_encoder_options('json', sort_keys=True, indent=4)
 
 
 class timeout:
     """Implements a timeout context manager to work with a with statement."""
-    def __init__(self, seconds=5, error_message='Timeout'):
+    def __init__(self, seconds=1, error_message='Timeout'):
         """
         :param seconds:
-        :type seconds: :py:class:`int`
+        :type seconds: :py:class:int
         :param error_message:
-        :type error_message: :py:class:`str`
+        :type error_message: :py:class:str
         """
         self.seconds = seconds
         self.error_message = error_message
 
-    def handle_timeout(self, signum, frame):
+    def handle_timeout(self):
         raise TimeoutError(self.error_message)
 
     def __enter__(self):
-        signal.signal(signal.SIGALRM, self.handle_timeout)
-        signal.alarm(self.seconds)
+        self.timer = threading.Timer(self.seconds, self.handle_timeout)
+        self.timer.start()
 
     def __exit__(self, type, value, traceback):
-        signal.alarm(0)
+        self.timer.cancel()
 
 
 def save_to_text(data: str, filename: str) -> None:

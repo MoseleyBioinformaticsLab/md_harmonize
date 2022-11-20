@@ -1309,6 +1309,7 @@ class Compound:
                                                                             resonance=resonance,
                                                                             bond_stereo=bond_stereo,
                                                                             backbone=backbone)
+        print(atom_color_with_neighbors)
         not_valid = []
         color_groups = self.color_groups(excluded=excluded_index)
         if not excluded_index:

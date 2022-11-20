@@ -13,6 +13,7 @@ Usage:
     mdh harmonize <database_names> <working_directory>
     mdh test4 <database_names> <working_directory>
     mdh test7 <k>
+    mdh test1
     
 
 Options:
@@ -397,6 +398,16 @@ def cli(args):
                                  format("_".join(database_names)))
         tools.save_to_jsonpickle(harmonized_reactions, save_directory + "/{0}_harmonized_reactions_0.5.json".
                                  format("_".join(database_names)))
+
+    elif args["test1"]:
+        kegg_compound_1_file = "/scratch/hji236/MDH_test/sources/KEGG/kcf/cpd:C05670.mol"
+        kegg_compound_2_file = "/scratch/hji236/MDH_test/sources/KEGG/kcf/cpd:C06114.mol"
+        kegg_1 = construct_compound_via_kcf(kegg_compound_1_file)
+        kegg_2 = construct_compound_via_kcf(kegg_compound_2_file)
+        compounds = {kegg_1.compound_name: kegg_1, kegg_2.compound_name: kegg_2}
+        rclass_dir = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/rclass_target/"
+        atom_mappings = parser_dict["KEGG"].create_atom_mappings(rclass_dir, compounds)
+        print(atom_mappings)
 
     elif args["test4"]:
         database_name = args['<database_names>']

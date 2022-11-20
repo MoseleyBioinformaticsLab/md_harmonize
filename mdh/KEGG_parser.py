@@ -391,6 +391,10 @@ class RpairParser:
             left_centers_list = self.get_center_list(left_center_candidates)
             right_center_list = self.get_center_list(right_center_candidates)
 
+            print(self.one_compound.compound_name, self.the_other_compound.compound_name)
+            print("left centers_list", left_centers_list, len(left_centers_list))
+            print("right centers_list", right_center_list, len(right_center_list))
+
             minimum_miss_count = float("inf")
             optimal_atom_mappings = {}
             for left_centers in left_centers_list:
@@ -401,6 +405,7 @@ class RpairParser:
                                                                          left_reaction_centers)
                     right_removed_bonds_list = self.remove_different_bonds(self.the_other_compound, right_centers,
                                                                            right_reaction_centers)
+
                     for left_removed_bonds in left_removed_bond_list:
                         for right_removed_bonds in right_removed_bonds_list:
                             this_mapping = self.map_components(left_removed_bonds, right_removed_bonds, left_centers,
@@ -538,7 +543,11 @@ class RpairParser:
         right_component_list = self.detect_components(self.the_other_compound, right_removed_bonds, right_centers)
         component_pairs = self.pair_components(left_component_list, right_component_list)
         atom_mappings = []
+        print("map components")
         for left_component_index, right_component_index in component_pairs:
+            print("left component index", left_component_index)
+            print("right component index", right_component_index)
+            
             left_component = self.construct_component(self.one_compound, left_component_index, left_removed_bonds)
             right_component = self.construct_component(self.the_other_compound, right_component_index, right_removed_bonds)
             if not self.preliminary_atom_mappings_check(left_component, right_component):

@@ -108,4 +108,3 @@ def open_json(filename: str):
     with open(filename, 'r') as infile:
         data = json.load(infile)
     return data
-

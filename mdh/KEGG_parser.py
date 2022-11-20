@@ -391,9 +391,9 @@ class RpairParser:
             left_centers_list = self.get_center_list(left_center_candidates)
             right_center_list = self.get_center_list(right_center_candidates)
 
-            print(self.one_compound.compound_name, self.the_other_compound.compound_name)
-            print("left centers_list", left_centers_list, len(left_centers_list))
-            print("right centers_list", right_center_list, len(right_center_list))
+            # print(self.one_compound.compound_name, self.the_other_compound.compound_name)
+            # print("left centers_list", left_centers_list, len(left_centers_list))
+            # print("right centers_list", right_center_list, len(right_center_list))
 
             minimum_miss_count = float("inf")
             optimal_atom_mappings = {}
@@ -506,10 +506,10 @@ class RpairParser:
                 cloned_bond.update_first_atom(idx_dict[atom_1])
                 cloned_bond.update_second_atom(idx_dict[atom_2])
                 bonds.append(cloned_bond)
-        print("construct the compound")
+        # print("construct the compound")
         this_compound = compound.Compound("partial_compound", atoms, bonds)
-        print(this_compound)
-        print("finish constructing compounds")
+        # print(this_compound)
+        # print("finish constructing compounds")
         return this_compound
 
     @staticmethod
@@ -525,14 +525,11 @@ class RpairParser:
         """
         left_component.color_compound(r_groups=False, bond_stereo=False, atom_stereo=False, resonance=True, backbone=True)
         right_component.color_compound(r_groups=False, bond_stereo=False, atom_stereo=False, resonance=True, backbone=True)
-        print("finish coloring")
         left, mapped = 0, 0
         for i, atom_left in enumerate(left_component.atoms):
-            print(i)
             if atom_left.default_symbol != "H":
                 left += 1
                 for j, atom_right in enumerate(right_component.atoms):
-                    print("right iteration", j)
                     if atom_left.color_layers == atom_right.color_layers:
                         mapped += 1
                         break
@@ -552,23 +549,20 @@ class RpairParser:
         right_component_list = self.detect_components(self.the_other_compound, right_removed_bonds, right_centers)
         component_pairs = self.pair_components(left_component_list, right_component_list)
         atom_mappings = []
-        print("map components", component_pairs)
         for left_component_index, right_component_index in component_pairs:
-            print("left component index", left_component_index)
-            print("right component index", right_component_index)
 
             left_component = self.construct_component(self.one_compound, left_component_index, left_removed_bonds)
             right_component = self.construct_component(self.the_other_compound, right_component_index, right_removed_bonds)
             if not self.preliminary_atom_mappings_check(left_component, right_component):
                 continue
-            print("left component atoms ", [(i, atom.atom_symbol) for i, atom in enumerate(left_component.atoms)])
-            print("right component atoms ", [(i, atom.atom_symbol) for i, atom in enumerate(right_component.atoms)])
-            print("left bonds", [(bond.first_atom_number, bond.second_atom_number) for bond in left_component.bonds])
-            print("right bonds", [(bond.first_atom_number, bond.second_atom_number) for bond in right_component.bonds])
+            # print("left component atoms ", [(i, atom.atom_symbol) for i, atom in enumerate(left_component.atoms)])
+            # print("right component atoms ", [(i, atom.atom_symbol) for i, atom in enumerate(right_component.atoms)])
+            # print("left bonds", [(bond.first_atom_number, bond.second_atom_number) for bond in left_component.bonds])
+            # print("right bonds", [(bond.first_atom_number, bond.second_atom_number) for bond in right_component.bonds])
 
             one_to_one_mappings_list = left_component.find_mappings(right_component, resonance=True, r_distance=False,
                                                                     backbone=True)
-            print("component mapp", one_to_one_mappings_list)
+            # print("component mapp", one_to_one_mappings_list)
             optimal_one_to_one_mappings = None
             minimum_miss_count = float("inf")
             for one_to_one_mappings in one_to_one_mappings_list:
@@ -762,7 +756,7 @@ def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compo
 def multiple_compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compound: compound.Compound,
                                     the_other_compound: compound.Compound) -> tuple:
     try:
-        with tools.timeout(seconds=100):
+        with tools.timeout(seconds=10):
             return compound_pair_mappings(rclass_name, rclass_definitions, one_compound, the_other_compound)
     except Exception as exception:
         print("fail to pass this due to timeout: ", rclass_name, one_compound.compound_name, the_other_compound.compound_name)

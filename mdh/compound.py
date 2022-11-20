@@ -1235,7 +1235,7 @@ class Compound:
                                                                             resonance=resonance,
                                                                             bond_stereo=bond_stereo,
                                                                             backbone=backbone)
-        print(atom_color_with_neighbors)
+        # print(atom_color_with_neighbors)
         if not excluded_index:
             excluded_index = []
 
@@ -1245,26 +1245,25 @@ class Compound:
         for index in atoms_to_color:
             atom_neighbors[index].append(index)
             visited[index].add(index)
-            
 
         if depth == 5000:
             depth = len(atoms_to_color)
-        print("color depth")
-        for j, atom in enumerate(self.atoms):
-            print(j, atom.neighbors)
+        # print("color depth")
+        # for j, atom in enumerate(self.atoms):
+        #     print(j, atom.neighbors)
         i = 0
-        print(depth)
+        # print(depth)
         while i < depth and atoms_to_color:
-            print(i)
-            print("before this round of coloring")
-            for j, atom in enumerate(self.atoms):
-                print(j, atom.color)
+            # print(i)
+            # print("before this round of coloring")
+            # for j, atom in enumerate(self.atoms):
+            #     print(j, atom.color)
 
             current_layer_color_groups = collections.defaultdict(list)
             for atom_index in atoms_to_color:
                 atom = self.atoms[atom_index]
                 color_elements = collections.Counter()
-                print("this neighbors, ", atom_index, atom_neighbors[atom_index])
+                # print("this neighbors, ", atom_index, atom_neighbors[atom_index])
                 for neighbor_index in atom_neighbors[atom_index]:
                     if neighbor_index not in excluded_index:
                         color_elements[atom_color_with_neighbors[neighbor_index]] += 1
@@ -1278,7 +1277,7 @@ class Compound:
                                                                                  visited[atom_index],
                                                                                  excluded=excluded_index)
 
-                print("new neighbors, ", atom.atom_number, atom_neighbors[atom.atom_number])
+                # print("new neighbors, ", atom.atom_number, atom_neighbors[atom.atom_number])
                 current_layer_color_groups[atom.color].append(atom_index)
 
             if i > 3:
@@ -1289,10 +1288,9 @@ class Compound:
                         atom_to_color_update.extend(current_layer_color_groups[name])
                 atoms_to_color = atom_to_color_update
             i += 1
-            print(atoms_to_color)
-        print("done coloring")
+            # print(atoms_to_color)
+        # print("done coloring")
 
-    
     def invalid_symmetric_atoms(self, atoms_to_color: list, excluded_index: bool = None, bond_stereo: bool = False,
                                 resonance: bool = False, backbone: bool = False) -> list:
         """
@@ -1379,6 +1377,7 @@ class Compound:
     """
         not_valid = self.invalid_symmetric_atoms(atoms_to_color, excluded_index, bond_stereo=bond_stereo,
                                                  resonance=resonance)
+        print("not valid atoms", not_valid)
         while not_valid:
             atom_color_with_neighbors = self.generate_atom_color_with_neighbors(atoms_to_color, excluded=excluded_index,
                                                                                 zero_core_color=False,

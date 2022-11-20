@@ -76,6 +76,16 @@ def construct_compound_via_components(compound_components: list) -> Optional[com
     return this_compound
 
 
+def compound_construct_all(entities: list, function) -> dict:
+
+    compounds = {}
+    for entity in entities:
+        this_compound = function(entity)
+        if this_compound:
+            compounds[this_compound.compound_name] = this_compound
+    return compounds
+
+
 def compound_construct_multiprocess(entities: list, function) -> dict:
     """
     To construct compounds with multiprocessing.
@@ -247,7 +257,7 @@ def cli(args):
             parser = parser_dict.get(database_name, None)
             # construct compounds
             molfiles = glob.glob(from_path + "/*")
-            compound_dict = compound_construct_multiprocess(molfiles, construct_compound_via_molfile)
+            compound_dict = compound_construct_all(molfiles, construct_compound_via_molfile)
 
             if args['--parse_kegg_atom']:
                 # I choose to parse the kegg atom mapings here, since the kegg atom mappings are only related to
@@ -263,10 +273,10 @@ def cli(args):
                     raise OSError("The directory {0} does not exist.".format(rclass_directory))
                 # construct KEGG compound via KEGG kcf files. This is used for atom mappings
                 kcf_files = glob.glob(working_directory + "/sources/KEGG/kcf/*")
-                kcf_compounds = compound_construct_multiprocess(kcf_files, construct_compound_via_kcf)
+                kcf_compounds = compound_construct_all(kcf_files, construct_compound_via_kcf)
                 print("count of original kegg compound files ", len(kcf_compounds))
                 original_files = glob.glob(working_directory + "/sources/KEGG/molfile/*")
-                original_compounds = compound_construct_multiprocess(original_files, construct_compound_via_molfile)
+                original_compounds = compound_construct_all(original_files, construct_compound_via_molfile)
                 print("count of original kegg compound files ", len(original_compounds))
                 print("comparison of kcf and original")
                 atom_order_check(kcf_compounds, original_compounds)
@@ -306,7 +316,7 @@ def cli(args):
                 raise OSError("Please construct the {0} compounds first!".format(database_name))
 
             compounds = tools.open_jsonpickle(save_directory + "/compounds.json")
-            compound_dict = compound_construct_multiprocess(list(compounds.values()), construct_compound_via_components)
+            compound_dict = compound_construct_all(list(compounds.values()), construct_compound_via_components)
 
             reaction_list = []
             parser = parser_dict.get(database_name, None)

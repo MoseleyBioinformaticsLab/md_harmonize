@@ -10,33 +10,59 @@ import json
 import jsonpickle
 import signal
 import threading
+import multiprocessing
+import time
+import typing as t
 
 jsonpickle.set_encoder_options('json', sort_keys=True, indent=4)
 
 
-class timeout:
-    """Implements a timeout context manager to work with a with statement."""
+def timeout(func:t.Callable[...,t.Any], args:t.Optional[tuple] = None, seconds:int = 1) -> None:
+    """Executes a given function but only for a certain specified time.
+    :param func: function to call
+    :param args: function arguments to use
+    :param seconds: length of timeout
+    :param default: default value if function does not execute properly.
+    """
 
-    def __init__(self, seconds=1, error_message='Timeout'):
-        """
-        :param seconds:
-        :type seconds: :py:class:`int`
-        :param error_message:
-        :type error_message: :py:class:`str`
-        """
-        self.seconds = seconds
-        self.error_message = error_message
+    def function_with_queue(queue:multiprocessing.Queue, *args):
+        queue.put(func(*(args or ())))
 
-    def handle_timeout(self, signum, frame):
-        raise TimeoutError(self.error_message)
+    queue = multiprocessing.Queue()
+    process = multiprocessing.Process(target=function_with_queue, args=(queue, *(args or ())))
+    process.start()
+    process.join(seconds)
 
-    def __enter__(self):
-        signal.signal(signal.SIGALRM, self.handle_timeout)
-        signal.alarm(self.seconds)
+    if process.is_alive():
+        process.terminate()
+        raise TimeoutError("{func_name} timeout taking more than {seconds} seconds.".format(func_name=func.__name__,
+                                                                                            seconds=seconds))
+    else:
+        return queue.get()
 
-    def __exit__(self, type, value, traceback):
-        signal.alarm(0)
-        
+# class timeout:
+#     """Implements a timeout context manager to work with a with statement."""
+#
+#     def __init__(self, seconds=1, error_message='Timeout'):
+#         """
+#         :param seconds:
+#         :type seconds: :py:class:`int`
+#         :param error_message:
+#         :type error_message: :py:class:`str`
+#         """
+#         self.seconds = seconds
+#         self.error_message = error_message
+#
+#     def handle_timeout(self, signum, frame):
+#         raise TimeoutError(self.error_message)
+#
+#     def __enter__(self):
+#         signal.signal(signal.SIGALRM, self.handle_timeout)
+#         signal.alarm(self.seconds)
+#
+#     def __exit__(self, type, value, traceback):
+#         signal.alarm(0)
+
     # def __init__(self, seconds=1, error_message='Timeout'):
     #     """
     #     :param seconds:

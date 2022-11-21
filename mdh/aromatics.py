@@ -146,6 +146,21 @@ class AromaticManager:
                 break
         return cycles
 
+    # def detect_aromatic_substructures_timeout(self, cpd: compound.Compound) -> None:
+    #     """
+    #     To detect the aromatic substructures in the compound and stop the search on timeout.
+    #     :param cpd: the :class:`~mdh.compound.Compound` entity.
+    #     :return: None.
+    #     """
+    #
+    #     try:
+    #         with tools.timeout(seconds=200):
+    #             self.detect_aromatic_substructures(cpd)
+    #     except:
+    #         print("Aromatic substructures in compound {0} can hardly be detected.".format(cpd.name))
+    #         pass
+    #     return
+
     def detect_aromatic_substructures_timeout(self, cpd: compound.Compound) -> None:
         """
         To detect the aromatic substructures in the compound and stop the search on timeout.
@@ -154,8 +169,7 @@ class AromaticManager:
         """
 
         try:
-            with tools.timeout(seconds=200):
-                self.detect_aromatic_substructures(cpd)
+            tools.timeout(self.detect_aromatic_substructures, (cpd,), seconds=200)
         except:
             print("Aromatic substructures in compound {0} can hardly be detected.".format(cpd.name))
             pass

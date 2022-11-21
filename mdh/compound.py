@@ -679,6 +679,20 @@ class Compound:
             for i, dist in enumerate(distance_matrix):
                 self.heavy_atoms[i].distance_to_r = dist
 
+    # def find_cycles(self, short_circuit: bool = False, cutoff: int = 40) -> list:
+    #     """
+    #     To find the cycles in the compound.
+    #
+    #     :return: the list of cycles in the compound.
+    # """
+    #     try:
+    #         with tools.timeout(seconds=10):
+    #             return self.find_cycles_helper(short_circuit=short_circuit, cutoff=cutoff)
+    #     except Exception as e:
+    #         print("Cycles in compound {0} can hardly be detected: {1}".format(self.name, e))
+    #         pass
+    #     return []
+
     def find_cycles(self, short_circuit: bool = False, cutoff: int = 40) -> list:
         """
         To find the cycles in the compound.
@@ -686,8 +700,8 @@ class Compound:
         :return: the list of cycles in the compound.
     """
         try:
-            with tools.timeout(seconds=10):
-                return self.find_cycles_helper(short_circuit=short_circuit, cutoff=cutoff)
+            cycles = tools.timeout(self.find_cycles_helper, (short_circuit, cutoff,), seconds=50)
+            return cycles
         except Exception as e:
             print("Cycles in compound {0} can hardly be detected: {1}".format(self.name, e))
             pass
@@ -1636,11 +1650,19 @@ class Compound:
             return 1
         return 2
 
+    # def circular_pair_relationship(self, the_other_compound) -> tuple:
+    #
+    #     try:
+    #         with tools.timeout(seconds=10):
+    #             return self.circular_pair_relationship_helper(the_other_compound)
+    #     except Exception as exception:
+    #         return None, None
+
     def circular_pair_relationship(self, the_other_compound) -> tuple:
 
         try:
-            with tools.timeout(seconds=10):
-                return self.circular_pair_relationship_helper(the_other_compound)
+            relationship, mapping = tools.timeout(self.circular_pair_relationship_helper, (the_other_compound,), seconds=10)
+            return relationship, mapping
         except Exception as exception:
             return None, None
 
@@ -1871,11 +1893,19 @@ class Compound:
         else:
             return None, None
 
+    # def with_r_pair_relationship(self, the_other_compound) -> tuple:
+    #
+    #     try:
+    #         with tools.timeout(seconds=10):
+    #             return self.with_r_pair_relationship_helper(the_other_compound)
+    #     except Exception as exception:
+    #         return None, None
+
     def with_r_pair_relationship(self, the_other_compound) -> tuple:
 
         try:
-            with tools.timeout(seconds=10):
-                return self.with_r_pair_relationship_helper(the_other_compound)
+            relationship, mapping = tools.timeout(self.with_r_pair_relationship_helper, (the_other_compound,), seconds=10)
+            return relationship, mapping
         except Exception as exception:
             return None, None
 

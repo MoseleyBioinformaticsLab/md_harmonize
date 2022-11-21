@@ -753,11 +753,22 @@ def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compo
     return one_compound.name + "_" + the_other_compound.name, atom_mappings
 
 
+# def multiple_compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compound: compound.Compound,
+#                                     the_other_compound: compound.Compound) -> tuple:
+#     try:
+#         with tools.timeout(seconds=10):
+#             return compound_pair_mappings(rclass_name, rclass_definitions, one_compound, the_other_compound)
+#     except Exception as exception:
+#         print("fail to pass this due to timeout: ", rclass_name, one_compound.compound_name, the_other_compound.compound_name)
+#         return one_compound.name + "_" + the_other_compound.name, []
+
+
 def multiple_compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compound: compound.Compound,
                                     the_other_compound: compound.Compound) -> tuple:
     try:
-        with tools.timeout(seconds=10):
-            return compound_pair_mappings(rclass_name, rclass_definitions, one_compound, the_other_compound)
+        name, mappings = tools.timeout(compound_pair_mappings, (rclass_name, rclass_definitions, one_compound,
+                                                                the_other_compound,), seconds=10)
+        return name, mappings
     except Exception as exception:
         print("fail to pass this due to timeout: ", rclass_name, one_compound.compound_name, the_other_compound.compound_name)
         return one_compound.name + "_" + the_other_compound.name, []

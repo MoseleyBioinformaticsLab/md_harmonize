@@ -6,7 +6,7 @@ The `MDH` can be used to:
     * Curate compound molfile representation.
     * Construct compound/reaction entity.
     * To detect aromatic substructures in a compound.
-    * Parse KEGG RClass represnetation to generate atom mappings between compounds.
+    * Parse KEGG RClass representation to generate atom mappings between compounds.
     * Harmonize compounds/reactions across databases.
 
 In this document, each use will be explained in details.
@@ -14,10 +14,14 @@ In this document, each use will be explained in details.
 The MDH API tutorial
 ~~~~~~~~~~~~~~~~~~~~
 
+Data preparation
+----------------
+The raw KEGG a
+
 Using MDH to download KEGG databases.
 -------------------------------------
 
-The MDH provides function to update the KEGG databases. Here is an example to download the latest KEGG data.
+The `MDH` provides function to update the KEGG databases. Here is an example to download the latest KEGG data.
 
 .. code:: Python
 

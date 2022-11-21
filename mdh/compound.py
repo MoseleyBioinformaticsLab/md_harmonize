@@ -300,7 +300,7 @@ class Compound:
         # print("start find cycles in the compound construction")
         start_time = datetime.now()
         self.cycles = self.find_cycles()
-        end_time = start_time = datetime.now()
+        end_time = datetime.now()
         consumed = end_time - start_time
         print("dedect cycle of {0} cost {1}".format(self.compound_name, consumed.total_seconds()))
 

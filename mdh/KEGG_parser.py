@@ -765,12 +765,19 @@ def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compo
 
 def multiple_compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compound: compound.Compound,
                                     the_other_compound: compound.Compound) -> tuple:
+    start_time = datetime.now()
     try:
         name, mappings = tools.timeout(compound_pair_mappings, (rclass_name, rclass_definitions, one_compound,
                                                                 the_other_compound,), seconds=10)
+        end_time = datetime.now()
+        consumed = end_time - start_time
+        print("parsing of this {0} cost {1}".format(rclass_name, consumed.total_seconds()))
         return name, mappings
     except Exception as exception:
         print("fail to pass this due to timeout: ", rclass_name, one_compound.compound_name, the_other_compound.compound_name)
+        end_time = datetime.now()
+        consumed = end_time - start_time
+        print("parsing of this {0} cost {1}".format(rclass_name, consumed.total_seconds()))
         return one_compound.name + "_" + the_other_compound.name, []
 
 

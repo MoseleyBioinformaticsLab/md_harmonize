@@ -417,11 +417,11 @@ class ReactionHarmonizationManager(HarmonizationManager):
             # print(max_score)
             if max_score == 1:
                 # To derive the one_to_one compound mappings on both sides.
-                print(one_reaction.name, the_other_reaction.name, mappings)
+                # print(one_reaction.name, the_other_reaction.name, mappings)
                 one_side_relationships, one_side_mappings = self.one_to_one_compound_mappings(mappings[0])
-                print("one side mappings of the compound:", one_side_mappings)
+                # print("one side mappings of the compound:", one_side_mappings)
                 the_other_side_relationships, the_other_side_mappings = self.one_to_one_compound_mappings(mappings[1])
-                print("the other side mappings of the compound:", the_other_side_mappings)
+                # print("the other side mappings of the compound:", the_other_side_mappings)
                 if one_side_relationships and the_other_side_relationships:
                     # To combine the compound mappings together.
                     one_side_mappings.update(the_other_side_mappings)
@@ -491,7 +491,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
                 if self.compound_harmonization_manager.has_visited(one_cpd.compound_name, the_other_cpd.compound_name):
                     continue
                 valid = False
-                print("current compare these two compounds: ", one_cpd.compound_name, the_other_cpd.compound_name)
+                # print("current compare these two compounds: ", one_cpd.compound_name, the_other_cpd.compound_name)
                 if one_cpd.formula == the_other_cpd.formula:
                     # resonance or linear-circular type
                     try:
@@ -620,7 +620,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
                         cpd_relationships.pop()
             return False
         back_track(0, cpd_relationships)
-        print("back tracking to achieve one to one mapping of compounds", cpd_relationships, one_to_one_mappings)
+        # print("back tracking to achieve one to one mapping of compounds", cpd_relationships, one_to_one_mappings)
         if len(cpd_relationships) == n:
             return cpd_relationships, one_to_one_mappings
         return None, None

@@ -168,7 +168,7 @@ def reaction_parser(reaction_text: list) -> dict:
             while len(current_reaction["^COMPARTMENT"]) < count_left + count_right:
                 current_reaction["^COMPARTMENT"].append(" ")
             reaction_dicts[current_reaction['UNIQUE-ID'][0]] = copy.deepcopy(current_reaction)
-            print(reaction_dicts[current_reaction['UNIQUE-ID'][0]])
+            # print(reaction_dicts[current_reaction['UNIQUE-ID'][0]])
             current_reaction = collections.defaultdict(list)
             count_left, count_right, previous_key = 0, 0, ""
             continue

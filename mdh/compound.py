@@ -298,11 +298,11 @@ class Compound:
                 second_atom.neighbors.append(bond.first_atom_number)
                 second_atom.bond_counts += int(bond.bond_type)
         # print("start find cycles in the compound construction")
-        start_time = datetime.now()
+        # start_time = datetime.now()
         self.cycles = self.find_cycles()
-        end_time = datetime.now()
-        consumed = end_time - start_time
-        print("dedect cycle of {0} cost {1}".format(self.compound_name, consumed.total_seconds()))
+        # end_time = datetime.now()
+        # consumed = end_time - start_time
+        # print("dedect cycle of {0} cost {1}".format(self.compound_name, consumed.total_seconds()))
 
         # print("start calculate distance in the compound construction")
         self.calculate_distance_to_r_groups()

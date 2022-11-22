@@ -600,13 +600,13 @@ class ReactionHarmonizationManager(HarmonizationManager):
         n = len(sorted_one_side)
         cpd_relationships = []
 
-        def back_track(i, cpd_relationships) -> None:
+        def back_track(i, cpd_relationships) -> bool:
             """
             To find one to one compound mappings.
 
             :param i: the ith compound in the sorted_one_side.
             :param cpd_relationships: the mapped compound for the ith compound in the sorted_one_side.
-            :return: None
+            :return: bool
             """
             if i == n:
                 return True
@@ -695,6 +695,6 @@ def harmonize_reaction_list(reaction_list: list, compound_harmonization_manager:
                 for reaction_one in reactions_one:
                     for reaction_two in reactions_two:
                         reaction_harmonized_manager.harmonize_reaction(reaction_one, reaction_two)
-                        
+
         round += 1
     return reaction_harmonized_manager

@@ -10,6 +10,10 @@ Welcome to mdh's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   guide
+   tutorial
+   api
+   license
 
 
 Indices and tables

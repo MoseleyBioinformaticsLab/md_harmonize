@@ -768,7 +768,7 @@ def multiple_compound_pair_mappings(rclass_name: str, rclass_definitions: list, 
     start_time = datetime.now()
     try:
         name, mappings = tools.timeout(compound_pair_mappings, (rclass_name, rclass_definitions, one_compound,
-                                                                the_other_compound,), seconds=10)
+                                                                the_other_compound,), seconds=1200)
         end_time = datetime.now()
         consumed = end_time - start_time
         print("parsing of this {0} cost {1}".format(rclass_name, consumed.total_seconds()))

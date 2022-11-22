@@ -681,6 +681,7 @@ def harmonize_reaction_list(reaction_list: list, compound_harmonization_manager:
     """
     reaction_harmonized_manager = ReactionHarmonizationManager(compound_harmonization_manager)
     k = len(reaction_list)
+    print("k is ", k)
     last_edges = 0
     round = 0
     while len(compound_harmonization_manager.harmonized_edges) != last_edges:
@@ -691,10 +692,11 @@ def harmonize_reaction_list(reaction_list: list, compound_harmonization_manager:
         last_edges = len(compound_harmonization_manager.harmonized_edges)
         for i in range(k):
             for j in range(i+1, k):
+                print("i and j are", i, j)
                 reactions_one, reactions_two = reaction_list[i], reaction_list[j]
                 for reaction_one in reactions_one:
                     for reaction_two in reactions_two:
                         reaction_harmonized_manager.harmonize_reaction(reaction_one, reaction_two)
-
+        print("finish one round")
         round += 1
     return reaction_harmonized_manager

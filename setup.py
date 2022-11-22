@@ -36,7 +36,7 @@ EXTENSIONS = [
 setup(
         name='MDH',
         version=find_version(),
-        packages=find_packages(),
+        packages=find_packages(exclude=['doc', 'docs', 'vignettes']),
         author='Huan Jin, Hunter N.B. Moseley',
         author_email='jinhuan0905@gmail.com, hunter.moseley@gmail.com',
         description='Methods for harmonizing public metabolic databases',
@@ -55,8 +55,10 @@ setup(
             'Intended Audience :: Science/Research',
             'License :: OSI Approved :: BSD License',
             'Operating System :: OS Independent',
-            'Programming Language :: Python :: 3.5',
             'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7',
+            'Programming Language :: Python :: 3.8',
+            'Programming Language :: Python :: 3.9',
+            'Programming Language :: Python :: 3.10',
             ],
 )

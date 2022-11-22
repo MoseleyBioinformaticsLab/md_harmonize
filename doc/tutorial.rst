@@ -1,7 +1,7 @@
 The MDH Tutorial
 ================
 
-The `MDH` can be used to:
+The `MDH` is intended to harmonize compound and reaction across public metabolic databases. It provides functionalities to:
     * Update KEGG database.
     * Curate compound molfile representation.
     * Construct compound/reaction entity.
@@ -16,36 +16,60 @@ The MDH API tutorial
 
 Data preparation
 ----------------
-The raw KEGG a
+The raw KEGG and MetaCyc is available on zenodo. Please download the data first and keep the hierarchy of directory.
 
-Using MDH to download KEGG databases.
+Using MDH to download KEGG databases
 -------------------------------------
 
-The `MDH` provides function to update the KEGG databases. Here is an example to download the latest KEGG data.
+The `MDH` provides function to update the KEGG databases, including compound kcf/molfile, reaction, and rclass.
 
-.. code:: Python
+.. code-block:: console
 
+    python3 -m mdh download KEGG <working_directory>
 
-
-
-Using MDH to curate compound molfile representation.
+Using MDH to curate compound molfile representation
 ----------------------------------------------------
 
+The `MDH` provides function to curate molfile representations, eg: add H.
 
-Using MDH to construct compound/reaction entity.
-------------------------------------------------
+.. code-block:: console
 
+    python3 -m mdh standardize <database_names> <working_directory>
 
-Using MDH to detect aromatic substructures in a compound.
----------------------------------------------------------
+Using MDH to construct compound/reaction entity
+-----------------------------------------------
 
+The `MDH` provides function to construct compound/reaction entities.
 
+Compound construction:
+.. code-block:: console
 
-Using MDH to parse RClass representation to generate atom mappings between compounds.
--------------------------------------------------------------------------------------
+    python3 -m mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom]
 
+Options
+-------
 
-Using MDH to harmonize compounds/reactions across databases.
-------------------------------------------------------------
+--parse-kegg-atom:
+The parse-kegg-atom option is used to
+
+Reaction construction:
+.. code-block:: console
+
+    python3 -m mdh initialize_reaction <database_names> <working_directory>
+
+Using MDH to extract aromatic substructures from compounds
+----------------------------------------------------------
+
+The `MDH` provides function to extract aromatic substructures from compounds using either indigo/BASS to construct
+aromatic manager that can be used to detect aromatic substructures in the compound.
+
+.. code-block:: console
+
+    python3 -m mdh aromatize <database_names> <working_directory> <save_file> [--aromatic_manager=<aromatic_manager_file>]
+
+Using MDH to harmonize compounds/reactions across databases
+-----------------------------------------------------------
+
+The `MDH` provides function to harmonize compounds/reactions across
 
 

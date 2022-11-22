@@ -55,7 +55,8 @@ The raw data from KEGG and MetaCyc databases can be accessed from this URL.
 Basic usage
 ~~~~~~~~~~~
 
-MDH combines several. Details about the files and other inputs are in the :doc:`tutorial`.
+MDH provides functions to achieve compound and reaction harmonization across public metabolic databases. Details about
+the usages are in the :doc:`tutorial`.
 
 .. code-block:: console
 

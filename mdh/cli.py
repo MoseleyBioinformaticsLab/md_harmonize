@@ -78,7 +78,12 @@ def construct_compound_via_components(compound_components: list) -> Optional[com
 
 
 def compound_construct_all(entities: list, function) -> dict:
+    """
 
+    :param entities:
+    :param function:
+    :return:
+    """
     compounds = {}
     for entity in entities:
         this_compound = function(entity)

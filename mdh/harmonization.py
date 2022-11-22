@@ -403,6 +403,8 @@ class ReactionHarmonizationManager(HarmonizationManager):
                                                                                        reversed_the_other_side_mappings)
             # here we see which case matches better, and determine the match direction
             max_score = max(ordered_jaccard, reversed_jaccard)
+            print("the jaccard score of the two reactions ", max_score)
+
             if ordered_jaccard > reversed_jaccard:
                 one_side_pairs = [one_reaction.one_side, the_other_reaction.one_side]
                 the_other_side_pairs = [one_reaction.the_other_side, the_other_reaction.the_other_side]
@@ -433,6 +435,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
 
             elif max_score >= 0.5:
                 # determine if there is missed compound harmonized edge. This threshold can be adjusted.
+                print("map compounds")
                 one_unmapped_compounds = self.unmapped_compounds(one_side_pairs[0], one_side_pairs[1], mappings[0])
                 self.match_unmapped_compounds(one_unmapped_compounds[0], one_unmapped_compounds[1])
 
@@ -488,11 +491,13 @@ class ReactionHarmonizationManager(HarmonizationManager):
         """
         for one_cpd in one_side_left:
             for the_other_cpd in the_other_side_left:
+                print("try to map compounds, ", one_cpd.compound_name, the_other_cpd.compound_name)
                 if self.compound_harmonization_manager.has_visited(one_cpd.compound_name, the_other_cpd.compound_name):
                     continue
                 valid = False
                 # print("current compare these two compounds: ", one_cpd.compound_name, the_other_cpd.compound_name)
                 if one_cpd.formula == the_other_cpd.formula:
+                    print("same formula")
                     # resonance or linear-circular type
                     try:
                         resonant_mappings = one_cpd.map_resonance(the_other_cpd, r_distance=False)
@@ -536,6 +541,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
 
                 if one_cpd.contains_r_groups():
                     # check if one cpd is more generic
+                    print("try to map with r group")
                     try:
                         relationship, atom_mappings = one_cpd.with_r_pair_relationship(the_other_cpd)
                     except:
@@ -694,8 +700,9 @@ def harmonize_reaction_list(reaction_list: list, compound_harmonization_manager:
             for j in range(i+1, k):
                 print("i and j are", i, j)
                 reactions_one, reactions_two = reaction_list[i], reaction_list[j]
-                for reaction_one in reactions_one:
-                    for reaction_two in reactions_two:
+                for i1, reaction_one in enumerate(reactions_one):
+                    for j1, reaction_two in enumerate(reactions_two):
+                        print("index of two reactions, ", i1, j1, reaction_one.reaction_name, reactions_two.reaction_name)
                         reaction_harmonized_manager.harmonize_reaction(reaction_one, reaction_two)
         print("finish one round")
         round += 1

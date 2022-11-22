@@ -1,0 +1,815 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mdh.harmonization &#8212; mdh 1.0.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for mdh.harmonization</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/python3</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">mdh.harmonization</span>
+<span class="sd">~~~~~~~~~~~~~~~~~</span>
+
+<span class="sd">This module provides the :class:`~mdh.harmonization.HarmonizedEdge` class,</span>
+<span class="sd">the :class:`mdh.harmonization.HarmonizedCompoundEdge` class,</span>
+<span class="sd">and the :class:`~mdh.harmonization.HarmonizedReactionEdge` class .</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">compound</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">reaction</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="HarmonizedEdge"><a class="viewcode-back" href="../../api.html#mdh.harmonization.HarmonizedEdge">[docs]</a><span class="k">class</span> <span class="nc">HarmonizedEdge</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The HarmonizedEdge to represent compound or reaction pairs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="HarmonizedEdge.__init__"><a class="viewcode-back" href="../../api.html#mdh.harmonization.HarmonizedEdge.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">one_side</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">,</span> <span class="n">reaction</span><span class="o">.</span><span class="n">Reaction</span><span class="p">],</span>
+                 <span class="n">the_other_side</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">,</span> <span class="n">reaction</span><span class="o">.</span><span class="n">Reaction</span><span class="p">],</span> <span class="n">relationship</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">edge_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">mappings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        HarmonizedEdge initializer.</span>
+
+<span class="sd">        :param one_side: one side of the edge. This can be compound or reaction.</span>
+<span class="sd">        :param the_other_side: the other side of the edge. This can be compound or reaction.</span>
+<span class="sd">        :param relationship: equivalent, generic-specific, or loose.</span>
+<span class="sd">        :param edge_type: for compound edge, this represents resonance, linear-circular, r group, same structure;</span>
+<span class="sd">        for reaction edge, this represents 3 level match or 4 level match.</span>
+<span class="sd">        :param mappings: for compound edge, the mappings refer to mapped atoms between compounds; for reaction edge,</span>
+<span class="sd">        the mappings refer to mapped compounds between reaction.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">one_side</span> <span class="o">=</span> <span class="n">one_side</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">the_other_side</span> <span class="o">=</span> <span class="n">the_other_side</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relationship</span> <span class="o">=</span> <span class="n">relationship</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">edge_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mappings</span> <span class="o">=</span> <span class="n">mappings</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">reversed_relationship</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To get the relationship between the other side and one side.</span>
+
+<span class="sd">        :return: the reversed relationship.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">relationship</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">relationship</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">relationship</span>
+        <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">relationship</span>
+
+<div class="viewcode-block" id="HarmonizedEdge.pair_relationship"><a class="viewcode-back" href="../../api.html#mdh.harmonization.HarmonizedEdge.pair_relationship">[docs]</a>    <span class="k">def</span> <span class="nf">pair_relationship</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        When we map compounds in the reaction, we can access the compound edge from either side.</span>
+
+<span class="sd">        :param name: the name of the searched one side.</span>
+<span class="sd">        :return: the relationship of the searched pair.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">one_side</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">relationship</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reversed_relationship</span></div></div>
+
+
+<div class="viewcode-block" id="HarmonizedCompoundEdge"><a class="viewcode-back" href="../../api.html#mdh.harmonization.HarmonizedCompoundEdge">[docs]</a><span class="k">class</span> <span class="nc">HarmonizedCompoundEdge</span><span class="p">(</span><span class="n">HarmonizedEdge</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The HarmonizedCompoundEdge to represent compound pairs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="HarmonizedCompoundEdge.__init__"><a class="viewcode-back" href="../../api.html#mdh.harmonization.HarmonizedCompoundEdge.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">one_compound</span><span class="p">:</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">,</span> <span class="n">the_other_compound</span><span class="p">:</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">,</span> <span class="n">relationship</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">edge_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">atom_mappings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        HarmonizedCompoundEdge initializer.</span>
+
+<span class="sd">        :param one_compound: one :class:`~mdh.compound.Compound` entity in the compound pair.</span>
+<span class="sd">        :param the_other_compound: the other :class:`~mdh.compound.Compound` entity in the compound pair.</span>
+<span class="sd">        :param relationship: the relationship (equivalent, generic-specific, or loose) between the two compounds.</span>
+<span class="sd">        :param edge_type: the edge type can be resonance, linear-circular, r group, or same structure.</span>
+<span class="sd">        :param atom_mappings: the atom mappings between the two compounds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">one_compound</span><span class="p">,</span> <span class="n">the_other_compound</span><span class="p">,</span> <span class="n">relationship</span><span class="p">,</span> <span class="n">edge_type</span><span class="p">,</span> <span class="n">atom_mappings</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">reversed_mappings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To get the atom mappings from compound on the other side to compound on the one side.</span>
+
+<span class="sd">        :return: atom mappings between the other side compound to one side compound.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">atom_mappings</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">from_atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mappings</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">to_atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mappings</span><span class="p">[</span><span class="n">from_atom</span><span class="p">]:</span>
+                <span class="n">atom_mappings</span><span class="p">[</span><span class="n">to_atom</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">from_atom</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">atom_mappings</span>
+
+<div class="viewcode-block" id="HarmonizedCompoundEdge.pair_atom_mappings"><a class="viewcode-back" href="../../api.html#mdh.harmonization.HarmonizedCompoundEdge.pair_atom_mappings">[docs]</a>    <span class="k">def</span> <span class="nf">pair_atom_mappings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To get the atom mappings of the harmonized compound edge, where one side equals to the parameter name.</span>
+
+<span class="sd">        :param name: the compound name.</span>
+<span class="sd">        :return: the atom mappings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">one_side</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mappings</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reversed_mappings</span></div></div>
+
+
+<div class="viewcode-block" id="HarmonizedReactionEdge"><a class="viewcode-back" href="../../api.html#mdh.harmonization.HarmonizedReactionEdge">[docs]</a><span class="k">class</span> <span class="nc">HarmonizedReactionEdge</span><span class="p">(</span><span class="n">HarmonizedEdge</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The HarmonizedReactionEdge to represent reaction pairs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="HarmonizedReactionEdge.__init__"><a class="viewcode-back" href="../../api.html#mdh.harmonization.HarmonizedReactionEdge.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">one_reaction</span><span class="p">:</span> <span class="n">reaction</span><span class="o">.</span><span class="n">Reaction</span><span class="p">,</span> <span class="n">the_other_reaction</span><span class="p">:</span> <span class="n">reaction</span><span class="o">.</span><span class="n">Reaction</span><span class="p">,</span> <span class="n">relationship</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">edge_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">compound_mappings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        HarmonizedReactionEdge initializer.</span>
+
+<span class="sd">        :param one_reaction: one :class:`~mdh.reaction.Reaction` entity in the reaction pair.</span>
+<span class="sd">        :param the_other_reaction: the other :class:`~mdh.reaction.Reaction` entity in the reaction pair.</span>
+<span class="sd">        :param relationship: the relationship (equivalent, generic-specific, or loose) between the two reactions.</span>
+<span class="sd">        :param edge_type: the reactions can be 3-level EC or 4-level EC paired.</span>
+<span class="sd">        :param compound_mappings: the dictionary of paired compounds in the reaction pair.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">one_reaction</span><span class="p">,</span> <span class="n">the_other_reaction</span><span class="p">,</span> <span class="n">relationship</span><span class="p">,</span> <span class="n">edge_type</span><span class="p">,</span> <span class="n">compound_mappings</span><span class="p">)</span></div></div>
+
+    <span class="c1"># def check_atom_mappings(self):</span>
+
+
+<div class="viewcode-block" id="HarmonizationManager"><a class="viewcode-back" href="../../api.html#mdh.harmonization.HarmonizationManager">[docs]</a><span class="k">class</span> <span class="nc">HarmonizationManager</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The HarmonizationManger takes charge of adding, removing or searching harmonized edge.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="HarmonizationManager.__init__"><a class="viewcode-back" href="../../api.html#mdh.harmonization.HarmonizationManager.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        HarmonizationManager initializer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">harmonized_edges</span> <span class="o">=</span> <span class="p">{}</span></div>
+    
+<div class="viewcode-block" id="HarmonizationManager.save_manager"><a class="viewcode-back" href="../../api.html#mdh.harmonization.HarmonizationManager.save_manager">[docs]</a>    <span class="k">def</span> <span class="nf">save_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To save all the names of harmonized edges.</span>
+
+<span class="sd">        :return: the list of harmonized edges.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">edges</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">harmonized_edges</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">edges</span></div>
+
+<div class="viewcode-block" id="HarmonizationManager.create_key"><a class="viewcode-back" href="../../api.html#mdh.harmonization.HarmonizationManager.create_key">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create_key</span><span class="p">(</span><span class="n">name_1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name_2</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To create the edge key. Each edge is represented by a unique key in the harmonized_edges dictionary.</span>
+
+<span class="sd">        :param name_1: the name of one side of the edge.</span>
+<span class="sd">        :param name_2: the name of the other side of the edge.</span>
+<span class="sd">        :return: the key of the edge.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name_1</span> <span class="o">&gt;</span> <span class="n">name_2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">name_1</span> <span class="o">+</span> <span class="s2">&quot;@&quot;</span> <span class="o">+</span> <span class="n">name_2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">name_2</span> <span class="o">+</span> <span class="s2">&quot;@&quot;</span> <span class="o">+</span> <span class="n">name_1</span></div>
+
+<div class="viewcode-block" id="HarmonizationManager.add_edge"><a class="viewcode-back" href="../../api.html#mdh.harmonization.HarmonizationManager.add_edge">[docs]</a>    <span class="k">def</span> <span class="nf">add_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">HarmonizedCompoundEdge</span><span class="p">,</span> <span class="n">HarmonizedReactionEdge</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To add this edge to the harmonized edges.</span>
+
+<span class="sd">        :param edge: the :class:`~mdh.harmonization.HarmonizedEdge` entity.</span>
+<span class="sd">        :return: bool whether the edge does not exist and is added successfully.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_key</span><span class="p">(</span><span class="n">edge</span><span class="o">.</span><span class="n">one_side</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">the_other_side</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">harmonized_edges</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">harmonized_edges</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="HarmonizationManager.remove_edge"><a class="viewcode-back" href="../../api.html#mdh.harmonization.HarmonizationManager.remove_edge">[docs]</a>    <span class="k">def</span> <span class="nf">remove_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">HarmonizedCompoundEdge</span><span class="p">,</span> <span class="n">HarmonizedReactionEdge</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To remove this edge from the harmonized edges.</span>
+
+<span class="sd">        :param edge: the :class:`~mdh.harmonization.HarmonizedEdge` entity.</span>
+<span class="sd">        :return: bool whether the edge exists and is removed successfully.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_key</span><span class="p">(</span><span class="n">edge</span><span class="o">.</span><span class="n">one_side</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">the_other_side</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">harmonized_edges</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">harmonized_edges</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="HarmonizationManager.search"><a class="viewcode-back" href="../../api.html#mdh.harmonization.HarmonizationManager.search">[docs]</a>    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name_2</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">HarmonizedCompoundEdge</span><span class="p">,</span> <span class="n">HarmonizedReactionEdge</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To search the edge based on the names of the two sides.</span>
+
+<span class="sd">        :param name_1: the name of one side of the edge.</span>
+<span class="sd">        :param name_2: the name of the other side of the edge.</span>
+<span class="sd">        :return: edge if the edge exists or None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_key</span><span class="p">(</span><span class="n">name_1</span><span class="p">,</span> <span class="n">name_2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">harmonized_edges</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">harmonized_edges</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="CompoundHarmonizationManager"><a class="viewcode-back" href="../../api.html#mdh.harmonization.CompoundHarmonizationManager">[docs]</a><span class="k">class</span> <span class="nc">CompoundHarmonizationManager</span><span class="p">(</span><span class="n">HarmonizationManager</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The CompoundHarmonizationManager takes charge of adding, removing or searching</span>
+<span class="sd">    :class:`~mdh.harmonization.HarmonizedCompoundEdge`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CompoundHarmonizationManager.__init__"><a class="viewcode-back" href="../../api.html#mdh.harmonization.CompoundHarmonizationManager.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        CompoundHarmonizationManager initializer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compound_in_edges</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">()</span>
+        <span class="c1"># the visited store invalid compound pairs to avoid redundant validation.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span></div>
+    
+<div class="viewcode-block" id="CompoundHarmonizationManager.find_compound"><a class="viewcode-back" href="../../api.html#mdh.harmonization.CompoundHarmonizationManager.find_compound">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">find_compound</span><span class="p">(</span><span class="n">compound_dict</span><span class="p">,</span> <span class="n">compound_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        </span>
+<span class="sd">        :param compound_dict: </span>
+<span class="sd">        :param compound_name: </span>
+<span class="sd">        :return: </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">sub_dict</span> <span class="ow">in</span> <span class="n">compound_dict</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">compound_name</span> <span class="ow">in</span> <span class="n">sub_dict</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">sub_dict</span><span class="p">[</span><span class="n">compound_name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+    
+<div class="viewcode-block" id="CompoundHarmonizationManager.create_manager"><a class="viewcode-back" href="../../api.html#mdh.harmonization.CompoundHarmonizationManager.create_manager">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create_manager</span><span class="p">(</span><span class="n">compound_dict</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">compound_pairs</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        </span>
+<span class="sd">        :param compound_dict: </span>
+<span class="sd">        :param compound_pairs: </span>
+<span class="sd">        :return: </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">compound_harmonization_manager</span> <span class="o">=</span> <span class="n">CompoundHarmonizationManager</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">compound_pairs</span><span class="p">:</span>
+            <span class="n">compound_name1</span><span class="p">,</span> <span class="n">compound_name2</span> <span class="o">=</span> <span class="n">pair</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">)</span>
+            <span class="n">compound1</span> <span class="o">=</span> <span class="n">CompoundHarmonizationManager</span><span class="o">.</span><span class="n">find_compound</span><span class="p">(</span><span class="n">compound_dict</span><span class="p">,</span> <span class="n">compound_name1</span><span class="p">)</span>
+            <span class="n">compound2</span> <span class="o">=</span> <span class="n">CompoundHarmonizationManager</span><span class="o">.</span><span class="n">find_compound</span><span class="p">(</span><span class="n">compound_dict</span><span class="p">,</span> <span class="n">compound_name2</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">compound1</span> <span class="ow">and</span> <span class="n">compound2</span><span class="p">:</span>
+                <span class="n">relationship</span><span class="p">,</span> <span class="n">atom_mappings</span> <span class="o">=</span> <span class="n">compound1</span><span class="o">.</span><span class="n">same_structure_relationship</span><span class="p">(</span><span class="n">compound2</span><span class="p">)</span>
+                <span class="n">harmonized_compound_edge</span> <span class="o">=</span> <span class="n">HarmonizedCompoundEdge</span><span class="p">(</span><span class="n">compound1</span><span class="p">,</span> <span class="n">compound2</span><span class="p">,</span> <span class="n">relationship</span><span class="p">,</span> <span class="s2">&quot;same_structure&quot;</span><span class="p">,</span> 
+                                                                  <span class="n">atom_mappings</span><span class="p">)</span>
+                <span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">harmonized_compound_edge</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">compound_harmonization_manager</span></div>
+                
+<div class="viewcode-block" id="CompoundHarmonizationManager.add_edge"><a class="viewcode-back" href="../../api.html#mdh.harmonization.CompoundHarmonizationManager.add_edge">[docs]</a>    <span class="k">def</span> <span class="nf">add_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">:</span> <span class="n">HarmonizedCompoundEdge</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To add a newly detected edge to the manager, and update the occurrences of compound in the harmonized edges.</span>
+<span class="sd">        This is for calculating the jaccard index.</span>
+
+<span class="sd">        :param edge: the :class:`~mdh.harmonization.HarmonizedCompoundEdge` entity.</span>
+<span class="sd">        :return: bool whether the edge does not exist and is added successfully.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compound_in_edges</span><span class="p">[</span><span class="n">edge</span><span class="o">.</span><span class="n">one_side</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compound_in_edges</span><span class="p">[</span><span class="n">edge</span><span class="o">.</span><span class="n">the_other_side</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="CompoundHarmonizationManager.remove_edge"><a class="viewcode-back" href="../../api.html#mdh.harmonization.CompoundHarmonizationManager.remove_edge">[docs]</a>    <span class="k">def</span> <span class="nf">remove_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">:</span> <span class="n">HarmonizedCompoundEdge</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To remove the edge from the manager, and update the occurrences of compound in the harmonized edges.</span>
+
+<span class="sd">        :param edge: the :class:`~mdh.harmonization.HarmonizedCompoundEdge` entity.</span>
+<span class="sd">        :return: bool whether the edge exists and is removed successfully.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compound_in_edges</span><span class="p">[</span><span class="n">edge</span><span class="o">.</span><span class="n">one_side</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compound_in_edges</span><span class="p">[</span><span class="n">edge</span><span class="o">.</span><span class="n">the_other_side</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="CompoundHarmonizationManager.has_visited"><a class="viewcode-back" href="../../api.html#mdh.harmonization.CompoundHarmonizationManager.has_visited">[docs]</a>    <span class="k">def</span> <span class="nf">has_visited</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name_2</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To check if the compound pair has been visited.</span>
+
+<span class="sd">        :param name_1: the name of one side of the edge.</span>
+<span class="sd">        :param name_2: the name of the other side of the edge.</span>
+<span class="sd">        :return: bool if the pair has been visited.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_key</span><span class="p">(</span><span class="n">name_1</span><span class="p">,</span> <span class="n">name_2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">visited</span></div>
+
+<div class="viewcode-block" id="CompoundHarmonizationManager.add_invalid"><a class="viewcode-back" href="../../api.html#mdh.harmonization.CompoundHarmonizationManager.add_invalid">[docs]</a>    <span class="k">def</span> <span class="nf">add_invalid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name_2</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To add the name of invalid compound pair to the visited.</span>
+
+<span class="sd">        :param name_1: the name of one side of the edge.</span>
+<span class="sd">        :param name_2: the name of the other side of the edge.</span>
+<span class="sd">        :return: None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_key</span><span class="p">(</span><span class="n">name_1</span><span class="p">,</span> <span class="n">name_2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visited</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CompoundHarmonizationManager.get_edge_list"><a class="viewcode-back" href="../../api.html#mdh.harmonization.CompoundHarmonizationManager.get_edge_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_edge_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To get the names of all the harmonized edges.</span>
+
+<span class="sd">        :return: the list of names of harmonized edges.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">harmonized_edges</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div></div>
+
+
+<div class="viewcode-block" id="ReactionHarmonizationManager"><a class="viewcode-back" href="../../api.html#mdh.harmonization.ReactionHarmonizationManager">[docs]</a><span class="k">class</span> <span class="nc">ReactionHarmonizationManager</span><span class="p">(</span><span class="n">HarmonizationManager</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The ReactionHarmonizationManager takes charge of adding, removing or searching</span>
+<span class="sd">    :class:`~mdh.harmonization.HarmonizedReactionEdge`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ReactionHarmonizationManager.__init__"><a class="viewcode-back" href="../../api.html#mdh.harmonization.ReactionHarmonizationManager.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compound_harmonization_manager</span><span class="p">:</span> <span class="n">CompoundHarmonizationManager</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ReactionHarmonizationManager initializer.</span>
+
+<span class="sd">        :param compound_harmonization_manager: the :class:`~mdh.harmonization.CompoundHarmonizationManager` entity for</span>
+<span class="sd">        compound pairs management.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compound_harmonization_manager</span> <span class="o">=</span> <span class="n">compound_harmonization_manager</span></div>
+
+<div class="viewcode-block" id="ReactionHarmonizationManager.compare_ecs"><a class="viewcode-back" href="../../api.html#mdh.harmonization.ReactionHarmonizationManager.compare_ecs">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">compare_ecs</span><span class="p">(</span><span class="n">one_ecs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">the_other_ecs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To compare two lists of EC numbers.</span>
+
+<span class="sd">        :param one_ecs: the dict of EC numbers of one reaction.</span>
+<span class="sd">        :param the_other_ecs: the dict of EC numbers of the other reaction.</span>
+<span class="sd">        :return: the level of EC number that they can be matched.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">[</span><span class="n">ec</span> <span class="k">for</span> <span class="n">ec</span> <span class="ow">in</span> <span class="n">one_ecs</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="k">if</span> <span class="n">ec</span> <span class="ow">in</span> <span class="n">the_other_ecs</span><span class="p">[</span><span class="mi">4</span><span class="p">]]:</span>
+            <span class="k">return</span> <span class="mi">4</span>
+        <span class="k">if</span> <span class="p">[</span><span class="n">ec</span> <span class="k">for</span> <span class="n">ec</span> <span class="ow">in</span> <span class="n">one_ecs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="k">if</span> <span class="n">ec</span> <span class="ow">in</span> <span class="n">the_other_ecs</span><span class="p">[</span><span class="mi">3</span><span class="p">]]:</span>
+            <span class="k">return</span> <span class="mi">3</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="ReactionHarmonizationManager.determine_relationship"><a class="viewcode-back" href="../../api.html#mdh.harmonization.ReactionHarmonizationManager.determine_relationship">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">determine_relationship</span><span class="p">(</span><span class="n">relationships</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To determine the relationship of the reaction pair based on the relationship of paired compounds.</span>
+
+<span class="sd">        :param relationships: the list of relationship of compound pairs in the two reactions.</span>
+<span class="sd">        :return: the relationships between the two reactions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">counter</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">relationships</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">counter</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># if at least one compound pair has loose relationship, then the relationship between the two reactions</span>
+            <span class="c1"># is loose.</span>
+            <span class="k">return</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">counter</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">counter</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># if compound pairs can have generic-specific as well specific-generic relationship, then the relationship</span>
+            <span class="c1"># between the two reactions is loose.</span>
+            <span class="k">return</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">counter</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">counter</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="c1"># equivalent relationship.</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="ReactionHarmonizationManager.harmonize_reaction"><a class="viewcode-back" href="../../api.html#mdh.harmonization.ReactionHarmonizationManager.harmonize_reaction">[docs]</a>    <span class="k">def</span> <span class="nf">harmonize_reaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">one_reaction</span><span class="p">:</span> <span class="n">reaction</span><span class="o">.</span><span class="n">Reaction</span><span class="p">,</span> <span class="n">the_other_reaction</span><span class="p">:</span> <span class="n">reaction</span><span class="o">.</span><span class="n">Reaction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To test if two reactions can be harmonized.</span>
+
+<span class="sd">        :param one_reaction: one :class:`~mdh.reaction.Reaction` that is involved in the reaction pair.</span>
+<span class="sd">        :param the_other_reaction: the other :class:`~mdh.reaction.Reaction` that is involved in the reaction pair.</span>
+<span class="sd">        :return: None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ec_comparison</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compare_ecs</span><span class="p">(</span><span class="n">one_reaction</span><span class="o">.</span><span class="n">ecs</span><span class="p">,</span> <span class="n">the_other_reaction</span><span class="o">.</span><span class="n">ecs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ec_comparison</span><span class="p">:</span>
+            <span class="c1"># Don&#39;t share the same ec, skip it.</span>
+            <span class="k">return</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># For the reaction pair, one_side of one reaction can be mapped to one_side of the other reaction;</span>
+            <span class="c1"># Or one_side of one reaction can be mapped to the_other_side of the other reaction.</span>
+
+            <span class="c1"># one_side to one_side</span>
+            <span class="c1"># we map compounds in the two sides separately.</span>
+            <span class="n">ordered_one_side_mappings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compound_mappings</span><span class="p">(</span><span class="n">one_reaction</span><span class="o">.</span><span class="n">one_side</span><span class="p">,</span> <span class="n">the_other_reaction</span><span class="o">.</span><span class="n">one_side</span><span class="p">)</span>
+            <span class="n">ordered_the_other_side_mappings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compound_mappings</span><span class="p">(</span><span class="n">one_reaction</span><span class="o">.</span><span class="n">the_other_side</span><span class="p">,</span>
+                                                                     <span class="n">the_other_reaction</span><span class="o">.</span><span class="n">the_other_side</span><span class="p">)</span>
+            <span class="n">ordered_jaccard</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jaccard</span><span class="p">(</span><span class="n">one_reaction</span><span class="o">.</span><span class="n">one_side</span><span class="p">,</span> <span class="n">the_other_reaction</span><span class="o">.</span><span class="n">one_side</span><span class="p">,</span> <span class="n">ordered_one_side_mappings</span><span class="p">)</span> <span class="o">*</span> \
+                              <span class="bp">self</span><span class="o">.</span><span class="n">jaccard</span><span class="p">(</span><span class="n">one_reaction</span><span class="o">.</span><span class="n">the_other_side</span><span class="p">,</span> <span class="n">the_other_reaction</span><span class="o">.</span><span class="n">the_other_side</span><span class="p">,</span>
+                                           <span class="n">ordered_the_other_side_mappings</span><span class="p">)</span>
+
+            <span class="c1"># one_side to the_other_side</span>
+            <span class="n">reversed_one_side_mappings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compound_mappings</span><span class="p">(</span><span class="n">one_reaction</span><span class="o">.</span><span class="n">one_side</span><span class="p">,</span> <span class="n">the_other_reaction</span><span class="o">.</span><span class="n">the_other_side</span><span class="p">)</span>
+            <span class="n">reversed_the_other_side_mappings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compound_mappings</span><span class="p">(</span><span class="n">one_reaction</span><span class="o">.</span><span class="n">the_other_side</span><span class="p">,</span>
+                                                                      <span class="n">the_other_reaction</span><span class="o">.</span><span class="n">one_side</span><span class="p">)</span>
+            <span class="n">reversed_jaccard</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jaccard</span><span class="p">(</span><span class="n">one_reaction</span><span class="o">.</span><span class="n">one_side</span><span class="p">,</span> <span class="n">the_other_reaction</span><span class="o">.</span><span class="n">the_other_side</span><span class="p">,</span>
+                                            <span class="n">reversed_one_side_mappings</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">jaccard</span><span class="p">(</span><span class="n">one_reaction</span><span class="o">.</span><span class="n">the_other_side</span><span class="p">,</span>
+                                                                                       <span class="n">the_other_reaction</span><span class="o">.</span><span class="n">one_side</span><span class="p">,</span>
+                                                                                       <span class="n">reversed_the_other_side_mappings</span><span class="p">)</span>
+            <span class="c1"># here we see which case matches better, and determine the match direction</span>
+            <span class="n">max_score</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">ordered_jaccard</span><span class="p">,</span> <span class="n">reversed_jaccard</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;the jaccard score of the two reactions &quot;</span><span class="p">,</span> <span class="n">max_score</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">ordered_jaccard</span> <span class="o">&gt;</span> <span class="n">reversed_jaccard</span><span class="p">:</span>
+                <span class="n">one_side_pairs</span> <span class="o">=</span> <span class="p">[</span><span class="n">one_reaction</span><span class="o">.</span><span class="n">one_side</span><span class="p">,</span> <span class="n">the_other_reaction</span><span class="o">.</span><span class="n">one_side</span><span class="p">]</span>
+                <span class="n">the_other_side_pairs</span> <span class="o">=</span> <span class="p">[</span><span class="n">one_reaction</span><span class="o">.</span><span class="n">the_other_side</span><span class="p">,</span> <span class="n">the_other_reaction</span><span class="o">.</span><span class="n">the_other_side</span><span class="p">]</span>
+                <span class="n">mappings</span> <span class="o">=</span> <span class="p">[</span><span class="n">ordered_one_side_mappings</span><span class="p">,</span> <span class="n">ordered_the_other_side_mappings</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">one_side_pairs</span> <span class="o">=</span> <span class="p">[</span><span class="n">one_reaction</span><span class="o">.</span><span class="n">one_side</span><span class="p">,</span> <span class="n">the_other_reaction</span><span class="o">.</span><span class="n">the_other_side</span><span class="p">]</span>
+                <span class="n">the_other_side_pairs</span> <span class="o">=</span> <span class="p">[</span><span class="n">one_reaction</span><span class="o">.</span><span class="n">the_other_side</span><span class="p">,</span> <span class="n">the_other_reaction</span><span class="o">.</span><span class="n">one_side</span><span class="p">]</span>
+                <span class="n">mappings</span> <span class="o">=</span> <span class="p">[</span><span class="n">reversed_one_side_mappings</span><span class="p">,</span> <span class="n">reversed_the_other_side_mappings</span><span class="p">]</span>
+
+            <span class="c1"># we need to add reaction harmonized edge, at the same time, find the compound mappings and</span>
+            <span class="c1"># determine the relationship of the edge.</span>
+            <span class="c1"># print(max_score)</span>
+            <span class="k">if</span> <span class="n">max_score</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># To derive the one_to_one compound mappings on both sides.</span>
+                <span class="c1"># print(one_reaction.name, the_other_reaction.name, mappings)</span>
+                <span class="n">one_side_relationships</span><span class="p">,</span> <span class="n">one_side_mappings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">one_to_one_compound_mappings</span><span class="p">(</span><span class="n">mappings</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="c1"># print(&quot;one side mappings of the compound:&quot;, one_side_mappings)</span>
+                <span class="n">the_other_side_relationships</span><span class="p">,</span> <span class="n">the_other_side_mappings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">one_to_one_compound_mappings</span><span class="p">(</span><span class="n">mappings</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="c1"># print(&quot;the other side mappings of the compound:&quot;, the_other_side_mappings)</span>
+                <span class="k">if</span> <span class="n">one_side_relationships</span> <span class="ow">and</span> <span class="n">the_other_side_relationships</span><span class="p">:</span>
+                    <span class="c1"># To combine the compound mappings together.</span>
+                    <span class="n">one_side_mappings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">the_other_side_mappings</span><span class="p">)</span>
+                    <span class="n">relationship</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">determine_relationship</span><span class="p">(</span><span class="n">one_side_relationships</span> <span class="o">+</span> <span class="n">the_other_side_relationships</span><span class="p">)</span>
+                    <span class="n">harmonized_reaction_edge</span> <span class="o">=</span> <span class="n">HarmonizedReactionEdge</span><span class="p">(</span><span class="n">one_reaction</span><span class="p">,</span> <span class="n">the_other_reaction</span><span class="p">,</span> <span class="n">relationship</span><span class="p">,</span>
+                                                                      <span class="n">ec_comparison</span><span class="p">,</span> <span class="n">one_side_mappings</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;find harmonized reaction: &quot;</span><span class="p">,</span> <span class="n">one_reaction</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">the_other_reaction</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">harmonized_reaction_edge</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">max_score</span> <span class="o">&gt;=</span> <span class="mf">0.5</span><span class="p">:</span>
+                <span class="c1"># determine if there is missed compound harmonized edge. This threshold can be adjusted.</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;map compounds&quot;</span><span class="p">)</span>
+                <span class="n">one_unmapped_compounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unmapped_compounds</span><span class="p">(</span><span class="n">one_side_pairs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">one_side_pairs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">mappings</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">match_unmapped_compounds</span><span class="p">(</span><span class="n">one_unmapped_compounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">one_unmapped_compounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+                <span class="n">the_other_unmapped_compounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unmapped_compounds</span><span class="p">(</span><span class="n">the_other_side_pairs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                                       <span class="n">the_other_side_pairs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">mappings</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">match_unmapped_compounds</span><span class="p">(</span><span class="n">the_other_unmapped_compounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">the_other_unmapped_compounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="ReactionHarmonizationManager.compound_mappings"><a class="viewcode-back" href="../../api.html#mdh.harmonization.ReactionHarmonizationManager.compound_mappings">[docs]</a>    <span class="k">def</span> <span class="nf">compound_mappings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">one_compounds</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">the_other_compounds</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To get the mapped compounds in the two compound lists.</span>
+
+<span class="sd">        :param one_compounds: one list of :class:`~mdh.compound.Compound` entities.</span>
+<span class="sd">        :param the_other_compounds: the other list of :class:`~mdh.compound.Compound` entities.</span>
+<span class="sd">        :return: the dictionary of paired compounds with their relationship. The relationship will be used to determine</span>
+<span class="sd">        the relationship of reaction pair.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mappings</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">one_compound</span> <span class="ow">in</span> <span class="n">one_compounds</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">the_other_compound</span> <span class="ow">in</span> <span class="n">the_other_compounds</span><span class="p">:</span>
+                <span class="n">harmonized_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">one_compound</span><span class="o">.</span><span class="n">compound_name</span><span class="p">,</span>
+                                                                             <span class="n">the_other_compound</span><span class="o">.</span><span class="n">compound_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">harmonized_edge</span><span class="p">:</span>
+                    <span class="n">mappings</span><span class="p">[</span><span class="n">one_compound</span><span class="o">.</span><span class="n">compound_name</span><span class="p">][</span><span class="n">the_other_compound</span><span class="o">.</span><span class="n">compound_name</span><span class="p">]</span> <span class="o">=</span> \
+                        <span class="n">harmonized_edge</span><span class="o">.</span><span class="n">pair_relationship</span><span class="p">(</span><span class="n">one_compound</span><span class="o">.</span><span class="n">compound_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mappings</span></div>
+
+<div class="viewcode-block" id="ReactionHarmonizationManager.unmapped_compounds"><a class="viewcode-back" href="../../api.html#mdh.harmonization.ReactionHarmonizationManager.unmapped_compounds">[docs]</a>    <span class="k">def</span> <span class="nf">unmapped_compounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">one_compounds</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">the_other_compounds</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">mappings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To get the compounds that cannot be mapped. This can lead to new compound pairs.</span>
+
+<span class="sd">        :param one_compounds: one list of :class:`~mdh.compound.Compound` entities.</span>
+<span class="sd">        :param the_other_compounds: the other list of :class:`~mdh.compound.Compound` entities.</span>
+<span class="sd">        :param mappings: the mapped compounds between the two compound lists.</span>
+<span class="sd">        :return: two lists of compounds that cannot be mapped.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">one_side_left</span> <span class="o">=</span> <span class="p">[</span><span class="n">cpd</span> <span class="k">for</span> <span class="n">cpd</span> <span class="ow">in</span> <span class="n">one_compounds</span> <span class="k">if</span> <span class="n">cpd</span><span class="o">.</span><span class="n">compound_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mappings</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="n">used_the_other</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">one_cpd</span> <span class="ow">in</span> <span class="n">mappings</span><span class="p">:</span>
+            <span class="n">used_the_other</span> <span class="o">|=</span> <span class="nb">set</span><span class="p">(</span><span class="n">mappings</span><span class="p">[</span><span class="n">one_cpd</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">the_other_side_left</span> <span class="o">=</span> <span class="p">[</span><span class="n">cpd</span> <span class="k">for</span> <span class="n">cpd</span> <span class="ow">in</span> <span class="n">the_other_compounds</span> <span class="k">if</span> <span class="n">cpd</span><span class="o">.</span><span class="n">compound_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">used_the_other</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">one_side_left</span><span class="p">,</span> <span class="n">the_other_side_left</span></div>
+
+<div class="viewcode-block" id="ReactionHarmonizationManager.match_unmapped_compounds"><a class="viewcode-back" href="../../api.html#mdh.harmonization.ReactionHarmonizationManager.match_unmapped_compounds">[docs]</a>    <span class="k">def</span> <span class="nf">match_unmapped_compounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">one_side_left</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">the_other_side_left</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To match the left compounds and add the valid compound pairs to the</span>
+<span class="sd">        :class:`~mdh.harmonization.CompoundHarmonizationManager`.</span>
+<span class="sd">        We also add the invalid compound pairs to the :class:`~mdh.harmonization.CompoundHarmonizationManager` to avoid</span>
+<span class="sd">        redundant match.</span>
+
+<span class="sd">        :param one_side_left: one list of left :class:`~mdh.compound.Compound` entities.</span>
+<span class="sd">        :param the_other_side_left: the other list of left :class:`~mdh.compound.Compound` entities.</span>
+<span class="sd">        :return: None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">one_cpd</span> <span class="ow">in</span> <span class="n">one_side_left</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">the_other_cpd</span> <span class="ow">in</span> <span class="n">the_other_side_left</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;try to map compounds, &quot;</span><span class="p">,</span> <span class="n">one_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">,</span> <span class="n">the_other_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">has_visited</span><span class="p">(</span><span class="n">one_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">,</span> <span class="n">the_other_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="c1"># print(&quot;current compare these two compounds: &quot;, one_cpd.compound_name, the_other_cpd.compound_name)</span>
+                <span class="k">if</span> <span class="n">one_cpd</span><span class="o">.</span><span class="n">formula</span> <span class="o">==</span> <span class="n">the_other_cpd</span><span class="o">.</span><span class="n">formula</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;same formula&quot;</span><span class="p">)</span>
+                    <span class="c1"># resonance or linear-circular type</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">resonant_mappings</span> <span class="o">=</span> <span class="n">one_cpd</span><span class="o">.</span><span class="n">map_resonance</span><span class="p">(</span><span class="n">the_other_cpd</span><span class="p">,</span> <span class="n">r_distance</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">add_invalid</span><span class="p">(</span><span class="n">one_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">,</span> <span class="n">the_other_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">)</span>
+                        <span class="k">continue</span>
+                    <span class="k">if</span> <span class="n">resonant_mappings</span><span class="p">:</span>
+                        <span class="c1"># here both atom_mappings and relationship should be returned.</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;find harmonized compound relationship with resonance relationship: &quot;</span><span class="p">,</span> <span class="n">the_other_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">,</span> <span class="n">one_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">)</span>
+                        <span class="n">relationship</span><span class="p">,</span> <span class="n">atom_mappings</span> <span class="o">=</span> <span class="n">one_cpd</span><span class="o">.</span><span class="n">optimal_resonant_mapping</span><span class="p">(</span><span class="n">the_other_cpd</span><span class="p">,</span> <span class="n">resonant_mappings</span><span class="p">)</span>
+                        <span class="n">harmonized_compound_edge</span> <span class="o">=</span> <span class="n">HarmonizedCompoundEdge</span><span class="p">(</span><span class="n">one_cpd</span><span class="p">,</span> <span class="n">the_other_cpd</span><span class="p">,</span> <span class="n">relationship</span><span class="p">,</span>
+                                                                          <span class="s2">&quot;resonance&quot;</span><span class="p">,</span> <span class="n">atom_mappings</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">harmonized_compound_edge</span><span class="p">)</span>
+                        <span class="c1"># check if they are resonant</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># check if they have circular and linear interchangeable formats.</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">relationship</span><span class="p">,</span> <span class="n">atom_mappings</span> <span class="o">=</span> <span class="n">one_cpd</span><span class="o">.</span><span class="n">circular_pair_relationship</span><span class="p">(</span><span class="n">the_other_cpd</span><span class="p">)</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">add_invalid</span><span class="p">(</span><span class="n">one_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">,</span>
+                                                                            <span class="n">the_other_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">)</span>
+                            <span class="k">continue</span>
+                        <span class="k">if</span> <span class="n">atom_mappings</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;find harmonized compound relationship with circular relationship: &quot;</span><span class="p">,</span> <span class="n">the_other_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">,</span> <span class="n">one_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">)</span>
+                            <span class="n">harmonized_compound_edge</span> <span class="o">=</span> <span class="n">HarmonizedCompoundEdge</span><span class="p">(</span><span class="n">one_cpd</span><span class="p">,</span> <span class="n">the_other_cpd</span><span class="p">,</span> <span class="n">relationship</span><span class="p">,</span>
+                                                                              <span class="s2">&quot;circular&quot;</span><span class="p">,</span> <span class="n">atom_mappings</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">harmonized_compound_edge</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="n">relationship</span><span class="p">,</span> <span class="n">atom_mappings</span> <span class="o">=</span> <span class="n">the_other_cpd</span><span class="o">.</span><span class="n">circular_pair_relationship</span><span class="p">(</span><span class="n">one_cpd</span><span class="p">)</span>
+                            <span class="k">except</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">add_invalid</span><span class="p">(</span><span class="n">one_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">,</span>
+                                                                                <span class="n">the_other_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">)</span>
+                                <span class="k">continue</span>
+                            <span class="k">if</span> <span class="n">atom_mappings</span><span class="p">:</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;find harmonized compound relationship with circular relationship: &quot;</span><span class="p">,</span> <span class="n">the_other_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">,</span> <span class="n">one_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">)</span>
+                                <span class="n">harmonized_compound_edge</span> <span class="o">=</span> <span class="n">HarmonizedCompoundEdge</span><span class="p">(</span><span class="n">the_other_cpd</span><span class="p">,</span> <span class="n">one_cpd</span><span class="p">,</span> <span class="n">relationship</span><span class="p">,</span>
+                                                                                  <span class="s2">&quot;circular&quot;</span><span class="p">,</span> <span class="n">atom_mappings</span><span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">harmonized_compound_edge</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+                <span class="k">if</span> <span class="n">one_cpd</span><span class="o">.</span><span class="n">contains_r_groups</span><span class="p">():</span>
+                    <span class="c1"># check if one cpd is more generic</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;try to map with r group&quot;</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">relationship</span><span class="p">,</span> <span class="n">atom_mappings</span> <span class="o">=</span> <span class="n">one_cpd</span><span class="o">.</span><span class="n">with_r_pair_relationship</span><span class="p">(</span><span class="n">the_other_cpd</span><span class="p">)</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">add_invalid</span><span class="p">(</span><span class="n">one_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">,</span>
+                                                                        <span class="n">the_other_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">)</span>
+                        <span class="k">continue</span>
+
+                    <span class="k">if</span> <span class="n">atom_mappings</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;find harmonized compound relationship with r group: &quot;</span><span class="p">,</span> <span class="n">the_other_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">,</span> <span class="n">one_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">)</span>
+                        <span class="n">harmonized_compound_edge</span> <span class="o">=</span> <span class="n">HarmonizedCompoundEdge</span><span class="p">(</span><span class="n">one_cpd</span><span class="p">,</span> <span class="n">the_other_cpd</span><span class="p">,</span> <span class="n">relationship</span><span class="p">,</span>
+                                                                          <span class="s2">&quot;r_group&quot;</span><span class="p">,</span> <span class="n">atom_mappings</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">harmonized_compound_edge</span><span class="p">)</span>
+                        <span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
+
+                <span class="k">if</span> <span class="n">the_other_cpd</span><span class="o">.</span><span class="n">contains_r_groups</span><span class="p">():</span>
+                    <span class="c1"># check if the other cpd is more generic.</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">relationship</span><span class="p">,</span> <span class="n">atom_mappings</span> <span class="o">=</span> <span class="n">the_other_cpd</span><span class="o">.</span><span class="n">with_r_pair_relationship</span><span class="p">(</span><span class="n">one_cpd</span><span class="p">)</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">add_invalid</span><span class="p">(</span><span class="n">one_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">,</span>
+                                                                        <span class="n">the_other_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">)</span>
+                        <span class="k">continue</span>
+                    <span class="k">if</span> <span class="n">atom_mappings</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;find harmonized compound relationship with r group: &quot;</span><span class="p">,</span> <span class="n">the_other_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">,</span> <span class="n">one_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">)</span>
+                        <span class="n">harmonized_compound_edge</span> <span class="o">=</span> <span class="n">HarmonizedCompoundEdge</span><span class="p">(</span><span class="n">the_other_cpd</span><span class="p">,</span> <span class="n">one_cpd</span><span class="p">,</span> <span class="n">relationship</span><span class="p">,</span>
+                                                                          <span class="s2">&quot;r_group&quot;</span><span class="p">,</span> <span class="n">atom_mappings</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">harmonized_compound_edge</span><span class="p">)</span>
+                        <span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">add_invalid</span><span class="p">(</span><span class="n">one_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">,</span> <span class="n">the_other_cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReactionHarmonizationManager.jaccard"><a class="viewcode-back" href="../../api.html#mdh.harmonization.ReactionHarmonizationManager.jaccard">[docs]</a>    <span class="k">def</span> <span class="nf">jaccard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">one_compounds</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">the_other_compounds</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">mappings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To calculate the jaccard index between the two list of compounds.</span>
+
+<span class="sd">        :param one_compounds: one list of :class:`~mdh.compound.Compound` entities.</span>
+<span class="sd">        :param the_other_compounds: the other list of :class:`~mdh.compound.Compound` entities.</span>
+<span class="sd">        :param mappings: the dictionary of mapped compounds between the two compound lists.</span>
+<span class="sd">        :return: the jaccard index of the two compound lists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">one_in_reactions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">compound_in_edges</span><span class="p">[</span><span class="n">cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">for</span>
+                            <span class="n">cpd</span> <span class="ow">in</span> <span class="n">one_compounds</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">the_other_in_reactions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">compound_in_edges</span><span class="p">[</span><span class="n">cpd</span><span class="o">.</span><span class="n">compound_name</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">cpd</span> <span class="ow">in</span>
+                                  <span class="n">the_other_compounds</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">denominator</span> <span class="o">=</span> <span class="n">one_in_reactions</span> <span class="o">+</span> <span class="n">the_other_in_reactions</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">mappings</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">denominator</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">mappings</span><span class="p">)</span> <span class="o">/</span> <span class="n">denominator</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="ReactionHarmonizationManager.one_to_one_compound_mappings"><a class="viewcode-back" href="../../api.html#mdh.harmonization.ReactionHarmonizationManager.one_to_one_compound_mappings">[docs]</a>    <span class="k">def</span> <span class="nf">one_to_one_compound_mappings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mappings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To find the one to one compound mappings between the two reactions.</span>
+<span class="sd">        This step is to avoid very extreme cases that a compound in one reaction can be mapped to two or more compounds</span>
+<span class="sd">        in the other reaction.</span>
+
+<span class="sd">        :param mappings: the dictionary of compound mappings.</span>
+<span class="sd">        :return: the tuple of relationship of compound pairs and dictionary of one to one compound mappings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">one_to_one_mappings</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">sorted_one_side</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">mappings</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">sorted_one_side</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_one_side</span><span class="p">)</span>
+        <span class="n">cpd_relationships</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span> <span class="nf">back_track</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">cpd_relationships</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            To find one to one compound mappings.</span>
+
+<span class="sd">            :param i: the ith compound in the sorted_one_side.</span>
+<span class="sd">            :param cpd_relationships: the mapped compound for the ith compound in the sorted_one_side.</span>
+<span class="sd">            :return: bool</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">n</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="n">one_side_cpd</span> <span class="o">=</span> <span class="n">sorted_one_side</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">the_other_cpd</span> <span class="ow">in</span> <span class="n">mappings</span><span class="p">[</span><span class="n">one_side_cpd</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">the_other_cpd</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">one_to_one_mappings</span><span class="p">:</span>
+                    <span class="n">cpd_relationships</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mappings</span><span class="p">[</span><span class="n">one_side_cpd</span><span class="p">][</span><span class="n">the_other_cpd</span><span class="p">])</span>
+                    <span class="n">one_to_one_mappings</span><span class="p">[</span><span class="n">the_other_cpd</span><span class="p">]</span> <span class="o">=</span> <span class="n">one_side_cpd</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">back_track</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">cpd_relationships</span><span class="p">):</span>
+                        <span class="k">del</span> <span class="n">one_to_one_mappings</span><span class="p">[</span><span class="n">the_other_cpd</span><span class="p">]</span>
+                        <span class="n">cpd_relationships</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">back_track</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">cpd_relationships</span><span class="p">)</span>
+        <span class="c1"># print(&quot;back tracking to achieve one to one mapping of compounds&quot;, cpd_relationships, one_to_one_mappings)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cpd_relationships</span><span class="p">)</span> <span class="o">==</span> <span class="n">n</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">cpd_relationships</span><span class="p">,</span> <span class="n">one_to_one_mappings</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="harmonize_compound_list"><a class="viewcode-back" href="../../api.html#mdh.harmonization.harmonize_compound_list">[docs]</a><span class="k">def</span> <span class="nf">harmonize_compound_list</span><span class="p">(</span><span class="n">compound_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CompoundHarmonizationManager</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    To harmonize compounds across different databases based on the compound coloring identifier.</span>
+
+<span class="sd">    :param compound_list: the list of :class:`~mdh.compound.Compound` dictionary from different sources.</span>
+<span class="sd">    :return: the :class:`~mdh.harmonization.CompoundHarmonizationManager` entity with harmonized compound edges.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">compound_harmonization_manager</span> <span class="o">=</span> <span class="n">CompoundHarmonizationManager</span><span class="p">()</span>
+    <span class="c1"># here, we need to color the compound for harmonization, do it the same time to avoid redundant coloring.</span>
+    <span class="c1"># we first just harmonize compounds with the same coloring identifiers.</span>
+    <span class="c1"># color the compounds</span>
+    <span class="k">for</span> <span class="n">compound_dict</span> <span class="ow">in</span> <span class="n">compound_list</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">compound_name</span> <span class="ow">in</span> <span class="n">compound_dict</span><span class="p">:</span>
+            <span class="n">compound_dict</span><span class="p">[</span><span class="n">compound_name</span><span class="p">]</span><span class="o">.</span><span class="n">color_compound</span><span class="p">(</span><span class="n">r_groups</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bond_stereo</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">atom_stereo</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                        <span class="n">resonance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">isotope_resolved</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">compound_list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+            <span class="n">compounds_one</span><span class="p">,</span> <span class="n">compounds_two</span> <span class="o">=</span> <span class="n">compound_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">compound_list</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">cpd_name_one</span> <span class="ow">in</span> <span class="n">compounds_one</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">cpd_name_two</span> <span class="ow">in</span> <span class="n">compounds_two</span><span class="p">:</span>
+                    <span class="c1"># here, we try to harmonize compounds with the same structure, use formula to remove unnecessary</span>
+                    <span class="c1"># comparison.</span>
+                    <span class="c1"># The whole compound string identifier can be rather long. Therefore, the comparison can take very</span>
+                    <span class="c1"># long time.</span>
+                    <span class="k">if</span> <span class="n">compounds_one</span><span class="p">[</span><span class="n">cpd_name_one</span><span class="p">]</span><span class="o">.</span><span class="n">formula</span> <span class="o">!=</span> <span class="n">compounds_two</span><span class="p">[</span><span class="n">cpd_name_two</span><span class="p">]</span><span class="o">.</span><span class="n">formula</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">color_one</span> <span class="o">=</span> <span class="n">compounds_one</span><span class="p">[</span><span class="n">cpd_name_one</span><span class="p">]</span><span class="o">.</span><span class="n">backbone_color_identifier</span><span class="p">(</span><span class="n">r_groups</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> \
+                                <span class="n">compounds_one</span><span class="p">[</span><span class="n">cpd_name_one</span><span class="p">]</span><span class="o">.</span><span class="n">metal_color_identifier</span><span class="p">(</span><span class="n">details</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="n">color_two</span> <span class="o">=</span> <span class="n">compounds_two</span><span class="p">[</span><span class="n">cpd_name_two</span><span class="p">]</span><span class="o">.</span><span class="n">backbone_color_identifier</span><span class="p">(</span><span class="n">r_groups</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> \
+                                <span class="n">compounds_two</span><span class="p">[</span><span class="n">cpd_name_two</span><span class="p">]</span><span class="o">.</span><span class="n">metal_color_identifier</span><span class="p">(</span><span class="n">details</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">color_one</span> <span class="o">==</span> <span class="n">color_two</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;find one pair using color identifiers&quot;</span><span class="p">,</span> <span class="n">cpd_name_one</span><span class="p">,</span> <span class="n">cpd_name_two</span><span class="p">)</span>
+                        <span class="n">relationship</span><span class="p">,</span> <span class="n">atom_mappings</span> <span class="o">=</span> <span class="n">compounds_one</span><span class="p">[</span><span class="n">cpd_name_one</span><span class="p">]</span><span class="o">.</span>\
+                            <span class="n">same_structure_relationship</span><span class="p">(</span><span class="n">compounds_two</span><span class="p">[</span><span class="n">cpd_name_two</span><span class="p">])</span>
+                        <span class="n">harmonized_compound_edge</span> <span class="o">=</span> <span class="n">HarmonizedCompoundEdge</span><span class="p">(</span><span class="n">compounds_one</span><span class="p">[</span><span class="n">cpd_name_one</span><span class="p">],</span>
+                                                                          <span class="n">compounds_two</span><span class="p">[</span><span class="n">cpd_name_two</span><span class="p">],</span> <span class="n">relationship</span><span class="p">,</span>
+                                                                          <span class="s2">&quot;same_structure&quot;</span><span class="p">,</span> <span class="n">atom_mappings</span><span class="p">)</span>
+                        <span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">harmonized_compound_edge</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">compound_harmonization_manager</span></div>
+
+
+<div class="viewcode-block" id="harmonize_reaction_list"><a class="viewcode-back" href="../../api.html#mdh.harmonization.harmonize_reaction_list">[docs]</a><span class="k">def</span> <span class="nf">harmonize_reaction_list</span><span class="p">(</span><span class="n">reaction_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">compound_harmonization_manager</span><span class="p">:</span> <span class="n">CompoundHarmonizationManager</span><span class="p">)</span> <span class="o">-&gt;</span> \
+        <span class="n">ReactionHarmonizationManager</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    To harmonize reactions across different sources based on the harmonized compounds. At the same time, this also</span>
+<span class="sd">    harmonizes compound pairs with resonance, linear-circular, r group types.</span>
+
+<span class="sd">    :param reaction_list: a list of :class:`~mdh.reaction.Reaction` list from different sources.</span>
+<span class="sd">    :param compound_harmonization_manager: a :class:`~mdh.harmonization.CompoundHarmonizationManager` containing</span>
+<span class="sd">    harmonized compound pairs with the same structure.</span>
+<span class="sd">    :return: :class:`~mdh.harmonization.ReactionHarmonizationManager`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">reaction_harmonized_manager</span> <span class="o">=</span> <span class="n">ReactionHarmonizationManager</span><span class="p">(</span><span class="n">compound_harmonization_manager</span><span class="p">)</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">reaction_list</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;k is &quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+    <span class="n">last_edges</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="nb">round</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">harmonized_edges</span><span class="p">)</span> <span class="o">!=</span> <span class="n">last_edges</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;harmonization round </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;current harmonized edges: &quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">harmonized_edges</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;edges from last round &quot;</span><span class="p">,</span> <span class="n">last_edges</span><span class="p">)</span>
+        <span class="c1"># if no new compound harmonized edges added, then we can stop harmonize.</span>
+        <span class="n">last_edges</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">compound_harmonization_manager</span><span class="o">.</span><span class="n">harmonized_edges</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;i and j are&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+                <span class="n">reactions_one</span><span class="p">,</span> <span class="n">reactions_two</span> <span class="o">=</span> <span class="n">reaction_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">reaction_list</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">reaction_one</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">reactions_one</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">j1</span><span class="p">,</span> <span class="n">reaction_two</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">reactions_two</span><span class="p">):</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;index of two reactions, &quot;</span><span class="p">,</span> <span class="n">i1</span><span class="p">,</span> <span class="n">j1</span><span class="p">,</span> <span class="n">reaction_one</span><span class="o">.</span><span class="n">reaction_name</span><span class="p">,</span> <span class="n">reactions_two</span><span class="o">.</span><span class="n">reaction_name</span><span class="p">)</span>
+                        <span class="n">reaction_harmonized_manager</span><span class="o">.</span><span class="n">harmonize_reaction</span><span class="p">(</span><span class="n">reaction_one</span><span class="p">,</span> <span class="n">reaction_two</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;finish one round&quot;</span><span class="p">)</span>
+        <span class="nb">round</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">reaction_harmonized_manager</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">mdh</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">The MDH Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">The MDH API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Huan Jin, Hunter N.B. Moseley.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -22,5 +22,5 @@ help:
 
 .PHONY: github
 github:
-        @make html
-        @cp -a _build/html/. ../doc
+	@make html
+	@cp -a _build/html/. ../doc

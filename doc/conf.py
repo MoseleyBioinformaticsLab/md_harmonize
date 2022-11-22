@@ -11,12 +11,11 @@ import sys
 
 sys.path.insert(0, os.path.abspath('.'))
 
-
 from mdh import __version__
 
-project = 'mdh'
-copyright = '2022, Huan Jin, Hunter N.B. Moseley'
-author = 'Huan Jin, Hunter N.B. Moseley'
+project = 'MDH'
+copyright = '2022, Huan Jin & Hunter Moseley'
+author = 'Huan Jin & Hunter Moseley'
 
 version = __version__
 release = __version__
@@ -36,29 +35,27 @@ extensions = [
 ]
 
 templates_path = ['_templates']
-
-
-# source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
-
-# The master toctree document.
-master_doc = 'index'
-
-# This is also used if you do content translation via gettext catalogs.
-# Usually you set "language" from the command line for these cases.
-language = None
-
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-# The name of the Pygments (syntax highlighting) style to use.
-pygments_style = "sphinx"
+
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = 'alabaster'
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+# -- Options for intersphinx extension ---------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html#configuration
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+}
+
+# -- Options for todo extension ----------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/extensions/todo.html#configuration
+
+todo_include_todos = True
+
+autodoc_typehints = 'both'
+autoclass_content = 'both'

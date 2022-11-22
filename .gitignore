@@ -1,6 +1,6 @@
 __pycache__/
 build/
-doc/_build/
+doc/_*
 dist/
 .idea/
 *.so

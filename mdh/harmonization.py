@@ -702,7 +702,7 @@ def harmonize_reaction_list(reaction_list: list, compound_harmonization_manager:
                 reactions_one, reactions_two = reaction_list[i], reaction_list[j]
                 for i1, reaction_one in enumerate(reactions_one):
                     for j1, reaction_two in enumerate(reactions_two):
-                        print("index of two reactions, ", i1, j1, reaction_one.reaction_name, reactions_two.reaction_name)
+                        print("index of two reactions, ", i1, j1, reaction_one.reaction_name, reaction_two.reaction_name)
                         reaction_harmonized_manager.harmonize_reaction(reaction_one, reaction_two)
         print("finish one round")
         round += 1

@@ -1,9 +1,9 @@
-.. mdh documentation master file, created by
-   sphinx-quickstart on Sun Sep 11 16:14:46 2022.
+.. MDH documentation master file, created by
+   sphinx-quickstart on Tue Nov 22 14:54:00 2022.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to mdh's documentation!
+Welcome to MDH's documentation!
 ===============================
 
 .. toctree::
@@ -14,7 +14,6 @@ Welcome to mdh's documentation!
    tutorial
    api
    license
-
 
 Indices and tables
 ==================

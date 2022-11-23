@@ -5,7 +5,7 @@
 mdh.compound
 ~~~~~~~~~~~~
 
-This module provides the :class:`~mdh.compound.Atom` class, the :class:`mdh.compound.Bond` class,
+This module provides the :class:`~mdh.compound.Atom` class, the :class:`~mdh.compound.Bond` class,
 and the :class:`~mdh.compound.Compound` class to construct compound entity.
 
 """

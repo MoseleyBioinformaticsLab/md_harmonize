@@ -15,6 +15,8 @@ from . import compound
 from . import reaction
 from . import tools
 from datetime import datetime
+import concurrent.futures as CF
+import pebble
 
 
 def kegg_data_parser(data: list) -> dict:
@@ -727,8 +729,60 @@ def create_reactions(reaction_directory: str, compounds: dict, atom_mappings: di
     return reactions
 
 
-def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compound: compound.Compound,
-                           the_other_compound: compound.Compound) -> tuple:
+# def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compound: compound.Compound,
+#                            the_other_compound: compound.Compound) -> tuple:
+#     """
+#     To get the atom mappings between two compounds based on the rclass definitions.
+#
+#     :param rclass_name: the name of the rclass.
+#     :param rclass_definitions: the list of rclass definitions.
+#     :param one_compound: one compound entity involved in the compound pair.
+#     :param the_other_compound: the other compound entity involved in the compound pair.
+#     :return: the compound pair name and its atom mappings.
+#     """
+#     atom_mappings = []
+#     # print("parse this pair", one_compound.compound_name, the_other_compound.compound_name)
+#     try:
+#         one_mappings = RpairParser(rclass_name, rclass_definitions, one_compound, the_other_compound).\
+#             generate_atom_mappings()
+#         the_other_mappings = RpairParser(rclass_name, rclass_definitions, the_other_compound, one_compound).\
+#             generate_atom_mappings()
+#         atom_mappings = one_mappings if len(one_mappings) > len(the_other_mappings) else the_other_mappings
+#     except Exception as e:
+#         print(rclass_name + "_" + one_compound.name + "_" + the_other_compound.name +
+#               "can hardly be parsed.")
+#         pass
+#     return one_compound.name + "_" + the_other_compound.name, atom_mappings
+
+
+# def multiple_compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compound: compound.Compound,
+#                                     the_other_compound: compound.Compound) -> tuple:
+#     try:
+#         with tools.timeout(seconds=10):
+#             return compound_pair_mappings(rclass_name, rclass_definitions, one_compound, the_other_compound)
+#     except Exception as exception:
+#         print("fail to pass this due to timeout: ", rclass_name, one_compound.compound_name, the_other_compound.compound_name)
+#         return one_compound.name + "_" + the_other_compound.name, []
+
+
+# def multiple_compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compound: compound.Compound,
+#                                     the_other_compound: compound.Compound) -> tuple:
+#     start_time = datetime.now()
+#     try:
+#         name, mappings = tools.timeout(compound_pair_mappings, (rclass_name, rclass_definitions, one_compound,
+#                                                                 the_other_compound,), seconds=1200)
+#         end_time = datetime.now()
+#         consumed = end_time - start_time
+#         print("parsing of this {0} {1} {2} cost {3}".format(rclass_name, one_compound.compound_name, the_other_compound.compound_name, consumed.total_seconds()))
+#         return name, mappings
+#     except Exception as exception:
+#         print("fail to pass this due to timeout: ", rclass_name, one_compound.compound_name, the_other_compound.compound_name)
+#         end_time = datetime.now()
+#         consumed = end_time - start_time
+#         print("parsing of this {0} {1} {2} cost {3}".format(rclass_name, one_compound.compound_name, the_other_compound.compound_name, consumed.total_seconds()))
+#         return one_compound.name + "_" + the_other_compound.name, []
+
+def compound_pair_mappings(pair_component: tuple) -> tuple:
     """
     To get the atom mappings between two compounds based on the rclass definitions.
 
@@ -738,6 +792,8 @@ def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compo
     :param the_other_compound: the other compound entity involved in the compound pair.
     :return: the compound pair name and its atom mappings.
     """
+
+    rclass_name, rclass_definitions, one_compound, the_other_compound = pair_component
     atom_mappings = []
     # print("parse this pair", one_compound.compound_name, the_other_compound.compound_name)
     try:
@@ -751,34 +807,6 @@ def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compo
               "can hardly be parsed.")
         pass
     return one_compound.name + "_" + the_other_compound.name, atom_mappings
-
-
-# def multiple_compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compound: compound.Compound,
-#                                     the_other_compound: compound.Compound) -> tuple:
-#     try:
-#         with tools.timeout(seconds=10):
-#             return compound_pair_mappings(rclass_name, rclass_definitions, one_compound, the_other_compound)
-#     except Exception as exception:
-#         print("fail to pass this due to timeout: ", rclass_name, one_compound.compound_name, the_other_compound.compound_name)
-#         return one_compound.name + "_" + the_other_compound.name, []
-
-
-def multiple_compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compound: compound.Compound,
-                                    the_other_compound: compound.Compound) -> tuple:
-    start_time = datetime.now()
-    try:
-        name, mappings = tools.timeout(compound_pair_mappings, (rclass_name, rclass_definitions, one_compound,
-                                                                the_other_compound,), seconds=1200)
-        end_time = datetime.now()
-        consumed = end_time - start_time
-        print("parsing of this {0} {1} {2} cost {3}".format(rclass_name, one_compound.compound_name, the_other_compound.compound_name, consumed.total_seconds()))
-        return name, mappings
-    except Exception as exception:
-        print("fail to pass this due to timeout: ", rclass_name, one_compound.compound_name, the_other_compound.compound_name)
-        end_time = datetime.now()
-        consumed = end_time - start_time
-        print("parsing of this {0} {1} {2} cost {3}".format(rclass_name, one_compound.compound_name, the_other_compound.compound_name, consumed.total_seconds()))
-        return one_compound.name + "_" + the_other_compound.name, []
 
 
 def create_atom_mappings(rclass_directory: str, compounds: dict) -> dict:
@@ -811,15 +839,31 @@ def create_atom_mappings(rclass_directory: str, compounds: dict) -> dict:
                     # print("parsing of this {0} cost {1}".format(rclass_name, consumed.total_seconds()))
                     compound_pairs.append((compounds[one_compound_name], compounds[the_other_compound_name]))
         if len(compound_pairs) > 1:
-            with multiprocessing.Pool() as pool:
-                results = pool.starmap(multiple_compound_pair_mappings, ((rclass_name, rclass_definitions, one_compound,
-                                                                 the_other_compound) for one_compound, the_other_compound in
-                                                                compound_pairs))
+            with pebble.ProcessPool() as pool:
+                pre_results = pool.map(compound_pair_mappings, [(rclass_name, rclass_definitions, one_compound,
+                                                                 the_other_compound,) for one_compound, the_other_compound in compound_pairs], timeout=100)
+                iterator = pre_results.result()
+                results = []
+                while True:
+                    try:
+                        this_result = next(iterator)
+                        results.append(this_result)
+                    except StopIteration:
+                        break
+                    except CF.TimeoutError as error:
+                        print("function took longer than %d seconds"%error.args[1])
+                    except pebble.ProcessExpired as error:
+                        print("%s. Exit code: %d" % (error, error.exitcode))
+                    except Exception as error:
+                        print("function raised %s" % error)
+                        print(error.traceback)
+
         elif len(compound_pairs) == 1:
-            results = [multiple_compound_pair_mappings(rclass_name, rclass_definitions, compound_pairs[0][0], compound_pairs[0][1])]
+                results = [compound_pair_mappings((rclass_name, rclass_definitions, compound_pairs[0][0], compound_pairs[0][1],))]
 
         for name, mapping in results:
             atom_mappings[rclass_name + "_" + name] = mapping
             if not mapping:
                 print("empty mappings", rclass_name + "_" + name)
+
     return atom_mappings

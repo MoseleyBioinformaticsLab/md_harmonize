@@ -771,13 +771,13 @@ def multiple_compound_pair_mappings(rclass_name: str, rclass_definitions: list, 
                                                                 the_other_compound,), seconds=1200)
         end_time = datetime.now()
         consumed = end_time - start_time
-        print("parsing of this {0} cost {1}".format(rclass_name, consumed.total_seconds()))
+        print("parsing of this {0} {1} {2} cost {3}".format(rclass_name, one_compound.compound_name, the_other_compound.compound_name, consumed.total_seconds()))
         return name, mappings
     except Exception as exception:
         print("fail to pass this due to timeout: ", rclass_name, one_compound.compound_name, the_other_compound.compound_name)
         end_time = datetime.now()
         consumed = end_time - start_time
-        print("parsing of this {0} cost {1}".format(rclass_name, consumed.total_seconds()))
+        print("parsing of this {0} {1} {2} cost {3}".format(rclass_name, one_compound.compound_name, the_other_compound.compound_name, consumed.total_seconds()))
         return one_compound.name + "_" + the_other_compound.name, []
 
 

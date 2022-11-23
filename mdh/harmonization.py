@@ -379,6 +379,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
         ec_comparison = self.compare_ecs(one_reaction.ecs, the_other_reaction.ecs)
         if not ec_comparison:
             # Don't share the same ec, skip it.
+            print("the two reactions don't share the same ec")
             return
         else:
             # For the reaction pair, one_side of one reaction can be mapped to one_side of the other reaction;
@@ -386,6 +387,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
 
             # one_side to one_side
             # we map compounds in the two sides separately.
+            print("the two reactions share the same ec. Let's start comparison")
             ordered_one_side_mappings = self.compound_mappings(one_reaction.one_side, the_other_reaction.one_side)
             ordered_the_other_side_mappings = self.compound_mappings(one_reaction.the_other_side,
                                                                      the_other_reaction.the_other_side)

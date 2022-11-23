@@ -16,7 +16,6 @@ import typing as t
 
 jsonpickle.set_encoder_options('json', sort_keys=True, indent=4)
 
-
 def timeout(func:t.Callable[...,t.Any], args:t.Optional[tuple] = None, seconds:int = 1) -> None:
     """Executes a given function but only for a certain specified time.
     :param func: function to call
@@ -28,8 +27,9 @@ def timeout(func:t.Callable[...,t.Any], args:t.Optional[tuple] = None, seconds:i
     def function_with_queue(queue:multiprocessing.Queue, *args):
         queue.put(func(*(args or ())))
 
-    queue = multiprocessing.Queue()
-    process = multiprocessing.Process(target=function_with_queue, args=(queue, *(args or ())))
+    context = multiprocessing.get_context('fork')
+    queue = context.Queue()
+    process = context.Process(target=function_with_queue, args=(queue, *(args or ())))
     process.start()
     process.join(seconds)
 
@@ -39,6 +39,29 @@ def timeout(func:t.Callable[...,t.Any], args:t.Optional[tuple] = None, seconds:i
                                                                                             seconds=seconds))
     else:
         return queue.get()
+
+# def timeout(func:t.Callable[...,t.Any], args:t.Optional[tuple] = None, seconds:int = 1) -> None:
+#     """Executes a given function but only for a certain specified time.
+#     :param func: function to call
+#     :param args: function arguments to use
+#     :param seconds: length of timeout
+#     :param default: default value if function does not execute properly.
+#     """
+#
+#     def function_with_queue(queue:multiprocessing.Queue, *args):
+#         queue.put(func(*(args or ())))
+#
+#     queue = multiprocessing.Queue()
+#     process = multiprocessing.Process(target=function_with_queue, args=(queue, *(args or ())))
+#     process.start()
+#     process.join(seconds)
+#
+#     if process.is_alive():
+#         process.terminate()
+#         raise TimeoutError("{func_name} timeout taking more than {seconds} seconds.".format(func_name=func.__name__,
+#                                                                                             seconds=seconds))
+#     else:
+#         return queue.get()
 
 # class timeout:
 #     """Implements a timeout context manager to work with a with statement."""

@@ -841,7 +841,7 @@ def create_atom_mappings(rclass_directory: str, compounds: dict) -> dict:
         if len(compound_pairs) > 1:
             with pebble.ProcessPool() as pool:
                 pre_results = pool.map(compound_pair_mappings, [(rclass_name, rclass_definitions, one_compound,
-                                                                 the_other_compound,) for one_compound, the_other_compound in compound_pairs], timeout=100)
+                                                                 the_other_compound,) for one_compound, the_other_compound in compound_pairs], timeout=1200)
                 iterator = pre_results.result()
                 results = []
                 while True:

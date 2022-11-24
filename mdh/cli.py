@@ -399,9 +399,9 @@ def cli(args):
         harmonized_compounds = reaction_harmonization_manager.compound_harmonization_manager.save_manager()
         harmonized_reactions = reaction_harmonization_manager.save_manager()
 
-        tools.save_to_jsonpickle(harmonized_compounds, save_directory + "/{0}_harmonized_compounds_0.5.json".
+        tools.save_to_jsonpickle(harmonized_compounds, save_directory + "/{0}_harmonized_compounds_1.json".
                                  format("_".join(database_names)))
-        tools.save_to_jsonpickle(harmonized_reactions, save_directory + "/{0}_harmonized_reactions_0.5.json".
+        tools.save_to_jsonpickle(harmonized_reactions, save_directory + "/{0}_harmonized_reactions_1.json".
                                  format("_".join(database_names)))
 
     elif args["test1"]:

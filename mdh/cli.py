@@ -3,7 +3,6 @@
 MDH command-line interface
 
 Usage:
-
     mdh -h | --help
     mdh --version
     mdh download <database_names> <working_directory>

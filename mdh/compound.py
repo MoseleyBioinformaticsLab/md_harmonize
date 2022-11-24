@@ -1688,6 +1688,7 @@ class Compound:
 
         optimal_mappings = {1: None, -1: None, 2: None, 0: None}
         min_count = {1: float("inf"), -1: float("inf"), 2: float("inf"), 0: float("inf")}
+        self.find_cycles()
         critical_atom_list = self.find_critical_atom_in_cycle()
         print("critical atoms, ", critical_atom_list)
         print(self.has_cycle)

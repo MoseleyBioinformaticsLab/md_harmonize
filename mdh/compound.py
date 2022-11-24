@@ -756,7 +756,7 @@ class Compound:
             for cycle in cycle_list:
                 for index in cycle:
                     atoms[index].in_cycle = True
-        
+        print("all cycles", all_cycles)
         if all_cycles:
             self.has_cycle = True
         return [list(x) for x in set(tuple(x) for x in [sorted(i[:-1]) for l in all_cycles for i in l])]

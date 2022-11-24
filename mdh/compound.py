@@ -669,35 +669,35 @@ class Compound:
             for i, dist in enumerate(distance_matrix):
                 self.heavy_atoms[i].distance_to_r = dist
 
-    # def find_cycles(self, short_circuit: bool = False, cutoff: int = 40) -> list:
-    #     """
-    #     To find the cycles in the compound.
-    #
-    #     :return: the list of cycles in the compound.
-    # """
-    #     try:
-    #         with tools.timeout(seconds=10):
-    #             return self.find_cycles_helper(short_circuit=short_circuit, cutoff=cutoff)
-    #     except Exception as e:
-    #         print("Cycles in compound {0} can hardly be detected: {1}".format(self.name, e))
-    #         pass
-    #     return []
-
-    def find_cycles(self, short_circuit: bool = False, cutoff: int = 40, seconds: int = 50) -> None:
+    def find_cycles(self, short_circuit: bool = False, cutoff: int = 40) -> list:
         """
-        To find the cycles in the compound with timeout limit.
+        To find the cycles in the compound.
 
-        :param short_circuit: whether to take short path.
-        :param cutoff: limit of cycle length.
-        :param seconds: the timeout limit.
-        """
+        :return: the list of cycles in the compound.
+    """
         try:
-            tools.timeout(self.find_cycles_helper, (short_circuit, cutoff,), seconds=seconds)
-            print("in timeout find_cycles", self.has_cycle)
-            print("in timeout find_cycles", [atom.atom_number for atom in self.atoms if atom.in_cycle])
+            with tools.timeout_context(seconds=10):
+                return self.find_cycles_helper(short_circuit=short_circuit, cutoff=cutoff)
         except Exception as e:
             print("Cycles in compound {0} can hardly be detected: {1}".format(self.name, e))
             pass
+        return []
+
+    # def find_cycles(self, short_circuit: bool = False, cutoff: int = 40, seconds: int = 50) -> None:
+    #     """
+    #     To find the cycles in the compound with timeout limit.
+    #
+    #     :param short_circuit: whether to take short path.
+    #     :param cutoff: limit of cycle length.
+    #     :param seconds: the timeout limit.
+    #     """
+    #     try:
+    #         tools.timeout(self.find_cycles_helper, (short_circuit, cutoff,), seconds=seconds)
+    #         print("in timeout find_cycles", self.has_cycle)
+    #         print("in timeout find_cycles", [atom.atom_number for atom in self.atoms if atom.in_cycle])
+    #     except Exception as e:
+    #         print("Cycles in compound {0} can hardly be detected: {1}".format(self.name, e))
+    #         pass
 
     def find_cycles_helper(self, short_circuit: bool = False, cutoff: int = 40) -> list:
         """

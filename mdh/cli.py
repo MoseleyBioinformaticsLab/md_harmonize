@@ -308,10 +308,10 @@ def cli(args):
                 atom_order_check(original_compounds, compound_dict)
                 atom_mappings = parser.create_atom_mappings(rclass_directory, kcf_compounds)
                 # atom_mappings = tools.open_jsonpickle(working_directory + "/kegg_atom_mappings_test.json")
-                save_function(atom_mappings, working_directory + "/kegg_atom_mappings_test_1.json")
+                save_function(atom_mappings, working_directory + "/kegg_atom_mappings.json")
                 atom_mappings = KEGG_atom_mapping_correction(KEGG_atom_index_mapping(kcf_compounds, compound_dict),
                                                              atom_mappings)
-                save_function(atom_mappings, working_directory + "/kegg_atom_mappings_IC_test_1.json")
+                save_function(atom_mappings, working_directory + "/kegg_atom_mappings_IC.json")
 
             for cpd_name in compound_dict:
                 cpd = compound_dict[cpd_name]
@@ -322,7 +322,7 @@ def cli(args):
 
             save_directory = to_directory + "/{0}".format(database_name)
             os.makedirs(save_directory, exist_ok=True)
-            save_function({name: compound_dict[name].encode() for name in compound_dict}, save_directory + "/compounds_test_1.json")
+            save_function([compound_dict[name].encode() for name in compound_dict], save_directory + "/compounds.json")
 
     elif args['initialize_reaction']:
 
@@ -379,15 +379,8 @@ def cli(args):
             if not os.path.exists(from_directory + "reactions.json"):
                 raise OSError("The file {0} does not exist.".format(from_directory + "reactions.json"))
             compounds = open_function(from_directory + "compounds.json")
-            compound_parsed = {}
-            for name in compounds:
-                try:
-                    this_compound = compound.Compound(compounds[name][0], compounds[name][1], compounds[name][2])
-                except:
-                    this_compound = None
-                    pass
-                if this_compound:
-                    compound_parsed[name] = this_compound
+            # this should be converted to compounds since it was saved in list format later.
+            compound_parsed = compound_construct_all(list(compounds.values()), construct_compound_via_components)
             compound_dict.append(compound_parsed)
             reactions = open_function(from_directory + "reactions.json")
             reaction_parsed = parse_reactions(compound_parsed, reactions)

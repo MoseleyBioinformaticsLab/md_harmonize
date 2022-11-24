@@ -757,13 +757,9 @@ class Compound:
         for cycle_list in all_cycles:
             for cycle in cycle_list:
                 for index in cycle:
-                    print("atoms in the cycle in find_cycles", index)
                     atoms[index].in_cycle = True
-        print("all cycles", all_cycles)
         if all_cycles:
             self.has_cycle = True
-        print("right after find_cycles", self.has_cycle)
-        print("right after find_cycles", [atom.atom_number for atom in self.atoms if atom.in_cycle])
         return [list(x) for x in set(tuple(x) for x in [sorted(i[:-1]) for l in all_cycles for i in l])]
 
     def structure_matrix(self, resonance: bool = False, backbone: bool = False) -> numpy.ndarray:

@@ -1688,10 +1688,12 @@ class Compound:
 
         optimal_mappings = {1: None, -1: None, 2: None, 0: None}
         min_count = {1: float("inf"), -1: float("inf"), 2: float("inf"), 0: float("inf")}
-        self.find_cycles()
+        # self.find_cycles()
+        print(self.has_cycle)
+        print("atoms in cycle, ", [atom.atom_number for atom in self.atoms if atom.in_cycle])
         critical_atom_list = self.find_critical_atom_in_cycle()
         print("critical atoms, ", critical_atom_list)
-        print(self.has_cycle)
+
         the_other_color = the_other_compound.backbone_color_identifier(r_groups=True) + \
                           the_other_compound.metal_color_identifier(details=False)
         for critical_atoms in critical_atom_list:

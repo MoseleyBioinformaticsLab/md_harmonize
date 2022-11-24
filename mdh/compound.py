@@ -1681,6 +1681,8 @@ class Compound:
         :return: the relationship and the atom mappings between the two compounds.
     """
         # default one compound should have a cycle.
+
+        print("this compound name, ", self.compound_name)
         self.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
         the_other_compound.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
 
@@ -1758,11 +1760,13 @@ class Compound:
         for atom in self.atoms:
             # Two Os are connected to one atom and one O is in the cycle.
             if atom.in_cycle and atom.default_symbol == "O":
+                print("find O in the cycle")
                 for neighbor_index in atom.neighbors:
                     neighbor = self.atoms[neighbor_index]
                     for next_neighbor_index in neighbor.neighbors:
                         if next_neighbor_index != atom.atom_number and self.atoms[next_neighbor_index].default_symbol == "O" \
                                 and self.bond_lookup[(next_neighbor_index, neighbor_index)].bond_type == "1":
+                            print("here got the critical atoms!")
                             critical_atoms.append([atom.atom_number, neighbor_index, next_neighbor_index])
         return critical_atoms
 

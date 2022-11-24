@@ -669,14 +669,17 @@ class Compound:
             for i, dist in enumerate(distance_matrix):
                 self.heavy_atoms[i].distance_to_r = dist
 
-    def find_cycles(self, short_circuit: bool = False, cutoff: int = 40) -> list:
+    def find_cycles(self, short_circuit: bool = False, cutoff: int = 40, seconds=10) -> list:
         """
         To find the cycles in the compound.
 
+        :param short_circuit: whether to take short path.
+        :param cutoff: limit of cycle length.
+        :param seconds: the timeout limit.
         :return: the list of cycles in the compound.
-    """
+        """
         try:
-            with tools.timeout_context(seconds=10):
+            with tools.timeout_context(seconds=seconds):
                 return self.find_cycles_helper(short_circuit=short_circuit, cutoff=cutoff)
         except Exception as e:
             print("Cycles in compound {0} can hardly be detected: {1}".format(self.name, e))

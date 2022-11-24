@@ -281,6 +281,7 @@ class Compound:
         :param bonds: a list of :class:`~mdh.compound.Bond` entities in the compound.
     """
         self.compound_name = compound_name
+        print(self.compound_name)
         self.atoms = atoms
         self.bonds = bonds
         self.bond_lookup = {}
@@ -755,6 +756,7 @@ class Compound:
         for cycle_list in all_cycles:
             for cycle in cycle_list:
                 for index in cycle:
+                    print("atoms in the cycle in find_cycles", index)
                     atoms[index].in_cycle = True
         print("all cycles", all_cycles)
         if all_cycles:
@@ -1689,8 +1691,6 @@ class Compound:
         optimal_mappings = {1: None, -1: None, 2: None, 0: None}
         min_count = {1: float("inf"), -1: float("inf"), 2: float("inf"), 0: float("inf")}
         # self.find_cycles()
-        print(self.has_cycle)
-        print("atoms in cycle, ", [atom.atom_number for atom in self.atoms if atom.in_cycle])
         critical_atom_list = self.find_critical_atom_in_cycle()
         print("critical atoms, ", critical_atom_list)
 

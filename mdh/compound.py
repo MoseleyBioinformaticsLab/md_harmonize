@@ -1242,9 +1242,9 @@ class Compound:
     def first_round_color(self, atoms_to_color: list, excluded_index: list = None, bond_stereo: bool = False,
                           resonance: bool = False, backbone: bool = False, depth: int = 5000) -> None:
         """
-        To do the first round of coloring this compound. We add neighbors' information layer by layer to the atom's color
-        identifier until it has a unique identifier or all the atoms in the compound have been used for naming (based on
-         the breadth first search algorithm).
+        To do the first round of coloring this compound. We add neighbors' information layer by layer to the atom's
+        color identifier until it has a unique identifier or all the atoms in the compound have been used for naming
+        (based on the breadth first search algorithm).
 
         :param atoms_to_color: the list of atom numbers to be colored.
         :param excluded_index: the list of atom numbers to be excluded from coloring.

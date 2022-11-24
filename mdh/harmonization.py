@@ -698,7 +698,7 @@ def harmonize_reaction_list(reaction_list: list, compound_harmonization_manager:
         for i in range(k):
             for j in range(i+1, k):
                 print("i and j are", i, j)
-                reactions_one, reactions_two = reaction_list[i], reaction_list[j]
+                reactions_one, reactions_two = reaction_list[i][:1000], reaction_list[j][:1000]
                 print("total reaction counts ", len(reactions_one), len(reactions_two))
                 for i1, reaction_one in enumerate(reactions_one):
                     for j1, reaction_two in enumerate(reactions_two):

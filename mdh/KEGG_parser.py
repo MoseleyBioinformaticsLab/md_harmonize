@@ -211,14 +211,14 @@ class RpairParser:
 
         4) Therefore, we need to generate the all the combinations for the center atoms in a compound.
 
-        eg: if there are three atom centers, each center has several candidates:
+            eg: if there are three atom centers, each center has several candidates:
 
-            center 1: [0, 1, 2]; center 2: [5, 6]; center 3: [10, 11]
+                center 1: [0, 1, 2]; center 2: [5, 6]; center 3: [10, 11]
 
-            The combinations for the center atoms:
+                The combinations for the center atoms:
 
-            [0, 5, 10], [0, 5, 11], [0, 6, 10], [0, 6, 11], [1, 5, 10], [1, 5, 11], [1, 6, 10], [1, 6, 11], [2, 5, 10],
-            [2, 5, 11], [2, 6, 10], [2, 6, 11]
+                [0, 5, 10], [0, 5, 11], [0, 6, 10], [0, 6, 11], [1, 5, 10], [1, 5, 11], [1, 6, 10], [1, 6, 11],
+                [2, 5, 10], [2, 5, 11], [2, 6, 10], [2, 6, 11]
 
         5) Next, we need to find the one to one atom mappings between the two compounds based on the mapped center atoms.
 

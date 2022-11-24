@@ -26,6 +26,8 @@ Usage:
 
     mdh test1
 
+    mdh test2
+
 Options:
     -h, --help          Show this screen.
     --version           Show version.
@@ -430,6 +432,22 @@ def cli(args):
         rclass_dir = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/rclass_target/"
         atom_mappings = parser_dict["KEGG"].create_atom_mappings(rclass_dir, compounds)
         print(atom_mappings)
+
+
+    elif args["test1"]:
+
+        # test linear circular transformation.
+        kegg_file = "/mlab/data/hji236/projects/MDH_test/standardized/KEGG/molfile/cpd:C00508.mol"
+        metacyc_file = "/mlab/data/hji236/projects/MDH_test/standardized/MetaCyc/molfile/L-RIBULOSE.mol"
+
+        kegg_cpd = construct_compound_via_molfile(kegg_file)
+        metacyc_cpd = construct_compound_via_molfile(metacyc_file)
+
+        relationship1, atom_mappings1 = kegg_cpd.circular_pair_relationship(metacyc_cpd)
+        relationship2, atom_mappings2 = metacyc_cpd.circular_pair_relationship(kegg_cpd)
+
+        print("relationship1, atom_mappings1", relationship1, atom_mappings1)
+        print("relationship2, atom_mappings2", relationship2, atom_mappings2)
 
     elif args["test4"]:
         database_name = args['<database_names>']

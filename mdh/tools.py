@@ -13,6 +13,7 @@ import threading
 import multiprocessing
 import time
 import typing as t
+import pickle
 
 jsonpickle.set_encoder_options('json', sort_keys=True, indent=4)
 
@@ -121,6 +122,18 @@ def save_to_json(data, filename: str) -> None:
         json.dump(data, outfile, indent=4)
 
 
+def save_to_pickle(data, filename: str) ->None:
+    """
+    To save the data into pickle.
+
+    :param data: data to be saved
+    :param filename: the file to save the data
+    :return: None.
+    """
+    with open(filename, 'wb') as outfile:
+        pickle.dump(data, outfile)
+
+
 def open_text(filename: str, encoding: str = 'utf-8') -> str:
     """
     To load text file.
@@ -156,3 +169,18 @@ def open_json(filename: str):
     with open(filename, 'r') as infile:
         data = json.load(infile)
     return data
+
+
+def open_pickle(filename: str):
+    """
+    To load data via pickle.
+
+    :param filename: the file to be loaded.
+    :return: the decoded data from the file.
+    """
+    with open(filename, 'rb') as infile:
+        data = pickle.load(infile)
+    return data
+
+
+

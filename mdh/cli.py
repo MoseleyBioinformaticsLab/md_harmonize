@@ -7,11 +7,11 @@ Usage:
     mdh --version
     mdh download <database_names> <working_directory>
     mdh standardize <database_names> <working_directory>
-    mdh aromatize <database_names> <working_directory> <save_file> [--aromatic_manager=<aromatic_manager_file>]
-    mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom]
-    mdh initialize_reaction <database_names> <working_directory>
-    mdh harmonize <database_names> <working_directory>
-    mdh test4 <database_names> <working_directory>
+    mdh aromatize <database_names> <working_directory> <save_file> [--aromatic_manager=<aromatic_manager_file>] [--pickle]
+    mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom] [--pickle]
+    mdh initialize_reaction <database_names> <working_directory> [--pickle]
+    mdh harmonize <database_names> <working_directory> [--pickle]
+    mdh test4 <database_names> <working_directory> [--pickle]
     mdh test7 <k>
     mdh test1
     mdh test2
@@ -39,11 +39,14 @@ faulthandler.enable()
 
 scraper_dict = {"KEGG": KEGG_database_scraper}
 parser_dict = {"KEGG": KEGG_parser, "MetaCyc": MetaCyc_parser}
+save_functions = {"pickle": tools.save_to_pickle, "jsonpickle": tools.save_to_jsonpickle}
+open_functions = {"pickle": tools.open_pickle, "jsonpickle": tools.open_jsonpickle}
 
 
 def construct_compound_via_molfile(molfile: str) -> Optional[compound.Compound]:
     """
     To construct compound based on the molfile representation.
+
     :param molfile: the molfile representation of the compound
     :return: the :class:`~mdh.compound.Compound` entity.
     """
@@ -55,6 +58,7 @@ def construct_compound_via_molfile(molfile: str) -> Optional[compound.Compound]:
 def construct_compound_via_kcf(file: str) -> Optional[compound.Compound]:
     """
     To construct compound based on the kcf representation.
+
     :param file: the kcf representation of the compound.
     :return: the :class:`~mdh.compound.Compound` entity.
     """
@@ -66,7 +70,8 @@ def construct_compound_via_kcf(file: str) -> Optional[compound.Compound]:
 def construct_compound_via_components(compound_components: list) -> Optional[compound.Compound]:
     """
     To construct compound based on the compound components.
-    :param compound_components:
+
+    :param compound_components: the compound components.
     :return: the :class:`~mdh.compound.Compound` entity.
     """
     try:
@@ -79,10 +84,11 @@ def construct_compound_via_components(compound_components: list) -> Optional[com
 
 def compound_construct_all(entities: list, function) -> dict:
     """
+    To construct compounds one by one.
 
-    :param entities:
-    :param function:
-    :return:
+    :param entities: the list of entities used for constructing compounds.
+    :param function: the function used to construct compounds.
+    :return: the dict of compounds.
     """
     compounds = {}
     for entity in entities:
@@ -95,6 +101,7 @@ def compound_construct_all(entities: list, function) -> dict:
 def compound_construct_multiprocess(entities: list, function) -> dict:
     """
     To construct compounds with multiprocessing.
+
     :param entities: the list of entities used for constructing compounds.
     :param function: the function used to construct compounds.
     :return: the dict of compounds.
@@ -108,6 +115,7 @@ def atom_order_check(compound_dict1: dict, compound_dict2:dict) -> None:
     """
     Here, we want to check if the order of the heavy atoms in the KEGG molfile and kcf representations is the same.
     Quality check.
+
     :param compound_dict1: one dict of compounds
     :param compound_dict2: the other dict of compounds.
     :return: None
@@ -136,6 +144,7 @@ def atom_order_check(compound_dict1: dict, compound_dict2:dict) -> None:
 def KEGG_atom_mapping_correction(atom_index_mappings: dict, atom_mappings: dict) -> dict:
     """
     The corrected atom mappings between KEGG compounds composed of molfile representations.
+
     :param atom_index_mappings: the dict of atom index mappings between kcf and molfile representations.
     :param atom_mappings: the dict of atom mappings between compounds derived from kcf representations.
     :return: the dict of atom mappings corrected for molfile representations.
@@ -156,6 +165,7 @@ def KEGG_atom_mapping_correction(atom_index_mappings: dict, atom_mappings: dict)
 def KEGG_atom_index_mapping(kcf_compounds: dict, mol_compounds: dict) -> dict:
     """
     To map the atom index between kcf and molfile representations for KEGG compounds.
+
     :param kcf_compounds: the dict of compounds composed of kcf representations.
     :param mol_compounds:the dict of compounds composed of molfile representations.
     :return: the dict of atom index mappings.
@@ -184,6 +194,7 @@ def KEGG_atom_index_mapping(kcf_compounds: dict, mol_compounds: dict) -> dict:
 def parse_reactions(compounds: dict, reactions: list) -> list:
     """
     To parse the reaction by linking to the compound entities.
+
     :param compounds: the dict of compound entities.
     :param reactions: the list of reaction entities.
     :return: the list of reaction entities.
@@ -196,6 +207,13 @@ def parse_reactions(compounds: dict, reactions: list) -> list:
 
 
 def cli(args):
+
+    save_function = save_functions["jsonpickle"]
+    open_function = open_functions["jsonpickle"]
+
+    if args['--pickle']:
+        save_function = save_functions["pickle"]
+        open_function = open_functions["pickle"]
 
     if args['download']:
         database_names = args['<database_names>'].split(",")
@@ -229,7 +247,7 @@ def cli(args):
         working_directory = args['<working_directory>']
         save_file = args['<save_file>']
         if args['--aromatic_manager']:
-            aromatic_manager = aromatics.AromaticManager.decode(tools.open_jsonpickle(args['--aromatic_manager']))
+            aromatic_manager = aromatics.AromaticManager.decode(open_function(args['--aromatic_manager']))
         else:
             aromatic_manager = aromatics.AromaticManager()
         for database_name in database_names:
@@ -249,12 +267,12 @@ def cli(args):
                     if os.path.getsize(kcf_file) != 0:
                         kcf_cpd = parser.create_compound_kcf(kcf_file)
                         aromatic_manager.kegg_aromatize(kcf_cpd)
-        tools.save_to_jsonpickle(aromatic_manager.encode(), save_file)
+        save_function(aromatic_manager.encode(), save_file)
     
     elif args['initialize_compound']:
         database_names = args['<database_names>'].split(",")
         working_directory = args['<working_directory>']
-        aromatic_manager = aromatics.AromaticManager.decode(tools.open_jsonpickle(args['<aromatic_manager_file>']))
+        aromatic_manager = aromatics.AromaticManager.decode(open_function(args['<aromatic_manager_file>']))
         to_directory = working_directory + "/initialized"
         for database_name in database_names:
             from_path = working_directory + "standardized/{0}/molfile".format(database_name)
@@ -290,10 +308,10 @@ def cli(args):
                 atom_order_check(original_compounds, compound_dict)
                 atom_mappings = parser.create_atom_mappings(rclass_directory, kcf_compounds)
                 # atom_mappings = tools.open_jsonpickle(working_directory + "/kegg_atom_mappings_test.json")
-                tools.save_to_jsonpickle(atom_mappings, working_directory + "/kegg_atom_mappings_test_1.json")
+                save_function(atom_mappings, working_directory + "/kegg_atom_mappings_test_1.json")
                 atom_mappings = KEGG_atom_mapping_correction(KEGG_atom_index_mapping(kcf_compounds, compound_dict),
                                                              atom_mappings)
-                tools.save_to_jsonpickle(atom_mappings, working_directory + "/kegg_atom_mappings_IC_test_1.json")
+                save_function(atom_mappings, working_directory + "/kegg_atom_mappings_IC_test_1.json")
 
             for cpd_name in compound_dict:
                 cpd = compound_dict[cpd_name]
@@ -304,8 +322,7 @@ def cli(args):
 
             save_directory = to_directory + "/{0}".format(database_name)
             os.makedirs(save_directory, exist_ok=True)
-            tools.save_to_jsonpickle({name: compound_dict[name].encode() for name in compound_dict}, save_directory +
-                                     "/compounds_test_1.json")
+            save_function({name: compound_dict[name].encode() for name in compound_dict}, save_directory + "/compounds_test_1.json")
 
     elif args['initialize_reaction']:
 
@@ -321,7 +338,7 @@ def cli(args):
             if not os.path.exists(save_directory + "/compounds.json"):
                 raise OSError("Please construct the {0} compounds first!".format(database_name))
 
-            compounds = tools.open_jsonpickle(save_directory + "/compounds.json")
+            compounds = open_function(save_directory + "/compounds.json")
             compound_dict = compound_construct_all(list(compounds.values()), construct_compound_via_components)
 
             reaction_list = []
@@ -333,7 +350,7 @@ def cli(args):
                     raise OSError("The directory {0} does not exist.".format(reaction_directory))
                 if not os.path.exists(working_directory + "/kegg_atom_mappings_IC.json"):
                     raise OSError("The atom mappings of KEGG compounds have not been generated.")
-                atom_mappings = tools.open_jsonpickle(working_directory + "/kegg_atom_mappings_IC.json")
+                atom_mappings = open_function(working_directory + "/kegg_atom_mappings_IC.json")
                 reaction_list = parser.create_reactions(reaction_directory, compound_dict, atom_mappings)
 
             elif database_name == "MetaCyc":
@@ -344,7 +361,7 @@ def cli(args):
                 if not os.path.exists(atom_mapping_file):
                     raise OSError("The file {0} does not exist.".format(atom_mapping_file))
                 reaction_list = parser.create_reactions(reaction_file, atom_mapping_file, compound_dict)
-            tools.save_to_jsonpickle(reaction_list, save_directory + "/reactions.json")
+            save_function(reaction_list, save_directory + "/reactions.json")
 
     elif args['harmonize']:
         # create harmonized compound manager first, then reaction harmonization manager.
@@ -361,7 +378,7 @@ def cli(args):
                 raise OSError("The file {0} does not exist.".format(from_directory + "compounds.json"))
             if not os.path.exists(from_directory + "reactions.json"):
                 raise OSError("The file {0} does not exist.".format(from_directory + "reactions.json"))
-            compounds = tools.open_jsonpickle(from_directory + "compounds.json")
+            compounds = open_function(from_directory + "compounds.json")
             compound_parsed = {}
             for name in compounds:
                 try:
@@ -372,23 +389,20 @@ def cli(args):
                 if this_compound:
                     compound_parsed[name] = this_compound
             compound_dict.append(compound_parsed)
-            reactions = tools.open_jsonpickle(from_directory + "reactions.json")
+            reactions = open_function(from_directory + "reactions.json")
             reaction_parsed = parse_reactions(compound_parsed, reactions)
             reaction_list.append(reaction_parsed)
         print("start compound harmonization")
         if os.path.exists(save_directory + "/{0}_initial_harmonized_compounds.json".format("_".join(database_names))):
             print("we find the initial_harmonized_compounds")
-            initial_harmonized_compounds = tools.open_jsonpickle(save_directory +
-                                                                 "/{0}_initial_harmonized_compounds.json".
-                                                                 format("_".join(database_names)))
+            initial_harmonized_compounds = open_function(save_directory + "/{0}_initial_harmonized_compounds.json".format("_".join(database_names)))
             compound_harmonization_manager = harmonization.CompoundHarmonizationManager.\
                 create_manager(compound_dict, initial_harmonized_compounds)
 
         else:
             compound_harmonization_manager = harmonization.harmonize_compound_list(compound_dict)
             initial_harmonized_compounds = compound_harmonization_manager.save_manager()
-            tools.save_to_jsonpickle(initial_harmonized_compounds, save_directory +
-                                     "/{0}_initial_harmonized_compounds.json".format("_".join(database_names)))
+            save_function(initial_harmonized_compounds, save_directory + "/{0}_initial_harmonized_compounds.json".format("_".join(database_names)))
         # while we do reaction harmonization, we need to pay attention to compound harmonization without same structural
         # representations.
         # this includes: R group, linear-circular-transformation, resonance.
@@ -399,10 +413,8 @@ def cli(args):
         harmonized_compounds = reaction_harmonization_manager.compound_harmonization_manager.save_manager()
         harmonized_reactions = reaction_harmonization_manager.save_manager()
 
-        tools.save_to_jsonpickle(harmonized_compounds, save_directory + "/{0}_harmonized_compounds_1.json".
-                                 format("_".join(database_names)))
-        tools.save_to_jsonpickle(harmonized_reactions, save_directory + "/{0}_harmonized_reactions_1.json".
-                                 format("_".join(database_names)))
+        save_function(harmonized_compounds, save_directory + "/{0}_harmonized_compounds_1.json".format("_".join(database_names)))
+        save_function(harmonized_reactions, save_directory + "/{0}_harmonized_reactions_1.json".format("_".join(database_names)))
 
     elif args["test1"]:
         # kegg_compound_1_file = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf/cpd:C05670"

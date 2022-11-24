@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 
 """
+mdh.MetaCyc_parser
+~~~~~~~~~~~~~~~~~~
+This module provides functions to parse MetaCyc text data.
 
-MetaCyc_parser.py is used to parse MetaCyc text data. 
 Note: All MetaCyc reactions atom_mappings are stored in a single text file.
 
 """
@@ -16,7 +18,7 @@ from . import reaction
 
 def reaction_side_parser(reaction_side: str) -> dict:
     """
-     This is to parse FROM_SIDE or TO_SIDE in the reaction.
+    This is to parse FROM_SIDE or TO_SIDE in the reaction.
 
     eg: FROM-SIDE - (CPD-9147 0 8) (OXYGEN-MOLECULE 9 10)
 
@@ -53,12 +55,12 @@ def reaction_side_parser(reaction_side: str) -> dict:
 
 def generate_one_to_one_mappings(from_side: dict, to_side: dict, indices: str) -> list:
     """
-    To generate the one to one atom mappings between two the sides of metabolic reaction.
+    To generate the one to one atom mappings between two the sides of a metabolic reaction.
 
-    :param from_side: the dictionary of compounds with their corresponding start and end atom index in the from_side.
-    :param to_side: the dictionary of compounds with their corresponding start and end atom index in the to_side.
-    :param indices: the list of mapped atoms.
-    :return: the list of mapped atoms between the two sides.
+    :param from_side: the dictionary of compounds with their corresponding start and end atom indices in the from_side.
+    :param to_side: the dictionary of compounds with their corresponding start and end atom indices in the to_side.
+    :param indices: the string representation of mapped atoms.
+    :return: the list of mapped atoms between the two sides (from_index, to_index).
     """
     from_index_dict = {}
     mappings = [int(num) for num in indices.split(" ") if num != ""]
@@ -87,11 +89,17 @@ def atom_mappings_parser(atom_mapping_text: list) -> dict:
     This is to parse the MetaCyc reaction with atom mappings.
 
     eg:
+
     REACTION - RXN-11981
+
     NTH-ATOM-MAPPING - 1
+
     MAPPING-TYPE - NO-HYDROGEN-ENCODING
+
     FROM-SIDE - (CPD-12950 0 23) (WATER 24 24)
+
     TO-SIDE - (CPD-12949 0 24)
+
     INDICES - 0 1 2 3 5 4 7 6 9 10 11 13 12 14 15 16 17 8 18 19 21 20 22 24 23
 
     note: the INDICES are atom mappings between two sides of the reaction.
@@ -127,34 +135,55 @@ def reaction_parser(reaction_text: list) -> dict:
     This is used to parse MetaCyc reaction.
 
     eg:
+
     UNIQUE-ID - RXN-13583
+
     TYPES - Redox-Half-Reactions
+
     ATOM-MAPPINGS - (:NO-HYDROGEN-ENCODING (1 0 2) (((WATER 0 0) (HYDROXYLAMINE 1 2)) ((NITRITE 0 2))))
+
     CREDITS - SRI
+
     CREDITS - caspi
+
     IN-PATHWAY - HAONITRO-RXN
+
     LEFT - NITRITE
+
     ^COMPARTMENT - CCO-IN
+
     LEFT - PROTON
+
     ^COEFFICIENT - 5
+
     ^COMPARTMENT - CCO-IN
+
     LEFT - E-
+
     ^COEFFICIENT - 4
+
     ORPHAN? - :NO
+
     PHYSIOLOGICALLY-RELEVANT? - T
+
     REACTION-BALANCE-STATUS - :BALANCED
+
     REACTION-DIRECTION - LEFT-TO-RIGHT
+
     RIGHT - HYDROXYLAMINE
+
     ^COMPARTMENT - CCO-IN
+
     RIGHT - WATER
+
     ^COMPARTMENT - CCO-IN
+
     STD-REDUCTION-POTENTIAL - 0.1
+
     //
 
     :param reaction_text: the text descriptions of MetaCyc reactions.
-    :type reaction_text: :py:class:`str`.
     :return: the dict of parsed MetaCyc reactions.
-    :rtype: :py:class:`dict`.
     """
     reaction_dicts = {}
     current_reaction = collections.defaultdict(list)
@@ -189,14 +218,13 @@ def reaction_parser(reaction_text: list) -> dict:
     return reaction_dicts
 
 
-def create_reactions(reaction_file: str, atom_mapping_file: str, compounds: dict) -> list:
+def create_reactions(reaction_file: str, atom_mapping_file: str) -> list:
     """
     To create MetaCyc reaction entities.
 
-    :param reaction_file: the filename of the reaction file.
-    :param atom_mapping_file: the filename of the atom mapping file.
-    :param compounds: a dictionary of :class:`~mdh.compound.Compound` entities.
-    :return: the constructed `~mdh.reaction.Reaction` entities.
+    :param reaction_file: the path to the reaction file.
+    :param atom_mapping_file: the path to the atom mapping file.
+    :return: the list of constructed :class:`~mdh.reaction.Reaction` entities.
     """
     reaction_dict = reaction_parser(tools.open_text(reaction_file, encoding='cp1252').split("\n"))
     atom_mappings = atom_mappings_parser(tools.open_text(atom_mapping_file).split("\n"))

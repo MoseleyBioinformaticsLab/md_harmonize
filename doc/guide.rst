@@ -12,7 +12,6 @@ Installation
 ~~~~~~~~~~~~
 
 The MDH package runs under Python 3.7+. Use pip_ to install.
-Starting with Python 3.4, pip_ is included by default.
 
 Install on Linux, Mac OS X
 --------------------------
@@ -44,6 +43,7 @@ MDH requires the following Python libraries:
     * numpy_ and cython_ for speeding optimization.
     * ctfile_ for parsing compound molfile representation.
     * indigo_ for detecting aromatic atoms in the compound.
+    * pebble_ for multiprocessing of cythonized calculation.
 
 
 Data
@@ -83,3 +83,4 @@ the usages are in the :doc:`tutorial`.
 .. _numpy: https://github.com/numpy/numpy
 .. _ctfile: https://github.com/MoseleyBioinformaticsLab/ctfile
 .. _indigo: https://github.com/epam/Indigo
+.. _pebble: https://pypi.org/project/Pebble/

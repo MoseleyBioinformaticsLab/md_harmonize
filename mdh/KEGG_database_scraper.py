@@ -1,9 +1,12 @@
 #!/usr/bin/python3
 
 """
-KEGG_database_scraper.py is used to download KEGG data (including compound, reaction, kcf, and rclass) from web.
+mdh.KEGG_database_scraper
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This URL can change.
+This module provides functions to download KEGG data (including compound, reaction, kcf, and rclass) from web.
+
+The URLs can change.
 """
 
 import requests
@@ -35,7 +38,7 @@ def update_entity(entries: list, sub_directory: str, directory: str, suffix: str
     """
     To download the KEGG entity (compound, reaction, or rclass) and save it into a file.
 
-    :param entries: the list of entry name to download.
+    :param entries: the list of entry names to download.
     :param sub_directory: the subdirectory to save the downloaded file.
     :param directory: the main directory to save the downloaded file.
     :param suffix: the suffix needed for download, like the mol for compound molfile and kcf for compound kcf file.
@@ -54,9 +57,9 @@ def update_entity(entries: list, sub_directory: str, directory: str, suffix: str
 
 def curate_molfile(file_path: str) -> None:
     """
-    To curate the molfile.
+    To curate the molfile representation.
 
-    :param file_path: the molfile path.
+    :param file_path: the path to the molfile.
     :return: None.
 """
     new_text = ""

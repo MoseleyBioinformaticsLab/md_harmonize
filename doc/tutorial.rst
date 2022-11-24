@@ -9,7 +9,7 @@ The `MDH` is intended to harmonize compound and reaction across public metabolic
     * Parse KEGG RClass representation to generate atom mappings between compounds.
     * Harmonize compounds/reactions across databases.
 
-In this document, each use will be explained in details.
+In this document, each usage will be explained in details.
 
 The MDH API tutorial
 ~~~~~~~~~~~~~~~~~~~~

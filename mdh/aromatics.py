@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """
-MDH.aromatics
+mdh.aromatics
 ~~~~~~~~~~~~~
 
 This module provides the :class:`~mdh.aromatics.AromaticManager` class entity.
@@ -18,8 +18,10 @@ class AromaticManager:
 
     """
     Two major functions are implemented in AromaticManager.
-    1) Extract aromatic substructures based on labelled aromatic atoms (mainly C and N) Or indigo detected aromatic bonds.
-        The first case only applies to KEGG compounds, and the second case applies to compound from any databases.
+
+    1) Extract aromatic substructures based on labelled aromatic atoms (mainly C and N) or indigo detected aromatic bonds.
+        The first case only applies to KEGG compounds, and the second case applies to compounds from any databases.
+
     2) Detect the aromatic substructures in any given compound, and update the bond type of the detected aromatic bonds.
     """
 
@@ -46,9 +48,9 @@ class AromaticManager:
     @staticmethod
     def decode(aromatic_structures: list):
         """
-        To construct the AromaticManager based on the components of aromatic substructures.
+        To construct the AromaticManager based on the aromatic substructures.
 
-        :param aromatic_structures: the list of components of aromatic substructures.
+        :param aromatic_structures: the list of aromatic substructures.
         :return: the constructed AromaticManager.
         """
         return AromaticManager([compound.Compound(sub[0], sub[1], sub[2]) for sub in aromatic_structures])
@@ -97,7 +99,7 @@ class AromaticManager:
         To extract aromatic substructures via Indigo, and add the newly detected aromatic substructures to the
         AromaticManger.
 
-        :param molfile: the filename of the molfile.
+        :param molfile: the path to the molfile.
         :return: None.
         """
         cpd = compound.Compound.create(molfile)
@@ -111,8 +113,8 @@ class AromaticManager:
         """
         To detect the aromatic bonds in the compound via Indigo method.
 
-        :param molfile: the filename of the molfile.
-        :return: the set of aromatic bonds represented by first_atom_number and second_atom_number of the bond.
+        :param molfile: the path to the molfile.
+        :return: the set of aromatic bonds represented by first_atom_number and second_atom_number in the bond.
         """
         aromatic_bonds = set()
         try:
@@ -131,8 +133,8 @@ class AromaticManager:
         """
         To fuse the cycles with shared atoms.
 
-        :param cycles: the list of individual cycles represented by atom numbers.
-        :return: the list of fused cycles.
+        :param cycles: the list of cycles represented by atom numbers.
+        :return: the list of cleaned cycles.
         """
         # to remove the cycle that is contained in another cycle.
         index_set = set(index for cycle in cycles for index in cycle)
@@ -161,15 +163,16 @@ class AromaticManager:
     #         pass
     #     return
 
-    def detect_aromatic_substructures_timeout(self, cpd: compound.Compound) -> None:
+    def detect_aromatic_substructures_timeout(self, cpd: compound.Compound, seconds=200) -> None:
         """
         To detect the aromatic substructures in the compound and stop the search on timeout.
+
         :param cpd: the :class:`~mdh.compound.Compound` entity.
+        :param seconds: the timeout limit.
         :return: None.
         """
-
         try:
-            tools.timeout(self.detect_aromatic_substructures, (cpd,), seconds=200)
+            tools.timeout(self.detect_aromatic_substructures, (cpd,), seconds=seconds)
         except:
             print("Aromatic substructures in compound {0} can hardly be detected.".format(cpd.name))
             pass
@@ -246,7 +249,7 @@ class AromaticManager:
 
     def extract_aromatic_substructures(self, cpd: compound.Compound) -> list:
         """
-        To detect the aromatic substructures in a compound based on the aromatic atoms. This is just for KEGG kcf file.
+        To detect the aromatic substructures in a compound based on the aromatic atoms. This only applies to KEGG kcf file.
 
         :param cpd: the :class:`~mdh.compound.Compound` entity.
         :return: the list of aromatic cycles represented by atom numbers.

@@ -4,7 +4,7 @@ mdh.harmonization
 ~~~~~~~~~~~~~~~~~
 
 This module provides the :class:`~mdh.harmonization.HarmonizedEdge` class,
-the :class:`mdh.harmonization.HarmonizedCompoundEdge` class,
+the :class:`~mdh.harmonization.HarmonizedCompoundEdge` class,
 and the :class:`~mdh.harmonization.HarmonizedReactionEdge` class .
 
 """
@@ -18,7 +18,7 @@ from typing import *
 class HarmonizedEdge(abc.ABC):
 
     """
-    The HarmonizedEdge to represent compound or reaction pairs.
+    The HarmonizedEdge representing compound or reaction pairs.
     """
     def __init__(self, one_side: Union[compound.Compound, reaction.Reaction],
                  the_other_side: Union[compound.Compound, reaction.Reaction], relationship: int,
@@ -29,10 +29,8 @@ class HarmonizedEdge(abc.ABC):
         :param one_side: one side of the edge. This can be compound or reaction.
         :param the_other_side: the other side of the edge. This can be compound or reaction.
         :param relationship: equivalent, generic-specific, or loose.
-        :param edge_type: for compound edge, this represents resonance, linear-circular, r group, same structure;
-        for reaction edge, this represents 3 level match or 4 level match.
-        :param mappings: for compound edge, the mappings refer to mapped atoms between compounds; for reaction edge,
-        the mappings refer to mapped compounds between reaction.
+        :param edge_type: for compound edge, this represents resonance, linear-circular, r group, same structure; for reaction edge, this represents 3 level match or 4 level match.
+        :param mappings: for compound edge, the mappings refer to mapped atoms between compounds; for reaction edge, the mappings refer to mapped compounds between reaction.
         """
         self.one_side = one_side
         self.the_other_side = the_other_side
@@ -67,7 +65,7 @@ class HarmonizedEdge(abc.ABC):
 class HarmonizedCompoundEdge(HarmonizedEdge):
 
     """
-    The HarmonizedCompoundEdge to represent compound pairs.
+    The HarmonizedCompoundEdge representing compound pairs.
     """
 
     def __init__(self, one_compound: compound.Compound, the_other_compound: compound.Compound, relationship: int,
@@ -134,7 +132,7 @@ class HarmonizedReactionEdge(HarmonizedEdge):
 class HarmonizationManager(abc.ABC):
 
     """
-    The HarmonizationManger takes charge of adding, removing or searching harmonized edge.
+    The HarmonizationManger is responsible for adding, removing or searching harmonized edge.
     """
 
     def __init__(self) -> None:
@@ -171,7 +169,7 @@ class HarmonizationManager(abc.ABC):
         To add this edge to the harmonized edges.
 
         :param edge: the :class:`~mdh.harmonization.HarmonizedEdge` entity.
-        :return: bool whether the edge does not exist and is added successfully.
+        :return: bool whether the edge is added successfully.
         """
         key = self.create_key(edge.one_side.name, edge.the_other_side.name)
         if key not in self.harmonized_edges:
@@ -184,7 +182,7 @@ class HarmonizationManager(abc.ABC):
         To remove this edge from the harmonized edges.
 
         :param edge: the :class:`~mdh.harmonization.HarmonizedEdge` entity.
-        :return: bool whether the edge exists and is removed successfully.
+        :return: bool whether the edge is removed successfully.
         """
         key = self.create_key(edge.one_side.name, edge.the_other_side.name)
         if key in self.harmonized_edges:
@@ -209,7 +207,7 @@ class HarmonizationManager(abc.ABC):
 class CompoundHarmonizationManager(HarmonizationManager):
 
     """
-    The CompoundHarmonizationManager takes charge of adding, removing or searching
+    The CompoundHarmonizationManager is responsible for adding, removing or searching
     :class:`~mdh.harmonization.HarmonizedCompoundEdge`.
     """
 
@@ -223,12 +221,13 @@ class CompoundHarmonizationManager(HarmonizationManager):
         self.visited = set()
     
     @staticmethod
-    def find_compound(compound_dict, compound_name):
+    def find_compound(compound_dict: list, compound_name: str) -> Optional[compound.Compound]:
         """
-        
-        :param compound_dict: 
-        :param compound_name: 
-        :return: 
+        To find the :class:`~mdh.compound.Compound` based on the compound name in the compound dict.
+
+        :param compound_dict: a list of compound dictionaries.
+        :param compound_name: the target compound name.
+        :return: the :class:`~mdh.compound.Compound`.
         """
         for sub_dict in compound_dict:
             if compound_name in sub_dict:
@@ -238,10 +237,11 @@ class CompoundHarmonizationManager(HarmonizationManager):
     @staticmethod
     def create_manager(compound_dict: list, compound_pairs: list):
         """
-        
-        :param compound_dict: 
-        :param compound_pairs: 
-        :return: 
+        To create the :class:`~mdh.harmonization.CompoundHarmonizationManager` based on the compound paris.
+
+        :param compound_dict: the list of compound dictionaries.
+        :param compound_pairs: the list of compound pairs.
+        :return: the :class:`~mdh.harmonization.CompoundHarmonizationManager`
         """
         compound_harmonization_manager = CompoundHarmonizationManager()
         for pair in compound_pairs:
@@ -261,7 +261,7 @@ class CompoundHarmonizationManager(HarmonizationManager):
         This is for calculating the jaccard index.
 
         :param edge: the :class:`~mdh.harmonization.HarmonizedCompoundEdge` entity.
-        :return: bool whether the edge does not exist and is added successfully.
+        :return: bool whether the edge is added successfully.
         """
         if super().add_edge(edge):
             self.compound_in_edges[edge.one_side.name] += 1
@@ -274,7 +274,7 @@ class CompoundHarmonizationManager(HarmonizationManager):
         To remove the edge from the manager, and update the occurrences of compound in the harmonized edges.
 
         :param edge: the :class:`~mdh.harmonization.HarmonizedCompoundEdge` entity.
-        :return: bool whether the edge exists and is removed successfully.
+        :return: bool whether the edge is removed successfully.
         """
         if super().remove_edge(edge):
             self.compound_in_edges[edge.one_side.name] -= 1
@@ -315,7 +315,7 @@ class CompoundHarmonizationManager(HarmonizationManager):
 
 class ReactionHarmonizationManager(HarmonizationManager):
     """
-    The ReactionHarmonizationManager takes charge of adding, removing or searching
+    The ReactionHarmonizationManager is responsible for adding, removing or searching
     :class:`~mdh.harmonization.HarmonizedReactionEdge`.
     """
 
@@ -323,8 +323,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
         """
         ReactionHarmonizationManager initializer.
 
-        :param compound_harmonization_manager: the :class:`~mdh.harmonization.CompoundHarmonizationManager` entity for
-        compound pairs management.
+        :param compound_harmonization_manager: the :class:`~mdh.harmonization.CompoundHarmonizationManager` entity for compound pairs management.
         """
         super().__init__()
         self.compound_harmonization_manager = compound_harmonization_manager
@@ -451,8 +450,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
 
         :param one_compounds: one list of :class:`~mdh.compound.Compound` entities.
         :param the_other_compounds: the other list of :class:`~mdh.compound.Compound` entities.
-        :return: the dictionary of paired compounds with their relationship. The relationship will be used to determine
-        the relationship of reaction pair.
+        :return: the dictionary of paired compounds with their relationship. The relationship will be used to determine the relationship of reaction pair.
         """
         mappings = collections.defaultdict(dict)
         for one_compound in one_compounds:
@@ -639,7 +637,7 @@ def harmonize_compound_list(compound_list: list) -> CompoundHarmonizationManager
     To harmonize compounds across different databases based on the compound coloring identifier.
 
     :param compound_list: the list of :class:`~mdh.compound.Compound` dictionary from different sources.
-    :return: the :class:`~mdh.harmonization.CompoundHarmonizationManager` entity with harmonized compound edges.
+    :return: the :class:`~mdh.harmonization.CompoundHarmonizationManager` containing harmonized compound edges.
     """
     compound_harmonization_manager = CompoundHarmonizationManager()
     # here, we need to color the compound for harmonization, do it the same time to avoid redundant coloring.
@@ -683,8 +681,7 @@ def harmonize_reaction_list(reaction_list: list, compound_harmonization_manager:
     harmonizes compound pairs with resonance, linear-circular, r group types.
 
     :param reaction_list: a list of :class:`~mdh.reaction.Reaction` list from different sources.
-    :param compound_harmonization_manager: a :class:`~mdh.harmonization.CompoundHarmonizationManager` containing
-    harmonized compound pairs with the same structure.
+    :param compound_harmonization_manager: a :class:`~mdh.harmonization.CompoundHarmonizationManager` containing harmonized compound pairs with the same structure.
     :return: :class:`~mdh.harmonization.ReactionHarmonizationManager`
     """
     reaction_harmonized_manager = ReactionHarmonizationManager(compound_harmonization_manager)

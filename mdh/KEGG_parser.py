@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 
 """
+mdh.KEGG_parser
+~~~~~~~~~~~~~~~
 
-KEGG_parser.py provides functions to parse KEGG data (including compound, reaction, kcf, and rclass).
+This module provides functions to parse KEGG data (including compound, reaction, kcf, and rclass).
 
 """
 
@@ -24,30 +26,55 @@ def kegg_data_parser(data: list) -> dict:
     This is to parse KEGG data (reaction, rclass, compound) file to a dictionary.
 
     eg:
+
     ENTRY       R00259                      Reaction
+
     NAME        acetyl-CoA:L-glutamate N-acetyltransferase
+
     DEFINITION  Acetyl-CoA + L-Glutamate <=> CoA + N-Acetyl-L-glutamate
+
     EQUATION    C00024 + C00025 <=> C00010 + C00624
+
     RCLASS      RC00004  C00010_C00024
+
                 RC00064  C00025_C00624
+
     ENZYME      2.3.1.1
+
     PATHWAY     rn00220  Arginine biosynthesis
+
                 rn01100  Metabolic pathways
+
                 rn01110  Biosynthesis of secondary metabolites
+
                 rn01210  2-Oxocarboxylic acid metabolism
+
                 rn01230  Biosynthesis of amino acids
+
     MODULE      M00028  Ornithine biosynthesis, glutamate => ornithine
+
                 M00845  Arginine biosynthesis, glutamate => acetylcitrulline => arginine
+
     ORTHOLOGY   K00618  amino-acid N-acetyltransferase [EC:2.3.1.1]
+
                 K00619  amino-acid N-acetyltransferase [EC:2.3.1.1]
+
                 K00620  glutamate N-acetyltransferase / amino-acid N-acetyltransferase [EC:2.3.1.35 2.3.1.1]
+
                 K11067  N-acetylglutamate synthase [EC:2.3.1.1]
+
                 K14681  argininosuccinate lyase / amino-acid N-acetyltransferase [EC:4.3.2.1 2.3.1.1]
+
                 K14682  amino-acid N-acetyltransferase [EC:2.3.1.1]
+
                 K22476  N-acetylglutamate synthase [EC:2.3.1.1]
+
                 K22477  N-acetylglutamate synthase [EC:2.3.1.1]
+
                 K22478  bifunctional N-acetylglutamate synthase/kinase [EC:2.3.1.1 2.7.2.8]
+
     DBLINKS     RHEA: 24295
+
     ///
 
     :param data: the KEGG reaction description.
@@ -97,26 +124,47 @@ def kegg_kcf_parser(kcf: list) -> dict:
     This is to parse KEGG kcf file to a dictionary.
 
     eg:
+
     ENTRY       C00013                      Compound
+
     ATOM        9
+
                 1   P1b P    22.2269  -20.0662
+
                 2   O2c O    23.5190  -20.0779
+
                 3   O1c O    21.0165  -20.0779
+
                 4   O1c O    22.2851  -21.4754
+
                 5   O1c O    22.2617  -18.4642
+
                 6   P1b P    24.8933  -20.0837
+
                 7   O1c O    24.9401  -21.4811
+
                 8   O1c O    26.1797  -20.0662
+
                 9   O1c O    24.9107  -18.4582
+
     BOND        8
+
                 1     1   2 1
+
                 2     1   3 1
+
                 3     1   4 1
+
                 4     1   5 2
+
                 5     2   6 1
+
                 6     6   7 1
+
                 7     6   8 1
+
                 8     6   9 2
+
     ///
 
     :param kcf: the kcf text.
@@ -152,28 +200,41 @@ class RpairParser:
     """This is to get one to one atom mappings between two compounds based on the rclass definition.
 
         Several steps are involved in this process:
+
         1) The rclass definition can have several pieces. Each piece describes a center atom (R) and its connected atoms.
         The connected atoms can stay the same (M) or change (D) between the two compound structures.
-        2) First we need to find the center atoms based on the rlcass descriptions.
+
+        2) First we need to find the center atoms based on the rclass descriptions.
+
         3) For each center atom, there are can multiple candidates. In other words, based on the RDM description,
         a bunch of atoms in the compound can meet the descriptions. (One simple case are the symmetric compounds).
+
         4) Therefore, we need to generate the all the combinations for the center atoms in a compound.
+
         eg: if there are three atom centers, each center has several candidates:
+
             center 1: [0, 1, 2]; center 2: [5, 6]; center 3: [10, 11]
+
             The combinations for the center atoms:
+
             [0, 5, 10], [0, 5, 11], [0, 6, 10], [0, 6, 11], [1, 5, 10], [1, 5, 11], [1, 6, 10], [1, 6, 11], [2, 5, 10],
             [2, 5, 11], [2, 6, 10], [2, 6, 11]
+
         5) Next, we need to find the one to one atom mappings between the two compounds based on the mapped center atoms.
+
         6) To solve this issue, we first disassemble each compound into different components. This is due to the
         difference atoms in the two compounds, i.e. broken bonds.
+
         7) Then we need to find the mappings between each disassembled component, and concatenate the mappings of all
         the components.
+
         8) To find the one to one atom mappings, we use the BASS algorithm. We assume the mapped component have the same
         structure since we have already removed the different parts. However, here we only map the backbone of the
         structure (in other words, we simply all the bond type to 1) due to bond change (double bond to single bond or
         triple bond to single bond)
+
         9) To ensure the optimal mappings, we count the mapped atoms with changed local environment and choose the
-        mapping with minimal changed local colors.
+        mapping with minimal changes.
     """
 
     def __init__(self, rclass_name: str, rclass_definitions: list, one_compound: compound.Compound,
@@ -237,7 +298,7 @@ class RpairParser:
         """
         To generate the atom neighbors represented by KEGG atom type for each atom in the compound.
         This is used to find the center atom.
-        We used KEGG atom type since the descriptions of atoms in rclass definitions use KEGG atom type.
+        We used KEGG atom type since the descriptions of atoms in the rclass definitions using KEGG atom type.
 
         :param this_compound: the compound entity.
         :return: the list of atom with its neighbors.
@@ -253,11 +314,11 @@ class RpairParser:
     @staticmethod
     def find_target_atom(atoms: list, target: tuple) -> list:
         """
-        To find the target atom from a list of atoms.
+        To find the target atoms from a list of candidate atoms.
 
-        :param atoms: a list of atoms to be searched.
+        :param atoms: a list of atoms to search from.
         :param target: the target atom to be searched.
-        :return: the list of atom number that match the target.
+        :return: the list of atom numbers that match the target atom.
         """
         target_index = []
         for i, atom in enumerate(atoms):
@@ -272,11 +333,11 @@ class RpairParser:
         To create the center atom based on its connected atoms and its counterpart atom in the other compound.
 
         :param i: the ith rclass definition.
-        :param kat: KEGG atom type of the center atom.
-        :param difference: the list of KEGG atom type of different connected atoms
-        :param the_other_difference: the list of KEGG atom type of different connected atoms of the other compound.
+        :param kat: the KEGG atom type of the center atom.
+        :param difference: the list of KEGG atom type of different connected atoms.
+        :param the_other_difference: the list of KEGG atom type of different connected atoms in the other compound.
         :param match: the list of KEGG atom type of the matched connected atoms.
-        :param the_other_match: the list of KEGG atom type of the matched connected atoms of the other compound.
+        :param the_other_match: the list of KEGG atom type of the matched connected atoms in the other compound.
         :return: the constructed reaction center.
         """
         match = list(zip(match, the_other_match))
@@ -289,12 +350,14 @@ class RpairParser:
     def find_center_atoms(self) -> tuple:
         """
         Example of rclass definition:
+
         C8x-C8y:*-C1c:N5y+S2x-N5y+S2x
+
         The RDM pattern is defined as KEGG atom type changes at the reaction center (R), the difference region (D),
         and the matched region (M) for each reactant pair. It characterizes chemical structure transformation patterns
         associated with enzymatic reactions.
 
-        :return: the list of reaction centers and their corresponding candidate atoms.
+        :return: the list of reaction centers and the corresponding candidate atoms.
         """
         left_reaction_centers, right_reaction_centers = [], []
         left_center_candidates, right_center_candidates = [], []
@@ -326,10 +389,8 @@ class RpairParser:
         """
         To generate all the combinations of reaction centers.
         
-        :param center_atom_index: list of atom index list for each reaction centers. eg: three reaction centers:
-        [[0, 1, 2], [5, 6], [10, 11]].
-        :return: the list of combined reaction centers. eg: [[0, 5, 10], [0, 5, 11], [0, 6, 10], [0, 6, 11], [1, 5, 10],
-        [1, 5, 11], [1, 6, 10], [1, 6, 11], [2, 5, 10], [2, 5, 11], [2, 6, 10], [2, 6, 11]]
+        :param center_atom_index: list of atom index list for each reaction centers. eg: three reaction centers: [[0, 1, 2], [5, 6], [10, 11]].
+        :return: the list of combined reaction centers. eg: [[0, 5, 10], [0, 5, 11], [0, 6, 10], [0, 6, 11], [1, 5, 10], [1, 5, 11], [1, 6, 10], [1, 6, 11], [2, 5, 10], [2, 5, 11], [2, 6, 10], [2, 6, 11]]
         """
         combines = []
 
@@ -359,10 +420,9 @@ class RpairParser:
         atoms. We need to get all the combinations.
         
         :param this_compound: the :class:`~mdh.compound.Compound` entity.
-        :param center_atom_numbers: the list of atom numbers of center atom in the compound.
-        :param reaction_centers: the list of reaction center descriptions of the compound.
-        :return: the list of bonds (represented by the atom numbers in the bond) that needs to be removed
-        based on the RDM descriptions.
+        :param center_atom_numbers: the list of atom numbers for center atom in the compound.
+        :param reaction_centers: the list of reaction center descriptions for the compound.
+        :return: the list of bonds (represented by the atom numbers in the bond) that needs to be removed based on the RDM descriptions.
         """
         removed_bonds = [[]]
         for i, idx in enumerate(center_atom_numbers):
@@ -392,10 +452,6 @@ class RpairParser:
                 self.find_center_atoms()
             left_centers_list = self.get_center_list(left_center_candidates)
             right_center_list = self.get_center_list(right_center_candidates)
-
-            # print(self.one_compound.compound_name, self.the_other_compound.compound_name)
-            # print("left centers_list", left_centers_list, len(left_centers_list))
-            # print("right centers_list", right_center_list, len(right_center_list))
 
             minimum_miss_count = float("inf")
             optimal_atom_mappings = {}
@@ -429,7 +485,7 @@ class RpairParser:
     @staticmethod
     def detect_components(this_compound: compound.Compound, removed_bonds: list, center_atom_numbers: list) -> list:
         """
-        To detect all the components in the compound after remove some bonds.
+        To detect all the components in the compound after removing some bonds.
         Basic idea is the breadth first search algorithm.
 
         :param this_compound: the :class:`~mdh.compound.Compound` entity.
@@ -466,9 +522,9 @@ class RpairParser:
     @staticmethod
     def pair_components(left_components: list, right_components: list) -> list:
         """
-        The two compounds are divided into separate components due to difference atoms. We need to pair each component
+        The two compounds are divided into separate components due to the difference atoms. We need to pair each component
         in one compound to its counterpart component in the other compound.
-        Here roughly pair the components based on the number of atoms in the component. Therefore, every component in
+        Here we roughly pair the components based on the number of atoms in the component. Therefore, every component in
         one compound can be paired with several components in the other compound.
         
         :param left_components: the components in one compound.
@@ -489,9 +545,9 @@ class RpairParser:
         bonds, facilitating the following atom mappings.
 
         :param this_compound: the :class:`~mdh.compound.Compound` entity.
-        :param atom_numbers: the list of atom numbers for atoms in the component.
+        :param atom_numbers: the list of atom numbers in the component.
         :param removed_bonds: the list of removed bonds (represented by the atom numbers in the bond) in the compound.
-        :return: the constructed component.
+        :return: the constructed component compound.
         """
         atoms = [this_compound.atoms[idx].clone() for idx in atom_numbers]
         idx_dict = {int(atom.atom_number): i for i, atom in enumerate(atoms)}
@@ -508,10 +564,7 @@ class RpairParser:
                 cloned_bond.update_first_atom(idx_dict[atom_1])
                 cloned_bond.update_second_atom(idx_dict[atom_2])
                 bonds.append(cloned_bond)
-        # print("construct the compound")
         this_compound = compound.Compound("partial_compound", atoms, bonds)
-        # print(this_compound)
-        # print("finish constructing compounds")
         return this_compound
 
     @staticmethod
@@ -557,14 +610,9 @@ class RpairParser:
             right_component = self.construct_component(self.the_other_compound, right_component_index, right_removed_bonds)
             if not self.preliminary_atom_mappings_check(left_component, right_component):
                 continue
-            # print("left component atoms ", [(i, atom.atom_symbol) for i, atom in enumerate(left_component.atoms)])
-            # print("right component atoms ", [(i, atom.atom_symbol) for i, atom in enumerate(right_component.atoms)])
-            # print("left bonds", [(bond.first_atom_number, bond.second_atom_number) for bond in left_component.bonds])
-            # print("right bonds", [(bond.first_atom_number, bond.second_atom_number) for bond in right_component.bonds])
 
             one_to_one_mappings_list = left_component.find_mappings(right_component, resonance=True, r_distance=False,
                                                                     backbone=True)
-            # print("component mapp", one_to_one_mappings_list)
             optimal_one_to_one_mappings = None
             minimum_miss_count = float("inf")
             for one_to_one_mappings in one_to_one_mappings_list:
@@ -612,8 +660,8 @@ class RpairParser:
         """
         To check if mapped the atoms can correspond to the mapped reaction center atoms.
         
-        :param left_centers: the list of center atom index in the left compound.
-        :param right_centers: the list of center atom index in the right compound.
+        :param left_centers: the list of center atom indices in the left compound.
+        :param right_centers: the list of center atom indices in the right compound.
         :param component_atom_mappings: the one to one atom mappings of one component.
         :return: bool whether the mappings are valid.
         """
@@ -628,7 +676,7 @@ class RpairParser:
         can cause change of local environment, which can change the atom identifier.
 
         :param one_to_one_mappings: the dictionary of atom mappings between the two compounds.
-        :return: the total number of mapped atoms with different local identifier.
+        :return: the total number of mapped atoms with different local identifiers.
         """
         count = 0
         for idx_1 in one_to_one_mappings:
@@ -644,7 +692,7 @@ def create_compound_kcf(kcf_file: str) -> Optional[compound.Compound]:
     """
     To construct compound entity based on the KEGG kcf file.
 
-    :param kcf_file: the filename contains kcf text.
+    :param kcf_file: the path to the kcf file.
     :return: the constructed compound entity.
     """
     kcf_dict = kegg_kcf_parser(tools.open_text(kcf_file).split("\n"))
@@ -664,12 +712,12 @@ def create_compound_kcf(kcf_file: str) -> Optional[compound.Compound]:
 # To avoid parsing the same rclass repeatedly, let's parse the rclass first, and look it up when we need.
 def create_reactions(reaction_directory: str, compounds: dict, atom_mappings: dict) -> list:
     """
-    To create KEGG `~mdh.reaction.Reaction` entities.
+    To create KEGG :class:`~mdh.reaction.Reaction` entities.
 
     :param reaction_directory: the directory that stores all the reaction files.
     :param compounds: a dictionary of :class:`~mdh.compound.Compound` entities.
     :param atom_mappings: the compound pair name and its atom mappings.
-    :return: the constructed `~mdh.reaction.Reaction` entities.
+    :return: the constructed :class:`~mdh.reaction.Reaction` entities.
     """
     # here we create compounds, rlcass descriptions, and reactions.
     reaction_files = glob.glob(reaction_directory+"*")

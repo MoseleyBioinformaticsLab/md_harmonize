@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """
-MDH.reaction
+mdh.reaction
 ~~~~~~~~~~~~
 
 This module provides the :class:`~mdh.reaction.Reaction` class entity.

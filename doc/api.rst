@@ -15,7 +15,7 @@ The MDH API Reference
     :member-order: bysource
     :members:
     :special-members:
-    :exclude-members: __weakref__, __str__, calculateMoietyState
+    :exclude-members: __weakref__, __str__
 
 
 .. automodule:: mdh.KEGG_database_scraper

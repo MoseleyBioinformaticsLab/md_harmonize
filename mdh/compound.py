@@ -1669,7 +1669,6 @@ class Compound:
         """
 
         try:
-            print("in the main funciton", self.has_cycle)
             relationship, mapping = tools.timeout(self.circular_pair_relationship_helper, (the_other_compound,), seconds=seconds)
             return relationship, mapping
         except Exception as exception:
@@ -1688,8 +1687,6 @@ class Compound:
     """
         # default one compound should have a cycle.
 
-        print("this compound name, ", self.compound_name)
-        print(self.has_cycle)
         self.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
         the_other_compound.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
 
@@ -1697,7 +1694,6 @@ class Compound:
         min_count = {1: float("inf"), -1: float("inf"), 2: float("inf"), 0: float("inf")}
         # self.find_cycles()
         critical_atom_list = self.find_critical_atom_in_cycle()
-        print("critical atoms, ", critical_atom_list)
 
         the_other_color = the_other_compound.backbone_color_identifier(r_groups=True) + \
                           the_other_compound.metal_color_identifier(details=False)
@@ -1706,8 +1702,6 @@ class Compound:
             self.find_cycles()
             this_color = self.backbone_color_identifier(r_groups=True) + self.metal_color_identifier(details=False)
             if this_color == the_other_color:
-                print("this critical atom set ", critical_atoms)
-                print("they have the same color")
                 atom_mappings = self.generate_atom_mapping_by_atom_color(the_other_compound)
                 excluded_atoms_the_other = list(set(itertools.chain.from_iterable([atom_mappings[i] for i in critical_atoms])))
                 one_chemical_details = self.get_chemical_details(critical_atoms)
@@ -1769,13 +1763,11 @@ class Compound:
         for atom in self.atoms:
             # Two Os are connected to one atom and one O is in the cycle.
             if atom.in_cycle and atom.default_symbol == "O":
-                print("find O in the cycle")
                 for neighbor_index in atom.neighbors:
                     neighbor = self.atoms[neighbor_index]
                     for next_neighbor_index in neighbor.neighbors:
                         if next_neighbor_index != atom.atom_number and self.atoms[next_neighbor_index].default_symbol == "O" \
                                 and self.bond_lookup[(next_neighbor_index, neighbor_index)].bond_type == "1":
-                            print("here got the critical atoms!")
                             critical_atoms.append([atom.atom_number, neighbor_index, next_neighbor_index])
         return critical_atoms
 

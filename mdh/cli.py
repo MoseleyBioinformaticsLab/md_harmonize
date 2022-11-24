@@ -422,7 +422,7 @@ def cli(args):
         print(atom_mappings)
 
 
-    elif args["test1"]:
+    elif args["test2"]:
 
         # test linear circular transformation.
         kegg_file = "/mlab/data/hji236/projects/MDH_test/standardized/KEGG/molfile/cpd:C00508.mol"

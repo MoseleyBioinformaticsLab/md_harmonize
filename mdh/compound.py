@@ -1665,6 +1665,7 @@ class Compound:
         """
 
         try:
+            print("in the main funciton", self.has_cycle)
             relationship, mapping = tools.timeout(self.circular_pair_relationship_helper, (the_other_compound,), seconds=seconds)
             return relationship, mapping
         except Exception as exception:

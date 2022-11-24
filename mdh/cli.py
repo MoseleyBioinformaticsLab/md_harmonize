@@ -429,6 +429,7 @@ def cli(args):
         metacyc_file = "/mlab/data/hji236/projects/MDH_test/standardized/MetaCyc/molfile/L-RIBULOSE.mol"
 
         kegg_cpd = construct_compound_via_molfile(kegg_file)
+        print("right after construction", kegg_cpd.has_cycle)
         # kegg has cycle
         metacyc_cpd = construct_compound_via_molfile(metacyc_file)
 

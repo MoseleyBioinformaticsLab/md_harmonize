@@ -281,7 +281,6 @@ class Compound:
         :param bonds: a list of :class:`~mdh.compound.Bond` entities in the compound.
     """
         self.compound_name = compound_name
-        print(self.compound_name)
         self.atoms = atoms
         self.bonds = bonds
         self.bond_lookup = {}
@@ -1685,6 +1684,7 @@ class Compound:
         # default one compound should have a cycle.
 
         print("this compound name, ", self.compound_name)
+        print(self.has_cycle)
         self.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
         the_other_compound.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
 

@@ -710,12 +710,11 @@ def create_compound_kcf(kcf_file: str) -> Optional[compound.Compound]:
 
 # when we create the kegg reaction, we need to parse the atom mappings based on rclass!
 # To avoid parsing the same rclass repeatedly, let's parse the rclass first, and look it up when we need.
-def create_reactions(reaction_directory: str, compounds: dict, atom_mappings: dict) -> list:
+def create_reactions(reaction_directory: str, atom_mappings: dict) -> list:
     """
     To create KEGG :class:`~mdh.reaction.Reaction` entities.
 
     :param reaction_directory: the directory that stores all the reaction files.
-    :param compounds: a dictionary of :class:`~mdh.compound.Compound` entities.
     :param atom_mappings: the compound pair name and its atom mappings.
     :return: the constructed :class:`~mdh.reaction.Reaction` entities.
     """
@@ -728,10 +727,10 @@ def create_reactions(reaction_directory: str, compounds: dict, atom_mappings: di
         
         one_side_coefficients, the_other_side_coefficients = parse_equation(this_reaction["EQUATION"][0])
 
-        if not all("cpd:" + compound_name in compounds for compound_name in one_side_coefficients) or not \
-                all("cpd:" + compound_name in compounds for compound_name in the_other_side_coefficients):
-            # here, we don't include the reactions that have unspecified compounds.
-            continue
+        # if not all("cpd:" + compound_name in compounds for compound_name in one_side_coefficients) or not \
+        #         all("cpd:" + compound_name in compounds for compound_name in the_other_side_coefficients):
+        #     # here, we don't include the reactions that have unspecified compounds.
+        #     continue
         one_side_compounds = ["cpd:" + compound_name for compound_name in one_side_coefficients]
         the_other_side_compounds = ["cpd:" + compound_name for compound_name in the_other_side_coefficients]
         one_side_coefficients.update(the_other_side_coefficients)

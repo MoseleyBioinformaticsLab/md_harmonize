@@ -10,7 +10,8 @@ Usage:
     mdh aromatize <database_names> <working_directory> <save_file> [--aromatic_manager=<aromatic_manager_file>] [--pickle]
     mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom] [--pickle] [--k]
     mdh initialize_reaction <database_names> <working_directory> [--pickle]
-    mdh harmonize <database_names> <working_directory> [--pickle]
+    mdh harmonize_compound <database_names> <working_directory> [--pickle]
+    mdh harmonize_reaction <database_names> <working_directory> [--pickle]
     mdh test4 <database_names> <working_directory> [--pickle]
     mdh test7 <k>
     mdh test1
@@ -350,11 +351,11 @@ def cli(args):
             save_directory = to_directory + "/{0}".format(database_name)
             os.makedirs(save_directory, exist_ok=True)
 
-            if not os.path.exists(save_directory + "/compounds.json"):
-                raise OSError("Please construct the {0} compounds first!".format(database_name))
+            # if not os.path.exists(save_directory + "/compounds.json"):
+            #     raise OSError("Please construct the {0} compounds first!".format(database_name))
 
-            compounds = open_function(save_directory + "/compounds.json")
-            compound_dict = compound_construct_all(list(compounds.values()), construct_compound_via_components)
+            # compounds = open_function(save_directory + "/compounds.json")
+            # compound_dict = compound_construct_all(compounds, construct_compound_via_components)
 
             reaction_list = []
             parser = parser_dict.get(database_name, None)
@@ -366,7 +367,7 @@ def cli(args):
                 if not os.path.exists(working_directory + "/kegg_atom_mappings_IC.json"):
                     raise OSError("The atom mappings of KEGG compounds have not been generated.")
                 atom_mappings = open_function(working_directory + "/kegg_atom_mappings_IC.json")
-                reaction_list = parser.create_reactions(reaction_directory, compound_dict, atom_mappings)
+                reaction_list = parser.create_reactions(reaction_directory, atom_mappings)
 
             elif database_name == "MetaCyc":
                 reaction_file = working_directory + "/sources/MetaCyc/reactions.dat"
@@ -375,7 +376,7 @@ def cli(args):
                     raise OSError("The file {0} does not exist.".format(reaction_file))
                 if not os.path.exists(atom_mapping_file):
                     raise OSError("The file {0} does not exist.".format(atom_mapping_file))
-                reaction_list = parser.create_reactions(reaction_file, atom_mapping_file, compound_dict)
+                reaction_list = parser.create_reactions(reaction_file, atom_mapping_file)
             save_function(reaction_list, save_directory + "/reactions.json")
 
     elif args['harmonize']:

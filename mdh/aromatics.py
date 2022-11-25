@@ -206,6 +206,7 @@ class AromaticManager:
                                 cycle.add(second_atom_number)
                         cycles.append(cycle)
         fused_cycles = self.fuse_cycles(cycles)
+        # print("aromatic cycles: ", fused_cycles)
         cpd.update_aromatic_bond_type(fused_cycles)
         return 
 

@@ -8,7 +8,7 @@ Usage:
     mdh download <database_names> <working_directory>
     mdh standardize <database_names> <working_directory>
     mdh aromatize <database_names> <working_directory> <save_file> [--aromatic_manager=<aromatic_manager_file>] [--pickle]
-    mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom] [--pickle] [--k]
+    mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom] [--pickle] [--k=k]
     mdh initialize_reaction <database_names> <working_directory> [--pickle]
     mdh harmonize_compound <database_names> <working_directory> [--pickle]
     mdh harmonize_reaction <database_names> <working_directory> [--pickle]

@@ -287,7 +287,7 @@ def cli(args):
         to_directory = working_directory + "/initialized"
         for database_name in database_names:
             if "_" in database_name:
-                database_name, k = database_name.split("-")
+                database_name, k = database_name.split("_")
                 from_path = working_directory + "standardized/{0}/molfile_{1}".format(database_name, k)
                 save_directory = to_directory + "/{0}".format(database_name)
                 save_file = save_directory + "/compounds_{0}.json".format(k)
@@ -394,7 +394,7 @@ def cli(args):
 
         for database_name in database_names:
             if "_" in database_name:
-                database_name, k = database_name.split("-")
+                database_name, k = database_name.split("_")
                 from_directory = working_directory + "/initialized/{0}/".format(database_name)
                 compound_file = from_directory + "compounds_{0}.json".format(k)
             else:
@@ -428,7 +428,7 @@ def cli(args):
     #         initial_harmonized_compounds = open_function(save_file)
     #         compound_harmonization_manager = harmonization.CompoundHarmonizationManager.\
     #             create_manager(compound_list, initial_harmonized_compounds)
-    #     
+    #
         # while we do reaction harmonization, we need to pay attention to compound harmonization without same structural
         # representations.
         # this includes: R group, linear-circular-transformation, resonance.

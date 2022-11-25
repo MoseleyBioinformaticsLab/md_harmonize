@@ -396,7 +396,7 @@ def cli(args):
                 raise OSError("The file {0} does not exist.".format(from_directory + "reactions.json"))
             compounds = open_function(from_directory + "compounds.json")
             # this should be converted to compounds since it was saved in list format later.
-            compound_parsed = compound_construct_multiprocess(compounds.values(), construct_compound_via_components)
+            compound_parsed = compound_construct_multiprocess(compounds, construct_compound_via_components)
             compound_dict.append(compound_parsed)
             reactions = open_function(from_directory + "reactions.json")
             reaction_parsed = parse_reactions(compound_parsed, reactions)

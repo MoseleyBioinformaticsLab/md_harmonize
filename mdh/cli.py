@@ -8,7 +8,7 @@ Usage:
     mdh download <database_names> <working_directory>
     mdh standardize <database_names> <working_directory>
     mdh aromatize <database_names> <working_directory> <save_file> [--aromatic_manager=<aromatic_manager_file>] [--pickle]
-    mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom] [--pickle] [--k=k]
+    mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom] [--pickle]
     mdh initialize_reaction <database_names> <working_directory> [--pickle]
     mdh harmonize_compound <database_names> <working_directory> [--pickle]
     mdh harmonize_reaction <database_names> <working_directory> [--pickle]
@@ -286,15 +286,24 @@ def cli(args):
         aromatic_manager = aromatics.AromaticManager.decode(open_function(args['<aromatic_manager_file>']))
         to_directory = working_directory + "/initialized"
         for database_name in database_names:
-            from_path = working_directory + "standardized/{0}/molfile".format(database_name)
-            if args['--k']:
-                from_path += "_{0}".format(args['--k'])
+            if "_" in database_name:
+                database_name, k = database_name.split("-")
+                from_path = working_directory + "standardized/{0}/molfile_{1}".format(database_name, k)
+                save_directory = to_directory + "/{0}".format(database_name)
+                save_file = save_directory + "/compounds_{0}.json".format(k)
+            else:
+                from_path = working_directory + "standardized/{0}/molfile".format(database_name)
+                save_directory = to_directory + "/{0}".format(database_name)
+                save_file = save_directory + "/compounds.json"
+
+            os.makedirs(save_directory, exist_ok=True)
+
             if not os.path.exists(from_path):
                 raise OSError("The directory {0} does not exist.".format(from_path))
             parser = parser_dict.get(database_name, None)
             # construct compounds
             molfiles = glob.glob(from_path + "/*")
-            compound_dict = compound_construct_multiprocess(molfiles, construct_compound_via_molfile)
+            compound_list = compound_construct_multiprocess(molfiles, construct_compound_via_molfile)
 
             if args['--parse_kegg_atom']:
                 # I choose to parse the kegg atom mapings here, since the kegg atom mappings are only related to
@@ -311,43 +320,32 @@ def cli(args):
                 # construct KEGG compound via KEGG kcf files. This is used for atom mappings
                 kcf_files = glob.glob(working_directory + "/sources/KEGG/kcf/*")
                 kcf_compounds = compound_construct_multiprocess(kcf_files, construct_compound_via_kcf)
-                print("count of original kegg compound files ", len(kcf_compounds))
                 original_files = glob.glob(working_directory + "/sources/KEGG/molfile/*")
                 original_compounds = compound_construct_multiprocess(original_files, construct_compound_via_molfile)
-                print("count of original kegg compound files ", len(original_compounds))
-                print("comparison of kcf and original")
                 atom_order_check(kcf_compounds, original_compounds)
-                print("comparison of standard and original")
-                atom_order_check(original_compounds, compound_dict)
+                atom_order_check(original_compounds, compound_list)
                 atom_mappings = parser.create_atom_mappings(rclass_directory, kcf_compounds)
                 # atom_mappings = tools.open_jsonpickle(working_directory + "/kegg_atom_mappings_test.json")
                 save_function(atom_mappings, working_directory + "/kegg_atom_mappings.json")
-                atom_mappings = KEGG_atom_mapping_correction(KEGG_atom_index_mapping(kcf_compounds, compound_dict),
+                atom_mappings = KEGG_atom_mapping_correction(KEGG_atom_index_mapping(kcf_compounds, compound_list),
                                                              atom_mappings)
                 save_function(atom_mappings, working_directory + "/kegg_atom_mappings_IC.json")
 
-            for cpd_name in compound_dict:
-                cpd = compound_dict[cpd_name]
+            for cpd_name in compound_list:
+                cpd = compound_list[cpd_name]
                 # aromatic substructure detection
                 aromatic_manager.detect_aromatic_substructures(cpd)
                 cpd.define_bond_stereochemistry()
                 cpd.curate_invalid_n()
 
-            save_directory = to_directory + "/{0}".format(database_name)
-            os.makedirs(save_directory, exist_ok=True)
-            save_file = save_directory + "/compounds.json"
-            if args['--k']:
-                save_file = save_directory + "/compounds_{0}.json".format(args['--k'])
-            save_function([compound_dict[name].encode() for name in compound_dict], save_file)
+            save_function([compound_list[name].encode() for name in compound_list], save_file)
 
     elif args['initialize_reaction']:
 
         database_names = args['<database_names>'].split(",")
         working_directory = args['<working_directory>']
         to_directory = working_directory + "/initialized"
-
         for database_name in database_names:
-
             save_directory = to_directory + "/{0}".format(database_name)
             os.makedirs(save_directory, exist_ok=True)
 
@@ -384,34 +382,53 @@ def cli(args):
 
         database_names = args['<database_names>'].split(",")
         working_directory = args['<working_directory>']
-        compound_dict = []
-        reaction_list = []
+        compound_list = []
+        # reaction_list = []
         save_directory = working_directory + "/harmonized"
         os.makedirs(save_directory, exist_ok=True)
+        save_file = save_directory + "/{0}_initial_harmonized_compounds.json".format("_".join(database_names))
+
+        if os.path.exists(save_file):
+            print("we find the initial_harmonized_compounds")
+            return
+
         for database_name in database_names:
-            from_directory = working_directory + "/initialized/{0}/".format(database_name)
-            if not os.path.exists(from_directory + "compounds.json"):
-                raise OSError("The file {0} does not exist.".format(from_directory + "compounds.json"))
-            if not os.path.exists(from_directory + "reactions.json"):
-                raise OSError("The file {0} does not exist.".format(from_directory + "reactions.json"))
-            compounds = open_function(from_directory + "compounds.json")
+            if "_" in database_name:
+                database_name, k = database_name.split("-")
+                from_directory = working_directory + "/initialized/{0}/".format(database_name)
+                compound_file = from_directory + "compounds_{0}.json".format(k)
+            else:
+                from_directory = working_directory + "/initialized/{0}/".format(database_name)
+                compound_file = from_directory + "compounds.json"
+            if not os.path.exists(compound_file):
+                raise OSError("The file {0} does not exist.".format(compound_file))
+
+            compounds = open_function(compound_file)
             # this should be converted to compounds since it was saved in list format later.
             compound_parsed = compound_construct_multiprocess(compounds, construct_compound_via_components)
-            compound_dict.append(compound_parsed)
-            reactions = open_function(from_directory + "reactions.json")
-            reaction_parsed = parse_reactions(compound_parsed, reactions)
-            reaction_list.append(reaction_parsed)
+            compound_list.append(compound_parsed)
+            # reactions = open_function(from_directory + "reactions.json")
+            # reaction_parsed = parse_reactions(compound_parsed, reactions)
+            # reaction_list.append(reaction_parsed)
         print("start compound harmonization")
-        if os.path.exists(save_directory + "/{0}_initial_harmonized_compounds.json".format("_".join(database_names))):
-            print("we find the initial_harmonized_compounds")
-            initial_harmonized_compounds = open_function(save_directory + "/{0}_initial_harmonized_compounds.json".format("_".join(database_names)))
-            compound_harmonization_manager = harmonization.CompoundHarmonizationManager.\
-                create_manager(compound_dict, initial_harmonized_compounds)
+        compound_harmonization_manager = harmonization.harmonize_compound_list(compound_list)
+        initial_harmonized_compounds = compound_harmonization_manager.save_manager()
+        save_function(initial_harmonized_compounds, save_file)
 
-        else:
-            compound_harmonization_manager = harmonization.harmonize_compound_list(compound_dict)
-            initial_harmonized_compounds = compound_harmonization_manager.save_manager()
-            save_function(initial_harmonized_compounds, save_directory + "/{0}_initial_harmonized_compounds.json".format("_".join(database_names)))
+
+    # elif args['harmonize_reaction']:
+    #
+    #     database_names = args['<database_names>'].split(",")
+    #     working_directory = args['<working_directory>']
+    #     to_directory = working_directory + "/initialized"
+    #
+    #
+    #     if os.path.exists(save_file):
+    #         print("we find the initial_harmonized_compounds")
+    #         initial_harmonized_compounds = open_function(save_file)
+    #         compound_harmonization_manager = harmonization.CompoundHarmonizationManager.\
+    #             create_manager(compound_list, initial_harmonized_compounds)
+    #     
         # while we do reaction harmonization, we need to pay attention to compound harmonization without same structural
         # representations.
         # this includes: R group, linear-circular-transformation, resonance.

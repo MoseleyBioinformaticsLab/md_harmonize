@@ -857,7 +857,7 @@ def compound_pair_mappings(pair_component: tuple) -> tuple:
     return one_compound.name + "_" + the_other_compound.name, atom_mappings
 
 
-def create_atom_mappings(rclass_directory: str, compounds: dict) -> dict:
+def create_atom_mappings(rclass_directory: str, compounds: dict, seconds: int = 1200) -> dict:
     """
     To generate the atom mappings between compounds based on RCLASS definitions.
 
@@ -889,7 +889,7 @@ def create_atom_mappings(rclass_directory: str, compounds: dict) -> dict:
         if len(compound_pairs) > 1:
             with pebble.ProcessPool() as pool:
                 pre_results = pool.map(compound_pair_mappings, [(rclass_name, rclass_definitions, one_compound,
-                                                                 the_other_compound,) for one_compound, the_other_compound in compound_pairs], timeout=1200)
+                                                                 the_other_compound,) for one_compound, the_other_compound in compound_pairs], timeout=seconds)
                 iterator = pre_results.result()
                 results = []
                 while True:

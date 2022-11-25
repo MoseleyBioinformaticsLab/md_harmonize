@@ -8,7 +8,7 @@ Usage:
     mdh download <database_names> <working_directory>
     mdh standardize <database_names> <working_directory>
     mdh aromatize <database_names> <working_directory> <save_file> [--aromatic_manager=<aromatic_manager_file>] [--pickle]
-    mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom] [--pickle]
+    mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom] [--pickle] [--k]
     mdh initialize_reaction <database_names> <working_directory> [--pickle]
     mdh harmonize <database_names> <working_directory> [--pickle]
     mdh test4 <database_names> <working_directory> [--pickle]
@@ -235,12 +235,22 @@ def cli(args):
             from_path = working_directory + "sources/{0}/molfile".format(database_name)
             if not os.path.exists(from_path):
                 raise OSError("The directory {0} does not exist.".format(from_path))
-            to_path = working_directory + "/standardized/{0}/molfile".format(database_name)
-            os.makedirs(to_path, exist_ok=True)
             molfiles = glob.glob(from_path + "/*")
-            for molfile in molfiles:
-                if os.path.getsize(molfile) != 0:
-                    openbabel_utils.standardize_molfile(molfile, to_path)
+            if len(molfiles) > 25000:
+                k = len(molfiles) // 25000
+                for i in range(k+1):
+                    to_path = working_directory + "/standardized/{0}/molfile_{1}".format(database_name, i)
+                    os.makedirs(to_path, exist_ok=True)
+                    for j in range(25000* i, min(25000* (i+1), len(molfiles))):
+                        molfile = molfiles[j]
+                        if os.path.getsize(molfile) != 0:
+                            openbabel_utils.standardize_molfile(molfile, to_path)
+            else:
+                to_path = working_directory + "/standardized/{0}/molfile".format(database_name)
+                os.makedirs(to_path, exist_ok=True)
+                for molfile in molfiles:
+                    if os.path.getsize(molfile) != 0:
+                        openbabel_utils.standardize_molfile(molfile, to_path)
 
     elif args['aromatize']:
         database_names = args['<database_names>'].split(",")
@@ -276,12 +286,14 @@ def cli(args):
         to_directory = working_directory + "/initialized"
         for database_name in database_names:
             from_path = working_directory + "standardized/{0}/molfile".format(database_name)
+            if args['--k']:
+                from_path += "_{0}".format(args['--k'])
             if not os.path.exists(from_path):
                 raise OSError("The directory {0} does not exist.".format(from_path))
             parser = parser_dict.get(database_name, None)
             # construct compounds
             molfiles = glob.glob(from_path + "/*")
-            compound_dict = compound_construct_all(molfiles, construct_compound_via_molfile)
+            compound_dict = compound_construct_multiprocess(molfiles, construct_compound_via_molfile)
 
             if args['--parse_kegg_atom']:
                 # I choose to parse the kegg atom mapings here, since the kegg atom mappings are only related to
@@ -297,10 +309,10 @@ def cli(args):
                     raise OSError("The directory {0} does not exist.".format(rclass_directory))
                 # construct KEGG compound via KEGG kcf files. This is used for atom mappings
                 kcf_files = glob.glob(working_directory + "/sources/KEGG/kcf/*")
-                kcf_compounds = compound_construct_all(kcf_files, construct_compound_via_kcf)
+                kcf_compounds = compound_construct_multiprocess(kcf_files, construct_compound_via_kcf)
                 print("count of original kegg compound files ", len(kcf_compounds))
                 original_files = glob.glob(working_directory + "/sources/KEGG/molfile/*")
-                original_compounds = compound_construct_all(original_files, construct_compound_via_molfile)
+                original_compounds = compound_construct_multiprocess(original_files, construct_compound_via_molfile)
                 print("count of original kegg compound files ", len(original_compounds))
                 print("comparison of kcf and original")
                 atom_order_check(kcf_compounds, original_compounds)
@@ -322,7 +334,10 @@ def cli(args):
 
             save_directory = to_directory + "/{0}".format(database_name)
             os.makedirs(save_directory, exist_ok=True)
-            save_function([compound_dict[name].encode() for name in compound_dict], save_directory + "/compounds.json")
+            save_file = save_directory + "/compounds.json"
+            if args['--k']:
+                save_file = save_directory + "/compounds_{0}.json".format(args['--k'])
+            save_function([compound_dict[name].encode() for name in compound_dict], save_file)
 
     elif args['initialize_reaction']:
 
@@ -380,7 +395,7 @@ def cli(args):
                 raise OSError("The file {0} does not exist.".format(from_directory + "reactions.json"))
             compounds = open_function(from_directory + "compounds.json")
             # this should be converted to compounds since it was saved in list format later.
-            compound_parsed = compound_construct_all(list(compounds.values()), construct_compound_via_components)
+            compound_parsed = compound_construct_multiprocess(list(compounds.values()), construct_compound_via_components)
             compound_dict.append(compound_parsed)
             reactions = open_function(from_directory + "reactions.json")
             reaction_parsed = parse_reactions(compound_parsed, reactions)
@@ -425,7 +440,6 @@ def cli(args):
         rclass_dir = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/rclass_target/"
         atom_mappings = parser_dict["KEGG"].create_atom_mappings(rclass_dir, compounds)
         print(atom_mappings)
-
 
     elif args["test2"]:
 

@@ -24,6 +24,7 @@ from .supplement import atomic_weights
 from .supplement import metal_symbols
 from .supplement import index_to_charge
 from . import tools
+
 from datetime import datetime
 # from .supplement import charge_to_index
 
@@ -670,7 +671,7 @@ class Compound:
             for i, dist in enumerate(distance_matrix):
                 self.heavy_atoms[i].distance_to_r = dist
 
-    def find_cycles(self, short_circuit: bool = False, cutoff: int = 40, seconds=10) -> list:
+    def find_cycles(self, short_circuit: bool = False, cutoff: int = 40, seconds=50) -> list:
         """
         To find the cycles in the compound.
 

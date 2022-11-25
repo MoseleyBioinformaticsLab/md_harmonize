@@ -33,6 +33,7 @@ class AromaticManager:
         """
         self.aromatic_substructures = aromatic_substructures if aromatic_substructures else []
         self.indigo = Indigo()
+
         for substructure in self.aromatic_substructures:
             substructure.update_color_tuple()
 
@@ -163,16 +164,15 @@ class AromaticManager:
     #         pass
     #     return
 
-    def detect_aromatic_substructures_timeout(self, cpd: compound.Compound, seconds=200) -> None:
+    def detect_aromatic_substructures_timeout(self, cpd: compound.Compound) -> None:
         """
         To detect the aromatic substructures in the compound and stop the search on timeout.
 
         :param cpd: the :class:`~mdh.compound.Compound` entity.
-        :param seconds: the timeout limit.
         :return: None.
         """
         try:
-            tools.timeout(self.detect_aromatic_substructures, (cpd,), seconds=seconds)
+            tools.timeout(self.detect_aromatic_substructures, (cpd,), seconds=200)
         except:
             print("Aromatic substructures in compound {0} can hardly be detected.".format(cpd.name))
             pass

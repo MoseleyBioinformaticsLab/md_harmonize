@@ -379,7 +379,7 @@ def cli(args):
                 reaction_list = parser.create_reactions(reaction_file, atom_mapping_file)
             save_function(reaction_list, save_directory + "/reactions.json")
 
-    elif args['harmonize']:
+    elif args['harmonize_compound']:
         # create harmonized compound manager first, then reaction harmonization manager.
 
         database_names = args['<database_names>'].split(",")
@@ -396,7 +396,7 @@ def cli(args):
                 raise OSError("The file {0} does not exist.".format(from_directory + "reactions.json"))
             compounds = open_function(from_directory + "compounds.json")
             # this should be converted to compounds since it was saved in list format later.
-            compound_parsed = compound_construct_multiprocess(list(compounds.values()), construct_compound_via_components)
+            compound_parsed = compound_construct_multiprocess(compounds.values(), construct_compound_via_components)
             compound_dict.append(compound_parsed)
             reactions = open_function(from_directory + "reactions.json")
             reaction_parsed = parse_reactions(compound_parsed, reactions)
@@ -415,15 +415,15 @@ def cli(args):
         # while we do reaction harmonization, we need to pay attention to compound harmonization without same structural
         # representations.
         # this includes: R group, linear-circular-transformation, resonance.
-        print("start reaction harmonization")
-        reaction_harmonization_manager = harmonization.harmonize_reaction_list(reaction_list,
-                                                                               compound_harmonization_manager)
-        # let's just save the list of harmonized names first.
-        harmonized_compounds = reaction_harmonization_manager.compound_harmonization_manager.save_manager()
-        harmonized_reactions = reaction_harmonization_manager.save_manager()
-
-        save_function(harmonized_compounds, save_directory + "/{0}_harmonized_compounds_1.json".format("_".join(database_names)))
-        save_function(harmonized_reactions, save_directory + "/{0}_harmonized_reactions_1.json".format("_".join(database_names)))
+        # print("start reaction harmonization")
+        # reaction_harmonization_manager = harmonization.harmonize_reaction_list(reaction_list,
+        #                                                                        compound_harmonization_manager)
+        # # let's just save the list of harmonized names first.
+        # harmonized_compounds = reaction_harmonization_manager.compound_harmonization_manager.save_manager()
+        # harmonized_reactions = reaction_harmonization_manager.save_manager()
+        #
+        # save_function(harmonized_compounds, save_directory + "/{0}_harmonized_compounds_1.json".format("_".join(database_names)))
+        # save_function(harmonized_reactions, save_directory + "/{0}_harmonized_reactions_1.json".format("_".join(database_names)))
 
     elif args["test1"]:
         # kegg_compound_1_file = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf/cpd:C05670"

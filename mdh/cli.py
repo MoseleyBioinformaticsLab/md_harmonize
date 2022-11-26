@@ -415,32 +415,46 @@ def cli(args):
         initial_harmonized_compounds = compound_harmonization_manager.save_manager()
         save_function(initial_harmonized_compounds, save_file)
 
+    elif args['harmonize_reaction']:
 
-    # elif args['harmonize_reaction']:
-    #
-    #     database_names = args['<database_names>'].split(",")
-    #     working_directory = args['<working_directory>']
-    #     to_directory = working_directory + "/initialized"
-    #
-    #
-    #     if os.path.exists(save_file):
-    #         print("we find the initial_harmonized_compounds")
-    #         initial_harmonized_compounds = open_function(save_file)
-    #         compound_harmonization_manager = harmonization.CompoundHarmonizationManager.\
-    #             create_manager(compound_list, initial_harmonized_compounds)
-    #
+        database_names = args['<database_names>'].split(",")
+        working_directory = args['<working_directory>']
+        to_directory = working_directory + "/harmonized"
+
+        initial_compound_pairs = to_directory + "/{0}_initial_harmonized_compounds.json".format("_".join(database_names))
+        if not os.path.exists(initial_compound_pairs):
+            raise OSError("Please do compound harmonization first.")
+
+        compound_list = []
+        reaction_list = []
+        for database_name in database_names:
+
+            compound_file = working_directory + "/initialized/{0}/compounds.json".format(database_name)
+            if not os.path.exists(compound_file):
+                raise OSError("Please construct {0} compounds first.".format(database_name))
+            compounds = open_function(compound_file)
+            parsed_compounds = {cpd.compound_name: cpd for cpd in compounds}
+            compound_list.append(parsed_compounds)
+
+            reaction_file = working_directory + "/initialized/{0}/reactions.json".format(database_name)
+            if not os.path.exists(reaction_file):
+                raise OSError("Please construct {0} reactions first.".format(database_name))
+            reactions = open_function(reaction_file)
+            parsed_reactions = parse_reactions(parsed_compounds, reactions)
+            reaction_list.append(parsed_reactions)
+
+        initial_harmonized_compounds = open_function(initial_compound_pairs)
+        compound_harmonization_manager = harmonization.CompoundHarmonizationManager.create_manager(compound_list, initial_harmonized_compounds)
+
         # while we do reaction harmonization, we need to pay attention to compound harmonization without same structural
         # representations.
         # this includes: R group, linear-circular-transformation, resonance.
-        # print("start reaction harmonization")
-        # reaction_harmonization_manager = harmonization.harmonize_reaction_list(reaction_list,
-        #                                                                        compound_harmonization_manager)
+
+        print("start reaction harmonization")
+        reaction_harmonization_manager = harmonization.harmonize_reaction_list(reaction_list, compound_harmonization_manager)
         # # let's just save the list of harmonized names first.
-        # harmonized_compounds = reaction_harmonization_manager.compound_harmonization_manager.save_manager()
-        # harmonized_reactions = reaction_harmonization_manager.save_manager()
-        #
-        # save_function(harmonized_compounds, save_directory + "/{0}_harmonized_compounds_1.json".format("_".join(database_names)))
-        # save_function(harmonized_reactions, save_directory + "/{0}_harmonized_reactions_1.json".format("_".join(database_names)))
+        harmonized_reactions = reaction_harmonization_manager.save_manager()
+        save_function(harmonized_reactions, to_directory + "/{0}_harmonized_reactions.json".format("_".join(database_names)))
 
     elif args["test1"]:
         # kegg_compound_1_file = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf/cpd:C05670"

@@ -181,6 +181,16 @@ class Atom:
         self.kat = kat
         return self.kat
 
+    def update_cycle(self, cycle_status: bool) -> bool:
+        """
+        To update the cycle status of the atom
+
+        :param cycle_status: whether the atom is in cycle
+        :return: cycle status
+        """
+        self.in_cycle = cycle_status
+        return self.in_cycle
+
     def clone(self):
         """
         To clone the atom.
@@ -712,12 +722,12 @@ class Compound:
         :param cutoff: limit of cycle length.
         :return: the list of cycles in the compound
         """
-        atoms, not_cyclic, cyclic, all_cycles = self.atoms, [], [], []
+        not_cyclic, cyclic, all_cycles = [], [], []
 
         def prune() -> None:
             while 1:
                 terminate = True
-                for prune_atom in atoms:
+                for prune_atom in self.atoms:
                     if prune_atom.atom_number not in not_cyclic:
                         # for atom with cycle, it at least has 2 neighbors to form a cycle.
                         if len([neighbor for neighbor in prune_atom.neighbors if neighbor not in not_cyclic]) < 2:
@@ -732,18 +742,18 @@ class Compound:
             paths, cycles = collections.deque([[start_index]]), []
             while paths:
                 indices = paths.popleft()
-                for neighbor in atoms[indices[-1]].neighbors:
+                for neighbor in self.atoms[indices[-1]].neighbors:
                     if neighbor not in not_cyclic:
                         if neighbor not in indices and len(indices) < cutoff:
-                            paths.append(list(indices) + [atoms[neighbor].atom_number])
+                            paths.append(list(indices) + [self.atoms[neighbor].atom_number])
                         elif neighbor == start_index and len(indices) != 2:
-                            cycles.append(list(indices) + [atoms[neighbor].atom_number])
+                            cycles.append(list(indices) + [self.atoms[neighbor].atom_number])
                             if short_circuit:
                                 return cycles
             if cycles:
                 return cycles
         prune()
-        for atom in atoms:
+        for atom in self.atoms:
             start_index = atom.atom_number
             if start_index not in not_cyclic:
                 if not short_circuit or start_index not in cyclic:
@@ -759,7 +769,7 @@ class Compound:
         for cycle_list in all_cycles:
             for cycle in cycle_list:
                 for index in cycle:
-                    atoms[index].in_cycle = True
+                    self.atoms[index].update_cycle(True)
         if all_cycles:
             self.has_cycle = True
         return [list(x) for x in set(tuple(x) for x in [sorted(i[:-1]) for l in all_cycles for i in l])]

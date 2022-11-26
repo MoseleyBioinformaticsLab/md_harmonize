@@ -37,7 +37,7 @@ class Atom:
                  mass_difference: str = "0", charge: str = "0", atom_stereo_parity: str = "0",
                  hydrogen_count: str = "0", stereo_care_box: str = "0", valence: str = "0", h0designator: str = "0",
                  atom_atom_mapping_number: str = "0", inversion_retention_flag: str = "0", exact_change_flag: str = "0",
-                 kat: str = ""):
+                 kat: str = "", in_cycle: bool = False):
         """Atom initializer.
 
         :param atom_symbol: atom_symbol.
@@ -56,6 +56,7 @@ class Atom:
         :param inversion_retention_flag: inversion_retention_flag.
         :param exact_change_flag: exact_change_flag.
         :param kat: KEGG atom type.
+        :param in_cycle: whether the atom is in cycle.
     """
         self.x = float(x.strip())
         self.y = float(y.strip())
@@ -77,7 +78,7 @@ class Atom:
         self.color = ""
         self.color_tuple = tuple()
         self.color_layers = collections.defaultdict()
-        self.in_cycle = False
+        self.in_cycle = in_cycle
         self.bond_counts = 0
         self.group_id = 0
         self.double_bond_counts = 0
@@ -203,7 +204,7 @@ class Atom:
                     stereo_care_box=self.stereo_care_box, valence=self.valence, h0designator=self.h0designator,
                     atom_atom_mapping_number=self.atom_atom_mapping_number,
                     inversion_retention_flag=self.inversion_retention_flag, exact_change_flag=self.exact_change_flag,
-                    kat=self.kat)
+                    kat=self.kat, in_cycle=self.in_cycle)
 
 
 class Bond:

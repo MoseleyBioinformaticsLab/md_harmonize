@@ -93,6 +93,7 @@ def compound_construct_all(entities: list, function) -> dict:
     """
     compounds = {}
     for entity in entities:
+        print(entity)
         this_compound = function(entity)
         if this_compound:
             compounds[this_compound.compound_name] = this_compound
@@ -290,7 +291,7 @@ def cli(args):
                 database_name, k = database_name.split("_")
                 from_path = working_directory + "standardized/{0}/molfile_{1}".format(database_name, k)
                 save_directory = to_directory + "/{0}".format(database_name)
-                save_file = save_directory + "/compounds_{0}.json".format(k)
+                save_file = save_directory + "/compounds_{0}_1.json".format(k)
             else:
                 from_path = working_directory + "standardized/{0}/molfile".format(database_name)
                 save_directory = to_directory + "/{0}".format(database_name)
@@ -303,7 +304,7 @@ def cli(args):
             parser = parser_dict.get(database_name, None)
             # construct compounds
             molfiles = glob.glob(from_path + "/*")
-            compound_list = compound_construct_multiprocess(molfiles, construct_compound_via_molfile)
+            compound_list = compound_construct_all(molfiles, construct_compound_via_molfile)
 
             if args['--parse_kegg_atom']:
                 # I choose to parse the kegg atom mapings here, since the kegg atom mappings are only related to

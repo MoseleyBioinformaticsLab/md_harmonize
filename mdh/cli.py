@@ -291,7 +291,7 @@ def cli(args):
                 database_name, k = database_name.split("_")
                 from_path = working_directory + "standardized/{0}/molfile_{1}".format(database_name, k)
                 save_directory = to_directory + "/{0}".format(database_name)
-                save_file = save_directory + "/compounds_{0}_1.json".format(k)
+                save_file = save_directory + "/compounds_{0}.json".format(k)
             else:
                 from_path = working_directory + "standardized/{0}/molfile".format(database_name)
                 save_directory = to_directory + "/{0}".format(database_name)

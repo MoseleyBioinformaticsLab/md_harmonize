@@ -433,16 +433,14 @@ def cli(args):
             compound_file = working_directory + "/initialized/{0}/compounds.json".format(database_name)
             if not os.path.exists(compound_file):
                 raise OSError("Please construct {0} compounds first.".format(database_name))
-            compounds = open_function(compound_file)
-            compounds = compound_construct_multiprocess(compounds, construct_compound_via_components)
-            parsed_compounds = {cpd.compound_name: cpd for cpd in compounds}
-            compound_list.append(parsed_compounds)
+            compounds = compound_construct_multiprocess(open_function(compound_file), construct_compound_via_components)
+            compound_list.append(compounds)
 
             reaction_file = working_directory + "/initialized/{0}/reactions.json".format(database_name)
             if not os.path.exists(reaction_file):
                 raise OSError("Please construct {0} reactions first.".format(database_name))
             reactions = open_function(reaction_file)
-            parsed_reactions = parse_reactions(parsed_compounds, reactions)
+            parsed_reactions = parse_reactions(compounds, reactions)
             reaction_list.append(parsed_reactions)
 
         initial_harmonized_compounds = open_function(initial_compound_pairs)

@@ -378,7 +378,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
         ec_comparison = self.compare_ecs(one_reaction.ecs, the_other_reaction.ecs)
         if not ec_comparison:
             # Don't share the same ec, skip it.
-            print("the two reactions don't share the same ec")
+            print("the two reactions don't share the same ec", flush=True)
             return
         else:
             # For the reaction pair, one_side of one reaction can be mapped to one_side of the other reaction;
@@ -404,7 +404,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
                                                                                        reversed_the_other_side_mappings)
             # here we see which case matches better, and determine the match direction
             max_score = max(ordered_jaccard, reversed_jaccard)
-            print("the jaccard score of the two reactions ", max_score)
+            print("the jaccard score of the two reactions ", max_score, flush=True)
 
             if ordered_jaccard > reversed_jaccard:
                 one_side_pairs = [one_reaction.one_side, the_other_reaction.one_side]
@@ -431,12 +431,12 @@ class ReactionHarmonizationManager(HarmonizationManager):
                     relationship = self.determine_relationship(one_side_relationships + the_other_side_relationships)
                     harmonized_reaction_edge = HarmonizedReactionEdge(one_reaction, the_other_reaction, relationship,
                                                                       ec_comparison, one_side_mappings)
-                    print("find harmonized reaction: ", one_reaction.name, the_other_reaction.name)
+                    print("find harmonized reaction: ", one_reaction.name, the_other_reaction.name, flush=True)
                     self.add_edge(harmonized_reaction_edge)
 
             elif max_score >= 0.5:
                 # determine if there is missed compound harmonized edge. This threshold can be adjusted.
-                print("map compounds")
+                print("map compounds", flush=True)
                 one_unmapped_compounds = self.unmapped_compounds(one_side_pairs[0], one_side_pairs[1], mappings[0])
                 self.match_unmapped_compounds(one_unmapped_compounds[0], one_unmapped_compounds[1])
 
@@ -491,13 +491,13 @@ class ReactionHarmonizationManager(HarmonizationManager):
         """
         for one_cpd in one_side_left:
             for the_other_cpd in the_other_side_left:
-                print("try to map compounds, ", one_cpd.compound_name, the_other_cpd.compound_name)
+                print("try to map compounds, ", one_cpd.compound_name, the_other_cpd.compound_name, flush=True)
                 if self.compound_harmonization_manager.has_visited(one_cpd.compound_name, the_other_cpd.compound_name):
                     continue
                 valid = False
                 # print("current compare these two compounds: ", one_cpd.compound_name, the_other_cpd.compound_name)
                 if one_cpd.formula == the_other_cpd.formula:
-                    print("same formula")
+                    print("same formula", flush=True)
                     # resonance or linear-circular type
                     try:
                         resonant_mappings = one_cpd.map_resonance(the_other_cpd, r_distance=False)
@@ -506,7 +506,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
                         continue
                     if resonant_mappings:
                         # here both atom_mappings and relationship should be returned.
-                        print("find harmonized compound relationship with resonance relationship: ", the_other_cpd.compound_name, one_cpd.compound_name)
+                        print("find harmonized compound relationship with resonance relationship: ", the_other_cpd.compound_name, one_cpd.compound_name, flush=True)
                         relationship, atom_mappings = one_cpd.optimal_resonant_mapping(the_other_cpd, resonant_mappings)
                         harmonized_compound_edge = HarmonizedCompoundEdge(one_cpd, the_other_cpd, relationship,
                                                                           "resonance", atom_mappings)
@@ -521,7 +521,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
                                                                             the_other_cpd.compound_name)
                             continue
                         if atom_mappings:
-                            print("find harmonized compound relationship with circular relationship: ", the_other_cpd.compound_name, one_cpd.compound_name)
+                            print("find harmonized compound relationship with circular relationship: ", the_other_cpd.compound_name, one_cpd.compound_name, flush=True)
                             harmonized_compound_edge = HarmonizedCompoundEdge(one_cpd, the_other_cpd, relationship,
                                                                               "circular", atom_mappings)
                             self.compound_harmonization_manager.add_edge(harmonized_compound_edge)
@@ -533,7 +533,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
                                                                                 the_other_cpd.compound_name)
                                 continue
                             if atom_mappings:
-                                print("find harmonized compound relationship with circular relationship: ", the_other_cpd.compound_name, one_cpd.compound_name)
+                                print("find harmonized compound relationship with circular relationship: ", the_other_cpd.compound_name, one_cpd.compound_name, flush=True)
                                 harmonized_compound_edge = HarmonizedCompoundEdge(the_other_cpd, one_cpd, relationship,
                                                                                   "circular", atom_mappings)
                                 self.compound_harmonization_manager.add_edge(harmonized_compound_edge)
@@ -541,7 +541,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
 
                 if one_cpd.contains_r_groups():
                     # check if one cpd is more generic
-                    print("try to map with r group")
+                    print("try to map with r group", flush=True)
                     try:
                         relationship, atom_mappings = one_cpd.with_r_pair_relationship(the_other_cpd)
                     except:
@@ -550,7 +550,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
                         continue
 
                     if atom_mappings:
-                        print("find harmonized compound relationship with r group: ", the_other_cpd.compound_name, one_cpd.compound_name)
+                        print("find harmonized compound relationship with r group: ", the_other_cpd.compound_name, one_cpd.compound_name, flush=True)
                         harmonized_compound_edge = HarmonizedCompoundEdge(one_cpd, the_other_cpd, relationship,
                                                                           "r_group", atom_mappings)
                         self.compound_harmonization_manager.add_edge(harmonized_compound_edge)
@@ -565,7 +565,7 @@ class ReactionHarmonizationManager(HarmonizationManager):
                                                                         the_other_cpd.compound_name)
                         continue
                     if atom_mappings:
-                        print("find harmonized compound relationship with r group: ", the_other_cpd.compound_name, one_cpd.compound_name)
+                        print("find harmonized compound relationship with r group: ", the_other_cpd.compound_name, one_cpd.compound_name, flush=True)
                         harmonized_compound_edge = HarmonizedCompoundEdge(the_other_cpd, one_cpd, relationship,
                                                                           "r_group", atom_mappings)
                         self.compound_harmonization_manager.add_edge(harmonized_compound_edge)
@@ -664,7 +664,7 @@ def harmonize_compound_list(compound_list: list) -> CompoundHarmonizationManager
                     color_two = compounds_two[cpd_name_two].backbone_color_identifier(r_groups=True) + \
                                 compounds_two[cpd_name_two].metal_color_identifier(details=False)
                     if color_one == color_two:
-                        print("find one pair using color identifiers", cpd_name_one, cpd_name_two)
+                        print("find one pair using color identifiers", cpd_name_one, cpd_name_two, flush=True)
                         relationship, atom_mappings = compounds_one[cpd_name_one].\
                             same_structure_relationship(compounds_two[cpd_name_two])
                         harmonized_compound_edge = HarmonizedCompoundEdge(compounds_one[cpd_name_one],
@@ -686,25 +686,25 @@ def harmonize_reaction_list(reaction_list: list, compound_harmonization_manager:
     """
     reaction_harmonized_manager = ReactionHarmonizationManager(compound_harmonization_manager)
     k = len(reaction_list)
-    print("k is ", k)
+    print("k is ", k, flush=True)
     last_edges = 0
     round = 0
     while len(compound_harmonization_manager.harmonized_edges) != last_edges:
-        print("harmonization round {0}".format(round))
-        print("current harmonized edges: ", len(compound_harmonization_manager.harmonized_edges))
-        print("edges from last round ", last_edges)
+        print("harmonization round {0}".format(round), flush=True)
+        print("current harmonized edges: ", len(compound_harmonization_manager.harmonized_edges), flush=True)
+        print("edges from last round ", last_edges, flush=True)
         # if no new compound harmonized edges added, then we can stop harmonize.
         last_edges = len(compound_harmonization_manager.harmonized_edges)
         for i in range(k):
             for j in range(i+1, k):
-                print("i and j are", i, j)
+                print("i and j are", i, j, flush=True)
                 reactions_one, reactions_two = reaction_list[i], reaction_list[j][:10000]
-                print("total reaction counts ", len(reactions_one), len(reactions_two))
+                print("total reaction counts ", len(reactions_one), len(reactions_two), flush=True)
                 for i1, reaction_one in enumerate(reactions_one):
                     for j1, reaction_two in enumerate(reactions_two):
-                        print("index of two reactions, ", i1, j1, reaction_one.reaction_name, reaction_two.reaction_name)
+                        print("index of two reactions, ", i1, j1, reaction_one.reaction_name, reaction_two.reaction_name, flush=True)
                         reaction_harmonized_manager.harmonize_reaction(reaction_one, reaction_two)
 
         round += 1
-        print("finish one round", round)
+        print("finish one round", round, flush=True)
     return reaction_harmonized_manager

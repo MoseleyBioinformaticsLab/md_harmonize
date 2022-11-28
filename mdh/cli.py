@@ -433,7 +433,7 @@ def cli(args):
             compound_file = working_directory + "/initialized/{0}/compounds.json".format(database_name)
             if not os.path.exists(compound_file):
                 raise OSError("Please construct {0} compounds first.".format(database_name))
-            compounds = open_function(compound_file)
+            compounds = compound_construct_multiprocess(open_function(compound_file), construct_compound_via_components)
             parsed_compounds = {cpd.compound_name: cpd for cpd in compounds}
             compound_list.append(parsed_compounds)
 

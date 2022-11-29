@@ -868,7 +868,7 @@ class Compound:
         the_other.update_color_tuple(resonance=resonance)
         mappings = []
         mapping_matrix = BASS.make_mapping_matrix(the_other, self, True, True, r_distance)
-        # print("mapping matrix", mapping_matrix)
+        print("mapping matrix", mapping_matrix)
         if mapping_matrix is not None:
             mappings = BASS.find_mappings(the_other.structure_matrix(resonance=resonance, backbone=backbone),
                                           the_other.distance_matrix, self.structure_matrix(resonance=resonance,

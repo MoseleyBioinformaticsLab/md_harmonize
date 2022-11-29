@@ -939,6 +939,8 @@ class Compound:
         the_other.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
 
         one_to_one_mappings = self.find_mappings(the_other, resonance=True, r_distance=r_distance)
+        print("resonant mappings", one_to_one_mappings)
+
         valid_mappings = []
         for cur_mappings in one_to_one_mappings:
             flag = True

@@ -16,6 +16,7 @@ Usage:
     mdh test7 <k>
     mdh test1
     mdh test2
+    mdh test3
 
 Options:
     -h, --help          Show this screen.
@@ -489,6 +490,23 @@ def cli(args):
 
         print("relationship1, atom_mappings1", relationship1, atom_mappings1)
         # print("relationship2, atom_mappings2", relationship2, atom_mappings2)
+
+
+    elif args["test3"]:
+
+        kegg_file = "/mlab/data/hji236/projects/MDH_test/standardized/KEGG/molfile/cpd:C20416.mol"
+        metacyc_file = "/mlab/data/hji236/projects/MDH_test/standardized/MetaCyc/molfile/CPD-12028.mol"
+        kegg_cpd = construct_compound_via_molfile(kegg_file)
+        metacyc_cpd = construct_compound_via_molfile(metacyc_file)
+        kegg_cpd.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False, isotope_resolved=False, charge=False)
+        metacyc_cpd.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False, isotope_resolved=False, charge=False)
+        print("do resonant mappings")
+        resonant_mappings = kegg_cpd.map_resonance(metacyc_cpd, r_distance=False)
+        print(resonant_mappings)
+
+
+
+
 
     elif args["test4"]:
         database_name = args['<database_names>']

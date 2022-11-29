@@ -925,7 +925,6 @@ class Compound:
         :param seconds:
         :return:
         """
-
         try:
             mapping = tools.timeout(self.map_resonance_helper, (the_other, r_distance,), seconds=seconds)
             return mapping
@@ -1687,7 +1686,7 @@ class Compound:
     #     except Exception as exception:
     #         return None, None
 
-    def circular_pair_relationship(self, the_other_compound, seconds : int = 10) -> tuple:
+    def circular_pair_relationship(self, the_other_compound, seconds : int = 50) -> tuple:
         """
         To determine the relationship of two compounds with interchangeable circular and linear representations with time limit.
 
@@ -1946,7 +1945,7 @@ class Compound:
     #     except Exception as exception:
     #         return None, None
 
-    def with_r_pair_relationship(self, the_other_compound, seconds: int = 10) -> tuple:
+    def with_r_pair_relationship(self, the_other_compound, seconds: int = 50) -> tuple:
         """
         To find the relationship and the atom mappings between the two compounds that have r_groups type with a time limit.
 

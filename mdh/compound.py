@@ -917,7 +917,22 @@ class Compound:
             one_to_one_mappings.append(cur_mappings)
         return one_to_one_mappings
 
-    def map_resonance(self, the_other, r_distance: bool = False) -> list:
+    def map_resonance(self, the_other, r_distance: bool = False, seconds: int = 50) -> list:
+        """
+
+        :param the_other:
+        :param r_distance:
+        :param seconds:
+        :return:
+        """
+
+        try:
+            mapping = tools.timeout(self.map_resonance_helper, (the_other, r_distance,), seconds=seconds)
+            return mapping
+        except Exception as exception:
+            return []
+
+    def map_resonance_helper(self, the_other, r_distance: bool = False) -> list:
         """
         Check if the resonant mappings are valid between the two compound structures. If the mapped atoms don't share
         the same local coloring identifier, we check if the difference is caused by the position of double bonds.

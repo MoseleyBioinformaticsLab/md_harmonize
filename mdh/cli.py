@@ -514,7 +514,7 @@ def cli(args):
         kegg_miss = tools.open_json(kegg_miss_file)
         metacyc_miss = tools.open_json(metacyc_miss_file)
 
-        kegg_miss = {key: "cpd:" + value for (key, value) in kegg_miss}
+        kegg_miss = {key: "cpd:" + value for (key, value) in kegg_miss.items()}
 
         kegg_names = set(kegg_miss.values())
         metacyc_names = set(metacyc_miss.values())

@@ -539,7 +539,7 @@ def cli(args):
             if hmd not in hmd_cpds or kegg_miss[hmd] not in kegg_cpds:
                 kegg_no_structure[hmd] = kegg_miss[hmd]
             else:
-                print("hmd cpd, kegg cpd", hmd,kegg_miss[hmd], hmd_cpds[hmd], kegg_cpds[kegg_miss[hmd]])
+                print("hmd cpd, kegg cpd", hmd, kegg_miss[hmd], hmd_cpds[hmd], kegg_cpds[kegg_miss[hmd]])
                 if hmd_cpds[hmd].formula() != kegg_cpds[kegg_miss[hmd]].formula():
                     kegg_formula_issue[hmd] = kegg_miss[hmd]
 

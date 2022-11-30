@@ -312,13 +312,13 @@ class Compound:
         self.calculate_distance_to_r_groups()
         self._distance_matrix = None
 
-    def __str__(self):
-        str = ""
-        for atom in self.atoms:
-            str += "{0} {1}\n".format(atom.atom_number, atom.default_symbol)
-        for bond in self.bonds:
-            str += "{0} {1} {2}\n".format(bond.first_atom_number, bond.second_atom_number, bond.bond_type)
-        return str
+    # def __str__(self):
+    #     str = ""
+    #     for atom in self.atoms:
+    #         str += "{0} {1}\n".format(atom.atom_number, atom.default_symbol)
+    #     for bond in self.bonds:
+    #         str += "{0} {1} {2}\n".format(bond.first_atom_number, bond.second_atom_number, bond.bond_type)
+    #     return str
 
     def encode(self) -> tuple:
         """

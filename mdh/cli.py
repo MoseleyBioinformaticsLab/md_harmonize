@@ -515,7 +515,7 @@ def cli(args):
         metacyc_miss = tools.open_json(metacyc_miss_file)
 
         kegg_miss = {key: "cpd:" + value for (key, value) in kegg_miss.items()}
-        print(kegg_miss)
+        # print(kegg_miss)
 
         kegg_names = set(kegg_miss.values())
         metacyc_names = set(metacyc_miss.values())
@@ -525,9 +525,9 @@ def cli(args):
         metacyc_cpds = compound_construct_all(["/mlab/data/hji236/projects/MDH_test/standardized/MetaCyc/molfile/" + name + ".mol" for name in metacyc_names], construct_compound_via_molfile)
         hmd_cpds = compound_construct_all(["/mlab/data/hji236/projects/MDH_test/standardized/HMD/molfile/" + name + ".mol" for name in hmd_names], construct_compound_via_molfile)
 
-        # print(kegg_cpds)
-        # print(metacyc_cpds)
-        # print(hmd_cpds)
+        print(kegg_cpds)
+        print(metacyc_cpds)
+        print(hmd_cpds)
 
         kegg_no_structure = {}
         kegg_formula_issue = {}
@@ -539,7 +539,7 @@ def cli(args):
             if hmd not in hmd_cpds or kegg_miss[hmd] not in kegg_cpds:
                 kegg_no_structure[hmd] = kegg_miss[hmd]
             else:
-                print("hmd cpd, kegg cpd", hmd_cpds[hmd], kegg_cpds[kegg_miss[hmd]])
+                print("hmd cpd, kegg cpd", hmd,kegg_miss[hmd], hmd_cpds[hmd], kegg_cpds[kegg_miss[hmd]])
                 if hmd_cpds[hmd].formula() != kegg_cpds[kegg_miss[hmd]].formula():
                     kegg_formula_issue[hmd] = kegg_miss[hmd]
 

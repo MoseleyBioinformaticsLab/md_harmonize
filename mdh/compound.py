@@ -868,7 +868,7 @@ class Compound:
         the_other.update_color_tuple(resonance=resonance)
         mappings = []
         mapping_matrix = BASS.make_mapping_matrix(the_other, self, True, True, r_distance)
-        print("mapping matrix", mapping_matrix)
+        # print("mapping matrix", mapping_matrix)
         if mapping_matrix is not None:
             mappings = BASS.find_mappings(the_other.structure_matrix(resonance=resonance, backbone=backbone),
                                           the_other.distance_matrix, self.structure_matrix(resonance=resonance,
@@ -953,7 +953,7 @@ class Compound:
         the_other.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
 
         one_to_one_mappings = self.find_mappings(the_other, resonance=True, r_distance=r_distance)
-        print("resonant mappings", one_to_one_mappings)
+        # print("resonant mappings", one_to_one_mappings)
 
         valid_mappings = []
         for cur_mappings in one_to_one_mappings:

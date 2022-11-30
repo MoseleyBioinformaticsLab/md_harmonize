@@ -17,6 +17,7 @@ Usage:
     mdh test1
     mdh test2
     mdh test3
+    mdh test4
 
 Options:
     -h, --help          Show this screen.
@@ -94,7 +95,7 @@ def compound_construct_all(entities: list, function) -> dict:
     """
     compounds = {}
     for entity in entities:
-        print(entity)
+        # print(entity)
         this_compound = function(entity)
         if this_compound:
             compounds[this_compound.compound_name] = this_compound
@@ -505,10 +506,52 @@ def cli(args):
         print(resonant_mappings)
 
 
-
-
-
     elif args["test4"]:
+
+        kegg_miss_file = "/mlab/data/hji236/projects/MDH_results/KEGG_miss.json"
+        metacyc_miss_file = "/mlab/data/hji236/projects/MDH_results/MetaCyc_miss.json"
+
+        kegg_miss = tools.open_json(kegg_miss_file)
+        metacyc_miss = tools.open_json(metacyc_miss_file)
+
+        kegg_miss = {key: "cpd:" + value for (key, value) in kegg_miss}
+
+        kegg_names = set(kegg_miss.values())
+        metacyc_names = set(metacyc_miss.values())
+        hmd_names = set(list(kegg_miss.keys()) + list(metacyc_miss.keys()))
+
+        kegg_cpds = compound_construct_all(["/mlab/data/hji236/projects/MDH_test/standardized/KEGG/molfile/" + name + ".mol" for name in kegg_names], construct_compound_via_molfile)
+        metacyc_cpds = compound_construct_all(["/mlab/data/hji236/projects/MDH_test/standardized/MetaCyc/molfile/" + name + ".mol" for name in metacyc_names], construct_compound_via_molfile)
+        hmd_cpds = compound_construct_all(["/mlab/data/hji236/projects/MDH_test/standardized/HMD/molfile/" + name + ".mol" for name in hmd_names], construct_compound_via_molfile)
+
+        kegg_no_structure = {}
+        kegg_formula_issue = {}
+        metacyc_no_structure = {}
+        metacyc_formula_issue = {}
+
+        for hmd in kegg_miss:
+            if hmd not in hmd_cpds or kegg_miss[hmd] not in kegg_cpds:
+                kegg_no_structure[hmd] = kegg_miss[hmd]
+            elif hmd_cpds[hmd].formula() != kegg_cpds[kegg_miss[hmd]].formula():
+                kegg_formula_issue[hmd] = kegg_miss[hmd]
+
+        for hmd in metacyc_miss:
+            if hmd not in hmd_cpds or metacyc_miss[hmd] not in metacyc_cpds:
+                metacyc_no_structure[hmd] = metacyc_miss[hmd]
+            elif hmd_cpds[hmd].formula() != metacyc_cpds[metacyc_miss[hmd]].formula():
+                metacyc_formula_issue[hmd] = metacyc_miss[hmd]
+
+        print("kegg no structure ", len(kegg_no_structure))
+        print("kegg formula issue ", len(kegg_formula_issue))
+        print("metacyc no structure ", len(metacyc_no_structure))
+        print("metacyc formula issue ", len(metacyc_formula_issue))
+
+        tools.save_to_json(kegg_no_structure, "/mlab/data/hji236/projects/MDH_results/KEGG_no_structure.json")
+        tools.save_to_json(kegg_formula_issue, "/mlab/data/hji236/projects/MDH_results/KEGG_formula_issue.json")
+        tools.save_to_json(metacyc_no_structure, "/mlab/data/hji236/projects/MDH_results/MetaCyc_no_structure.json")
+        tools.save_to_json(metacyc_formula_issue, "/mlab/data/hji236/projects/MDH_results/MetaCyc_formula_issue.json")
+
+    elif args["test5"]:
         database_name = args['<database_names>']
         working_directory = args['<working_directory>']
         # from_directory = working_directory + "/initialized/"

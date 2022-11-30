@@ -53,7 +53,7 @@ def construct_compound_via_molfile(molfile: str) -> Optional[compound.Compound]:
     :param molfile: the molfile representation of the compound
     :return: the :class:`~mdh.compound.Compound` entity.
     """
-    if os.path.getsize(molfile) != 0:
+    if os.path.exists(molfile) and os.path.getsize(molfile) != 0:
         return compound.Compound.create(molfile)
     return None
 
@@ -65,7 +65,7 @@ def construct_compound_via_kcf(file: str) -> Optional[compound.Compound]:
     :param file: the kcf representation of the compound.
     :return: the :class:`~mdh.compound.Compound` entity.
     """
-    if os.path.getsize(file) != 0:
+    if os.path.exists(file) and os.path.getsize(file) != 0:
         return parser_dict['KEGG'].create_compound_kcf(file)
     return None
 

@@ -49,7 +49,7 @@ MDH requires the following Python libraries:
 Data
 ~~~~
 
-The raw data from KEGG and MetaCyc databases can be accessed from this URL.
+The raw data from KEGG and MetaCyc databases can be accessed from this URL: https://doi.org/10.5281/zenodo.7384576
 
 
 Basic usage
@@ -65,14 +65,19 @@ the usages are in the :doc:`tutorial`.
     mdh --version
     mdh download <database_names> <working_directory>
     mdh standardize <database_names> <working_directory>
-    mdh aromatize <database_names> <working_directory> <save_file> [--aromatic_manager=<aromatic_manager_file>]
-    mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom]
-    mdh initialize_reaction <database_names> <working_directory>
-    mdh harmonize <database_names> <working_directory>
+    mdh aromatize <database_names> <working_directory> <save_file> [--aromatic_manager=<aromatic_manager_file>] [--pickle]
+    mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom] [--pickle] [--split=k]
+    mdh initialize_reaction <database_names> <working_directory> [--pickle]
+    mdh harmonize_compound <database_names> <working_directory> [--pickle]
+    mdh harmonize_reaction <database_names> <working_directory> [--pickle]
 
  Options:
     -h, --help          Show this screen.
     --version           Show version.
+    --aromatic_manager  A pre-constructed aromatic manager is provided.
+    --pickle            Use pickle to save the results, otherwise use jsonpickle.
+    --parse_kegg_atom   To parse KEGG atom mapping between compounds.
+    --split             Split compounds to speed up construction.
 
 
 .. _GitHub: https://github.com/MoseleyBioinformaticsLab/MDH

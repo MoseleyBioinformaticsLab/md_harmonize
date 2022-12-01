@@ -1,4 +1,3 @@
-
 #!/usr/bin/python3
 
 """
@@ -9,9 +8,7 @@ tools.py provides functions to open file or save data to file.
 import json
 import jsonpickle
 import signal
-import threading
 import multiprocessing
-import time
 import typing as t
 import pickle
 

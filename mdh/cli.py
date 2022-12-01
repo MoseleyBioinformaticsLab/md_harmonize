@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 """
 MDH command-line interface
 
@@ -19,7 +20,7 @@ Options:
     --aromatic_manager  A pre-constructed aromatic manager is provided.
     --pickle            Use pickle to save the results, otherwise use jsonpickle.
     --parse_kegg_atom   To parse KEGG atom mapping between compounds.
-    --split             Split the compounds to speed construction.
+    --split             Split compounds to speed up construction.
 
 """
 

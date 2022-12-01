@@ -69,7 +69,6 @@ class AromaticManager:
                 if all(aromatic_substructure.composition[key] == substructure.composition[key] for key in
                        substructure.composition):
                     mapping_matrix = BASS.make_mapping_matrix(aromatic_substructure, substructure, True, True, False)
-                    # mapping_matrix = BASS_test.make_mapping_matrix(aromatic_substructure, substructure, True, True)
                     if mapping_matrix is not None:
                         isomorphs = BASS.find_mappings(aromatic_substructure.structure_matrix(resonance=False),
                                                        aromatic_substructure.distance_matrix,
@@ -206,7 +205,6 @@ class AromaticManager:
                                 cycle.add(second_atom_number)
                         cycles.append(cycle)
         fused_cycles = self.fuse_cycles(cycles)
-        # print("aromatic cycles: ", fused_cycles)
         cpd.update_aromatic_bond_type(fused_cycles)
         return 
 

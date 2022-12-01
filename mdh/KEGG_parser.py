@@ -11,12 +11,10 @@ This module provides functions to parse KEGG data (including compound, reaction,
 import collections
 import glob
 import re
-import multiprocessing
 from typing import *
 from . import compound
 from . import reaction
 from . import tools
-from datetime import datetime
 import concurrent.futures as CF
 import pebble
 
@@ -726,11 +724,6 @@ def create_reactions(reaction_directory: str, atom_mappings: dict) -> list:
         reaction_name = this_reaction["ENTRY"][0].split()[0]
         
         one_side_coefficients, the_other_side_coefficients = parse_equation(this_reaction["EQUATION"][0])
-
-        # if not all("cpd:" + compound_name in compounds for compound_name in one_side_coefficients) or not \
-        #         all("cpd:" + compound_name in compounds for compound_name in the_other_side_coefficients):
-        #     # here, we don't include the reactions that have unspecified compounds.
-        #     continue
         one_side_compounds = ["cpd:" + compound_name for compound_name in one_side_coefficients]
         the_other_side_compounds = ["cpd:" + compound_name for compound_name in the_other_side_coefficients]
         one_side_coefficients.update(the_other_side_coefficients)
@@ -879,11 +872,6 @@ def create_atom_mappings(rclass_directory: str, compounds: dict, seconds: int = 
             for token in tokens:
                 one_compound_name, the_other_compound_name = token.split("_")
                 if one_compound_name in compounds and the_other_compound_name in compounds:
-                    # start_time = datetime.now()
-                    # results.append(multiple_compound_pair_mappings(rclass_name, rclass_definitions, compounds[one_compound_name], compounds[the_other_compound_name]))
-                    # end_time = datetime.now()
-                    # consumed = end_time - start_time
-                    # print("parsing of this {0} cost {1}".format(rclass_name, consumed.total_seconds()))
                     compound_pairs.append((compounds[one_compound_name], compounds[the_other_compound_name]))
         if len(compound_pairs) > 1:
             with pebble.ProcessPool() as pool:

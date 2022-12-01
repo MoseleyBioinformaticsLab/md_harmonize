@@ -16,7 +16,10 @@ The MDH API tutorial
 
 Data preparation
 ----------------
-The raw KEGG and MetaCyc is available on zenodo. Please download the data first and keep the hierarchy of directory.
+The raw KEGG, MetaCyc and HMD is available on zenodo https://doi.org/10.5281/zenodo.7384576. Please download the data first and keep the hierarchy of directory. The following data is included in the directory:
+    * KEGG compound molfile, compound kcf, rclass, and reaction.
+    * MetaCyc compound molfile, atom-mapping and reactions.
+    * HMD compound molfile.
 
 Using MDH to download KEGG databases
 -------------------------------------
@@ -36,6 +39,8 @@ The `MDH` provides function to curate molfile representations, eg: add H.
 
     python3 -m mdh standardize <database_names> <working_directory>
 
+Note: Multiple database names can be provided with "," separation, eg: KEGG,MetaCyc.
+
 Using MDH to construct compound/reaction entity
 -----------------------------------------------
 
@@ -50,7 +55,7 @@ Options
 -------
 
 --parse-kegg-atom:
-The parse-kegg-atom option is used to
+The parse-kegg-atom option is used for parsing KEGG atom mapping between compounds based on KEGG RClass definitions.
 
 Reaction construction:
 .. code-block:: console
@@ -67,9 +72,19 @@ aromatic manager that can be used to detect aromatic substructures in the compou
 
     python3 -m mdh aromatize <database_names> <working_directory> <save_file> [--aromatic_manager=<aromatic_manager_file>]
 
+Options
+-------
+--aromatic_manager option to indicate a pre-constructed aromatic manager is provided and newly discovered aromatic substructures will be added to aromatic manager.
+
 Using MDH to harmonize compounds/reactions across databases
 -----------------------------------------------------------
 
-The `MDH` provides function to harmonize compounds/reactions across
+The `MDH` provides function to harmonize compounds/reactions across metabolic databases.
+
+.. code-block:: console
+
+    python3 -m mdh harmonize_compound <database_names> <working_directory>
+    python3 -m mdh harmonize_reaction <database_names> <working_directory>
+
 
 

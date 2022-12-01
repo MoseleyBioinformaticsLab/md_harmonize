@@ -25,7 +25,8 @@ REQUIRES = [
         "numpy",
         "cython",
         "epam.indigo",
-        "ctfile"
+        "ctfile",
+        "pebble"
 ]
 
 

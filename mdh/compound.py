@@ -773,8 +773,6 @@ class Compound:
                     self.atoms[index].update_cycle(True)
         if all_cycles:
             self.has_cycle = True
-        # print("find_cycles", self.has_cycle)
-        # print("find_cycles", [atom.atom_number for atom in self.atoms if atom.in_cycle])
         return [list(x) for x in set(tuple(x) for x in [sorted(i[:-1]) for l in all_cycles for i in l])]
 
     def structure_matrix(self, resonance: bool = False, backbone: bool = False) -> numpy.ndarray:
@@ -868,7 +866,6 @@ class Compound:
         the_other.update_color_tuple(resonance=resonance)
         mappings = []
         mapping_matrix = BASS.make_mapping_matrix(the_other, self, True, True, r_distance)
-        # print("mapping matrix", mapping_matrix)
         if mapping_matrix is not None:
             mappings = BASS.find_mappings(the_other.structure_matrix(resonance=resonance, backbone=backbone),
                                           the_other.distance_matrix, self.structure_matrix(resonance=resonance,
@@ -876,7 +873,6 @@ class Compound:
                                           self.distance_matrix, mapping_matrix)
         # for the mappings, the from_idx, to_idx in enumerate(mapping), from_idx is in the_other_compound, to_idx is in
         # the self.
-        # print("mapping matrix", mapping_matrix)
         one_to_one_mappings = []
         for sub in mappings:
             cur_mappings = {}
@@ -953,7 +949,6 @@ class Compound:
         the_other.color_compound(r_groups=True, atom_stereo=False, bond_stereo=False)
 
         one_to_one_mappings = self.find_mappings(the_other, resonance=True, r_distance=r_distance)
-        # print("resonant mappings", one_to_one_mappings)
 
         valid_mappings = []
         for cur_mappings in one_to_one_mappings:
@@ -1354,7 +1349,6 @@ class Compound:
                                                                             resonance=resonance,
                                                                             bond_stereo=bond_stereo,
                                                                             backbone=backbone)
-        # print(atom_color_with_neighbors)
         not_valid = []
         color_groups = self.color_groups(excluded=excluded_index)
         if not excluded_index:

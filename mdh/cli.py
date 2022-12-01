@@ -8,22 +8,22 @@ Usage:
     mdh download <database_names> <working_directory>
     mdh standardize <database_names> <working_directory>
     mdh aromatize <database_names> <working_directory> <save_file> [--aromatic_manager=<aromatic_manager_file>] [--pickle]
-    mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom] [--pickle]
+    mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom] [--pickle] [--split=k]
     mdh initialize_reaction <database_names> <working_directory> [--pickle]
     mdh harmonize_compound <database_names> <working_directory> [--pickle]
     mdh harmonize_reaction <database_names> <working_directory> [--pickle]
-    mdh test4 <database_names> <working_directory> [--pickle]
-    mdh test7 <k>
-    mdh test1
-    mdh test2
-    mdh test3
-    mdh test4
 
 Options:
     -h, --help          Show this screen.
     --version           Show version.
+    --aromatic_manager  A pre-constructed aromatic manager is provided.
+    --pickle            Use pickle to save the results, otherwise use jsonpickle.
+    --parse_kegg_atom   To parse KEGG atom mapping between compounds.
+    --split             Split the compounds to speed construction.
 
 """
+
+
 import glob
 import os
 import multiprocessing
@@ -240,12 +240,13 @@ def cli(args):
             if not os.path.exists(from_path):
                 raise OSError("The directory {0} does not exist.".format(from_path))
             molfiles = glob.glob(from_path + "/*")
-            if len(molfiles) > 25000:
-                k = len(molfiles) // 25000
-                for i in range(k+1):
+            if args['--split']:
+                k = args['--split']
+                section_count = len(molfiles) // k
+                for i in range(k+2):
                     to_path = working_directory + "/standardized/{0}/molfile_{1}".format(database_name, i)
                     os.makedirs(to_path, exist_ok=True)
-                    for j in range(25000* i, min(25000* (i+1), len(molfiles))):
+                    for j in range(section_count * i, min(section_count * (i+1), len(molfiles))):
                         molfile = molfiles[j]
                         if os.path.getsize(molfile) != 0:
                             openbabel_utils.standardize_molfile(molfile, to_path)
@@ -352,12 +353,6 @@ def cli(args):
             save_directory = to_directory + "/{0}".format(database_name)
             os.makedirs(save_directory, exist_ok=True)
 
-            # if not os.path.exists(save_directory + "/compounds.json"):
-            #     raise OSError("Please construct the {0} compounds first!".format(database_name))
-
-            # compounds = open_function(save_directory + "/compounds.json")
-            # compound_dict = compound_construct_all(compounds, construct_compound_via_components)
-
             reaction_list = []
             parser = parser_dict.get(database_name, None)
 
@@ -458,204 +453,3 @@ def cli(args):
         harmonized_reactions = reaction_harmonization_manager.save_manager()
         save_function(harmonized_reactions, to_directory + "/{0}_harmonized_reactions.json".format("_".join(database_names)))
 
-    elif args["test1"]:
-        # kegg_compound_1_file = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf/cpd:C05670"
-        # kegg_compound_2_file = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf/cpd:C06114"
-
-        # kegg_compound_1_file = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf/cpd:C01063"
-        # kegg_compound_2_file = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf/cpd:C09813"
-        # kegg_1 = construct_compound_via_kcf(kegg_compound_1_file)
-        # kegg_2 = construct_compound_via_kcf(kegg_compound_2_file)
-        # compounds = {kegg_1.compound_name: kegg_1, kegg_2.compound_name: kegg_2}
-
-        cpd_names = ["cpd:C00037", "cpd:C01921", "cpd:C00051", "cpd:C01921"]
-        cpd = ["/mlab/data/hji236/projects/MDH_test/sources/KEGG/kcf/" + name for name in cpd_names]
-        compounds = compound_construct_all(cpd, construct_compound_via_kcf)
-        rclass_dir = "/mlab/data/hji236/projects/MDH_test/sources/KEGG/rclass_target/"
-        atom_mappings = parser_dict["KEGG"].create_atom_mappings(rclass_dir, compounds)
-        print(atom_mappings)
-
-    elif args["test2"]:
-
-        # test linear circular transformation.
-        kegg_file = "/mlab/data/hji236/projects/MDH_test/standardized/KEGG/molfile/cpd:C00508.mol"
-        metacyc_file = "/mlab/data/hji236/projects/MDH_test/standardized/MetaCyc/molfile/L-RIBULOSE.mol"
-
-        kegg_cpd = construct_compound_via_molfile(kegg_file)
-        print("right after construction", kegg_cpd.has_cycle)
-        # kegg has cycle
-        metacyc_cpd = construct_compound_via_molfile(metacyc_file)
-
-        relationship1, atom_mappings1 = kegg_cpd.circular_pair_relationship(metacyc_cpd)
-        # relationship2, atom_mappings2 = metacyc_cpd.circular_pair_relationship(kegg_cpd)
-
-        print("relationship1, atom_mappings1", relationship1, atom_mappings1)
-        # print("relationship2, atom_mappings2", relationship2, atom_mappings2)
-
-
-    elif args["test3"]:
-
-        kegg_file = "/mlab/data/hji236/projects/MDH_test/standardized/KEGG/molfile/cpd:C20416.mol"
-        metacyc_file = "/mlab/data/hji236/projects/MDH_test/standardized/MetaCyc/molfile/CPD-12028.mol"
-        kegg_cpd = construct_compound_via_molfile(kegg_file)
-        metacyc_cpd = construct_compound_via_molfile(metacyc_file)
-        kegg_cpd.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False, isotope_resolved=False, charge=False)
-        metacyc_cpd.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False, isotope_resolved=False, charge=False)
-        print("do resonant mappings")
-        resonant_mappings = kegg_cpd.map_resonance(metacyc_cpd, r_distance=False)
-        print(resonant_mappings)
-
-
-    elif args["test4"]:
-
-        kegg_miss_file = "/mlab/data/hji236/projects/MDH_results/KEGG_miss.json"
-        metacyc_miss_file = "/mlab/data/hji236/projects/MDH_results/MetaCyc_miss.json"
-
-        kegg_miss = tools.open_json(kegg_miss_file)
-        metacyc_miss = tools.open_json(metacyc_miss_file)
-
-        kegg_miss = {key: "cpd:" + value for (key, value) in kegg_miss.items()}
-        # print(kegg_miss)
-
-        kegg_names = set(kegg_miss.values())
-        metacyc_names = set(metacyc_miss.values())
-        hmd_names = set(list(kegg_miss.keys()) + list(metacyc_miss.keys()))
-
-        kegg_cpds = compound_construct_all(["/mlab/data/hji236/projects/MDH_test/standardized/KEGG/molfile/" + name + ".mol" for name in kegg_names], construct_compound_via_molfile)
-        metacyc_cpds = compound_construct_all(["/mlab/data/hji236/projects/MDH_test/standardized/MetaCyc/molfile/" + name + ".mol" for name in metacyc_names], construct_compound_via_molfile)
-        hmd_cpds = compound_construct_all(["/mlab/data/hji236/projects/MDH_test/standardized/HMD/molfile/" + name + ".mol" for name in hmd_names], construct_compound_via_molfile)
-
-
-        kegg_no_structure = {}
-        kegg_formula_issue = {}
-        metacyc_no_structure = {}
-        metacyc_formula_issue = {}
-
-        for hmd in kegg_miss:
-            if hmd not in hmd_cpds or kegg_miss[hmd] not in kegg_cpds:
-                kegg_no_structure[hmd] = kegg_miss[hmd]
-
-            elif hmd_cpds[hmd].formula != kegg_cpds[kegg_miss[hmd]].formula:
-                kegg_formula_issue[hmd] = kegg_miss[hmd]
-
-        for hmd in metacyc_miss:
-            if hmd not in hmd_cpds or metacyc_miss[hmd] not in metacyc_cpds:
-                metacyc_no_structure[hmd] = metacyc_miss[hmd]
-            elif hmd_cpds[hmd].formula != metacyc_cpds[metacyc_miss[hmd]].formula:
-                metacyc_formula_issue[hmd] = metacyc_miss[hmd]
-
-        print("kegg no structure ", len(kegg_no_structure))
-        print("kegg formula issue ", len(kegg_formula_issue))
-        print("metacyc no structure ", len(metacyc_no_structure))
-        print("metacyc formula issue ", len(metacyc_formula_issue))
-
-        tools.save_to_json(kegg_no_structure, "/mlab/data/hji236/projects/MDH_results/KEGG_no_structure.json")
-        tools.save_to_json(kegg_formula_issue, "/mlab/data/hji236/projects/MDH_results/KEGG_formula_issue.json")
-        tools.save_to_json(metacyc_no_structure, "/mlab/data/hji236/projects/MDH_results/MetaCyc_no_structure.json")
-        tools.save_to_json(metacyc_formula_issue, "/mlab/data/hji236/projects/MDH_results/MetaCyc_formula_issue.json")
-
-    elif args["test5"]:
-        database_name = args['<database_names>']
-        working_directory = args['<working_directory>']
-        # from_directory = working_directory + "/initialized/"
-
-        # r group testing
-        kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C01371.mol"
-        metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/Alkanes.mol"
-
-
-        #
-        # kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C04618.mol"
-        # metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-13230.mol"
-        #
-        kegg_compound = construct_compound_via_molfile(kegg_compound_file)
-        metacyc_compound = construct_compound_via_molfile(metacyc_compound_file)
-        print(kegg_compound.compound_name, metacyc_compound.compound_name)
-        #
-        # # kegg_compound = kegg_compound_parsed["cpd:C04618"]
-        # # metacyc_compound = metacyc_compound_parsed["CPD-13230"]
-        relationship, mapping = kegg_compound.with_r_pair_relationship(metacyc_compound)
-        print(relationship, mapping)
-
-
-        # resonance testing
-        # kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C11821.mol"
-        # metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/5-HYDROXYISOURATE.mol"
-        # kegg_compound = construct_compound_via_molfile(kegg_compound_file)
-        # metacyc_compound = construct_compound_via_molfile(metacyc_compound_file)
-        # resonant_mappings = kegg_compound.map_resonance(metacyc_compound, r_distance=False)
-        # if resonant_mappings:
-        #     relationship, atom_mappings = kegg_compound.optimal_resonant_mapping(metacyc_compound, resonant_mappings)
-        #     print(atom_mappings)
-        #
-        # # linear circular testing
-        # kegg_compound_file = "/scratch/hji236/MDH_test/standardized/KEGG/molfile/cpd:C05345.mol"
-        # metacyc_compound_file = "/scratch/hji236/MDH_test/standardized/MetaCyc/molfile/CPD-15709.mol"
-        # kegg_compound = construct_compound_via_molfile(kegg_compound_file)
-        # metacyc_compound = construct_compound_via_molfile(metacyc_compound_file)
-        # relationship, atom_mappings = kegg_compound.circular_pair_relationship(metacyc_compound)
-        # print(relationship, atom_mappings)
-
-
-
-    # kegg_compound = construct_compound_via_molfile(kegg_compound_file)
-    # metacyc_compound = construct_compound_via_molfile(metacyc_compound_file)
-    # # compounds = tools.open_jsonpickle(from_directory + "KEGG/compounds.json")
-    # # kegg_compound_parsed = { name: compound.Compound(compounds[name][0], compounds[name][1], compounds[name][2]) for
-    # #                         name in compounds }
-    # # compounds = tools.open_jsonpickle(from_directory + "MetaCyc/compounds.json")
-    # # metacyc_compound_parsed = {name: compound.Compound(compounds[name][0], compounds[name][1], compounds[name][2]) for
-    # #                         name in compounds}
-
-    #     database_names = args['<database_names>'].split(",")
-    #     ks = args['<ks>'].split(",")
-    #     working_directory = args['<working_directory>']
-    #     compound_dict = []
-    #     for i, database_name in enumerate(database_names):
-    #         from_directory = working_directory + "/initialized/{0}/".format(database_name)
-    #         if ks[i] == "*":
-    #             files = glob.glob("{0}compounds*.json".format(from_directory))
-    #         else:
-    #             files = glob.glob("{0}compounds_{1}.json".format(from_directory, ks[i]))
-    #         if not files:
-    #             raise OSError("The file {0} does not exist.".format(from_directory + "compounds.json"))
-    #         compounds = {}
-    #         for file in files:
-    #             compounds.update(tools.open_jsonpickle(file))
-    #         print("construct compounds")
-    #         compounds = compound_construct_multiprocess(list(compounds.values()), construct_cpd_components)
-    #         compound_dict.append(compounds)
-    #         print("complete compound construction")
-    #     compound_harmonization_manager = harmonization.harmonize_compound_list(compound_dict)
-    #     save_directory = working_directory + "/harmonized/"
-    #     os.makedirs(save_directory, exist_ok=True)
-    #     tools.save_to_json(compound_harmonization_manager.save_manager(), working_directory +
-    #                        "{0}_{1}.json".format("_".join(database_names), "_".join(ks)))
-    #
-    #
-    # # construct compounds in MDH, sub group
-    # elif args['test7']:
-    #     aromatic_manager_file = "/scratch/hji236/MDH_test/aromatic_manager_1.json"
-    #     aromatic_manager = aromatics.AromaticManager.decode(tools.open_jsonpickle(aromatic_manager_file))
-    #     k = args['<k>']
-    #     file_dir = "/scratch/hji236/MDH_test/standardized/HMD/molfile_split/sub_{0}".format(k)
-    #     to_directory = "/scratch/hji236/MDH_test/initialized/HMD/"
-    #     compound_dict = {}
-    #     molfiles = glob.glob(file_dir + "/*")
-    #     # compound_dict = compound_construct_multiprocess(molfiles, construct_cpd)
-    #     for file in molfiles:
-    #         print(file)
-    #         compound = construct_cpd(file)
-    #         compound_dict[compound.compound_name] = compound
-    #     for cpd_name in compound_dict:
-    #         cpd = compound_dict[cpd_name]
-    #         # aromatic substructure detection
-    #         print(cpd_name)
-    #         aromatic_manager.detect_aromatic_substructures(cpd)
-    #         cpd.define_bond_stereochemistry()
-    #         cpd.curate_invalid_n()
-    #     tools.save_to_jsonpickle({name: compound_dict[name].encode() for name in compound_dict},
-    #                              to_directory + "/compounds_{0}.json".format(k))
-    #
-
-    

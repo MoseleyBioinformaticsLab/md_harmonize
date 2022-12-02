@@ -13,6 +13,7 @@ Usage:
     mdh initialize_reaction <database_names> <working_directory> [--pickle]
     mdh harmonize_compound <database_names> <working_directory> [--pickle]
     mdh harmonize_reaction <database_names> <working_directory> [--pickle]
+    mdh test
 
 Options:
     -h, --help          Show this screen.
@@ -453,4 +454,19 @@ def cli(args):
         # # let's just save the list of harmonized names first.
         harmonized_reactions = reaction_harmonization_manager.save_manager()
         save_function(harmonized_reactions, to_directory + "/{0}_harmonized_reactions.json".format("_".join(database_names)))
+
+    elif args["test"]:
+
+        hmd_file = "/mlab/data/hji236/projects/MDH_test/standardized/HMD/molfile/HMDB0248809.mol"
+        metacyc_file = "/mlab/data/hji236/projects/MDH_test/standardized/MetaCyc/molfile/AZIRIDINE.mol"
+        hmd_cpd = construct_compound_via_molfile(hmd_file)
+        metacyc_cpd = construct_compound_via_molfile(metacyc_file)
+        hmd_cpd.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False, isotope_resolved=False, charge=False)
+        metacyc_cpd.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False, isotope_resolved=False, charge=False)
+        print("hmd color group", hmd_cpd.color_groups())
+        print("metacyc color group", metacyc_cpd.color_groups())
+
+
+
+
 

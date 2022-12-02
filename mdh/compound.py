@@ -914,11 +914,12 @@ class Compound:
 
     def map_resonance(self, the_other, r_distance: bool = False, seconds: int = 50) -> list:
         """
+        Check if the resonant mappings are valid between the two compound structures.
 
-        :param the_other:
-        :param r_distance:
-        :param seconds:
-        :return:
+        :param the_other: the mappings compound entity.
+        :param r_distance: to take account of position of R groups.
+        :param seconds: the timeout limit
+        :return:the list of valid atom mappings between the two compound structures.
         """
         try:
             mapping = tools.timeout(self.map_resonance_helper, (the_other, r_distance,), seconds=seconds)

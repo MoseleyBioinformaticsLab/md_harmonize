@@ -198,6 +198,7 @@ class RpairParser:
     """This is to get one to one atom mappings between two compounds based on the rclass definition.
 
         Several steps are involved in this process:
+
         1. The rclass definition can have several pieces. Each piece describes a center atom (R) and its connected atoms.
         The connected atoms can stay the same (M) or change (D) between the two compound structures.
 
@@ -825,10 +826,7 @@ def compound_pair_mappings(pair_component: tuple) -> tuple:
     """
     To get the atom mappings between two compounds based on the rclass definitions.
 
-    :param rclass_name: the name of the rclass.
-    :param rclass_definitions: the list of rclass definitions.
-    :param one_compound: one compound entity involved in the compound pair.
-    :param the_other_compound: the other compound entity involved in the compound pair.
+    :param pair_component: a tuple containing the rclass_name, rclass_definitions, one_compound and the_other_compound.
     :return: the compound pair name and its atom mappings.
     """
 
@@ -854,8 +852,10 @@ def create_atom_mappings(rclass_directory: str, compounds: dict, seconds: int = 
 
     :param rclass_directory: the directory that stores the rclass files.
     :param compounds: a dictionary of :class:`~mdh.compound.Compound` entities.
+    :param seconds: the timeout limit.
     :return: the atom mappings of compound pairs.
     """
+
     rclass_files = glob.glob(rclass_directory + "*")
     atom_mappings = collections.defaultdict(dict)
     for rclass_file in rclass_files:

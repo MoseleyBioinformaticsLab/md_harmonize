@@ -473,6 +473,8 @@ def cli(args):
             metacyc_color = metacyc_cpd.backbone_color_identifier(r_groups=True) + metacyc_cpd.metal_color_identifier(details=False)
             print(hmd_color)
             print(metacyc_color)
+            if hmd_color == metacyc_color:
+                print("same color")
 
 
 

@@ -51,6 +51,7 @@ Compound construction:
 
     python3 -m mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom]
 
+
 Options
 -------
 

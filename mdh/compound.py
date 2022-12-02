@@ -1963,7 +1963,7 @@ class Compound:
         2) If we can find the mappings, then we need to validate the mappings with the validate_mapping_with_r
         function.
 
-        3) Then we get the optimal atom mappings of the mapped parts.
+        3）Then we get the optimal atom mappings of the mapped parts.
 
         4) We need to map the unmatched branches in the specific compound to the corresponding R group in the generic
         compound.

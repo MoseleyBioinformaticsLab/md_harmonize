@@ -91,7 +91,7 @@ def kegg_data_parser(data: list) -> dict:
     return reaction_dict
 
 
-def parse_equation(equation: str) -> (dict, dict):
+def parse_equation(equation: str) -> tuple:
     """
     This is to parse the KEGG reaction equation.
 
@@ -198,16 +198,15 @@ class RpairParser:
     """This is to get one to one atom mappings between two compounds based on the rclass definition.
 
         Several steps are involved in this process:
-
-        1) The rclass definition can have several pieces. Each piece describes a center atom (R) and its connected atoms.
+        1. The rclass definition can have several pieces. Each piece describes a center atom (R) and its connected atoms.
         The connected atoms can stay the same (M) or change (D) between the two compound structures.
 
-        2) First we need to find the center atoms based on the rclass descriptions.
+        2. First we need to find the center atoms based on the rclass descriptions.
 
-        3) For each center atom, there are can multiple candidates. In other words, based on the RDM description,
-        a bunch of atoms in the compound can meet the descriptions. (One simple case are the symmetric compounds).
+        3. For each center atom, there are can multiple candidates. In other words, based on the RDM description, a bunch
+        of atoms in the compound can meet the descriptions. (One simple case are the symmetric compounds).
 
-        4) Therefore, we need to generate the all the combinations for the center atoms in a compound.
+        4. Therefore, we need to generate the all the combinations for the center atoms in a compound.
 
             eg: if there are three atom centers, each center has several candidates:
 
@@ -215,23 +214,23 @@ class RpairParser:
 
                 The combinations for the center atoms:
 
-                [0, 5, 10], [0, 5, 11], [0, 6, 10], [0, 6, 11], [1, 5, 10], [1, 5, 11], [1, 6, 10], [1, 6, 11],
-                [2, 5, 10], [2, 5, 11], [2, 6, 10], [2, 6, 11]
+                [0, 5, 10], [0, 5, 11], [0, 6, 10], [0, 6, 11], [1, 5, 10], [1, 5, 11], [1, 6, 10], [1, 6, 11], [2, 5, 10],
+                [2, 5, 11], [2, 6, 10], [2, 6, 11]
 
-        5) Next, we need to find the one to one atom mappings between the two compounds based on the mapped center atoms.
+        5. Next, we need to find the one to one atom mappings between the two compounds based on the mapped center atoms.
 
-        6) To solve this issue, we first disassemble each compound into different components. This is due to the
+        6. To solve this issue, we first disassemble each compound into different components. This is due to the
         difference atoms in the two compounds, i.e. broken bonds.
 
-        7) Then we need to find the mappings between each disassembled component, and concatenate the mappings of all
+        7. Then we need to find the mappings between each disassembled component, and concatenate the mappings of all
         the components.
 
-        8) To find the one to one atom mappings, we use the BASS algorithm. We assume the mapped component have the same
+        8. To find the one to one atom mappings, we use the BASS algorithm. We assume the mapped component have the same
         structure since we have already removed the different parts. However, here we only map the backbone of the
         structure (in other words, we simply all the bond type to 1) due to bond change (double bond to single bond or
         triple bond to single bond)
 
-        9) To ensure the optimal mappings, we count the mapped atoms with changed local environment and choose the
+        9. To ensure the optimal mappings, we count the mapped atoms with changed local environment and choose the
         mapping with minimal changes.
     """
 

@@ -5,7 +5,8 @@ Description
 ~~~~~~~~~~~
 
 MDH was created to achieve creation and harmonization of compounds and reactions in
-the public metabolic databases. It is a command line tool that provides
+the public metabolic databases. It is a command line tool that provides harmonize
+compounds/reactions in the public metabolic databases.
 
 
 Installation

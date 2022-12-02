@@ -465,13 +465,15 @@ def cli(args):
         metacyc_cpd.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False, isotope_resolved=False, charge=False)
         print("hmd color group", hmd_cpd.color_groups())
         print("metacyc color group", metacyc_cpd.color_groups())
+        print(hmd_cpd.formula)
+        print(metacyc_cpd.formula)
         if hmd_cpd.formula != metacyc_cpd.formula:
             print("same formula")
             hmd_color = hmd_cpd.backbone_color_identifier(r_groups=True) + hmd_cpd.metal_color_identifier(details=False)
             metacyc_color = metacyc_cpd.backbone_color_identifier(r_groups=True) + metacyc_cpd.metal_color_identifier(details=False)
             print(hmd_color)
             print(metacyc_color)
-            
+
 
 
 

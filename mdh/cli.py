@@ -16,12 +16,12 @@ Usage:
     mdh test
 
 Options:
-    -h, --help          Show this screen.
-    --version           Show version.
-    --aromatic_manager  A pre-constructed aromatic manager is provided.
-    --pickle            Use pickle to save the results, otherwise use jsonpickle.
-    --parse_kegg_atom   To parse KEGG atom mapping between compounds.
-    --split             Split compounds to speed up construction.
+    -h, --help           Show this screen.
+    --version            Show version.
+    --aromatic_manager=<aromatic_manager_file>   A pre-constructed aromatic manager is provided.
+    --pickle             Use pickle to save the results, otherwise use jsonpickle.
+    --parse_kegg_atom    To parse KEGG atom mapping between compounds.
+    --split=k              Split compounds to speed up construction.
 
 """
 

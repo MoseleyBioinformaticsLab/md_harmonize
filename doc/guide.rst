@@ -71,7 +71,6 @@ the usages are in the :doc:`tutorial`.
     mdh initialize_reaction <database_names> <working_directory> [--pickle]
     mdh harmonize_compound <database_names> <working_directory> [--pickle]
     mdh harmonize_reaction <database_names> <working_directory> [--pickle]
-    mdh test
 
  Options:
     -h, --help           Show this screen.

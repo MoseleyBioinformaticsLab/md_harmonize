@@ -455,26 +455,6 @@ def cli(args):
         harmonized_reactions = reaction_harmonization_manager.save_manager()
         save_function(harmonized_reactions, to_directory + "/{0}_harmonized_reactions.json".format("_".join(database_names)))
 
-    elif args["test"]:
-
-        hmd_file = "/mlab/data/hji236/projects/MDH_test/standardized/HMD/molfile/HMDB0248809.mol"
-        metacyc_file = "/mlab/data/hji236/projects/MDH_test/standardized/MetaCyc/molfile/AZIRIDINE.mol"
-        hmd_cpd = construct_compound_via_molfile(hmd_file)
-        metacyc_cpd = construct_compound_via_molfile(metacyc_file)
-        hmd_cpd.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False, isotope_resolved=False, charge=False)
-        metacyc_cpd.color_compound(r_groups=True, bond_stereo=False, atom_stereo=False, resonance=False, isotope_resolved=False, charge=False)
-        print("hmd color group", hmd_cpd.color_groups())
-        print("metacyc color group", metacyc_cpd.color_groups())
-        print(hmd_cpd.formula)
-        print(metacyc_cpd.formula)
-        if hmd_cpd.formula == metacyc_cpd.formula:
-            print("same formula")
-            hmd_color = hmd_cpd.backbone_color_identifier(r_groups=True) + hmd_cpd.metal_color_identifier(details=False)
-            metacyc_color = metacyc_cpd.backbone_color_identifier(r_groups=True) + metacyc_cpd.metal_color_identifier(details=False)
-            print(hmd_color)
-            print(metacyc_color)
-            if hmd_color == metacyc_color:
-                print("same color")
 
 
 

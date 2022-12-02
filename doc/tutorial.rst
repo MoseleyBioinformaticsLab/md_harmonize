@@ -47,6 +47,7 @@ Using MDH to construct compound/reaction entity
 The `MDH` provides function to construct compound/reaction entities.
 
 Compound construction:
+
 .. code-block:: console
 
     python3 -m mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom]
@@ -58,7 +59,9 @@ Options
 --parse-kegg-atom:
 The parse-kegg-atom option is used for parsing KEGG atom mapping between compounds based on KEGG RClass definitions.
 
+
 Reaction construction:
+
 .. code-block:: console
 
     python3 -m mdh initialize_reaction <database_names> <working_directory>

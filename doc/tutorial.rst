@@ -28,7 +28,7 @@ Updates the KEGG metabolic databases, including compound kcf/molfile, reaction, 
 
 .. code-block:: console
 
-    python3 -m mdh download KEGG <working_directory>
+    mdh download KEGG <working_directory>
 
 Using MDH to curate compound molfile representation
 ----------------------------------------------------
@@ -37,7 +37,7 @@ Curates molfile representations, eg: add H.
 
 .. code-block:: console
 
-    python3 -m mdh standardize <database_names> <working_directory>
+    mdh standardize <database_names> <working_directory>
 
 Note: Multiple database names can be provided with comma separation, eg: KEGG,MetaCyc.
 
@@ -50,7 +50,7 @@ Compound construction:
 
 .. code-block:: console
 
-    python3 -m mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom]
+    mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom]
 
 
 Options
@@ -64,7 +64,7 @@ Reaction construction:
 
 .. code-block:: console
 
-    python3 -m mdh initialize_reaction <database_names> <working_directory>
+    mdh initialize_reaction <database_names> <working_directory>
 
 Using MDH to extract aromatic substructures from compounds
 ----------------------------------------------------------
@@ -74,7 +74,7 @@ aromatic manager that can be used to detect aromatic substructures in the compou
 
 .. code-block:: console
 
-    python3 -m mdh aromatize <database_names> <working_directory> <save_file> [--aromatic_manager=<aromatic_manager_file>]
+    mdh aromatize <database_names> <working_directory> <save_file> [--aromatic_manager=<aromatic_manager_file>]
 
 Options
 -------
@@ -87,8 +87,8 @@ Harmonizes compounds/reactions across metabolic databases.
 
 .. code-block:: console
 
-    python3 -m mdh harmonize_compound <database_names> <working_directory>
-    python3 -m mdh harmonize_reaction <database_names> <working_directory>
+    mdh harmonize_compound <database_names> <working_directory>
+    mdh harmonize_reaction <database_names> <working_directory>
 
 
 

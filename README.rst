@@ -9,9 +9,6 @@ MDH
    :target: https://pypi.org/project/MDH
    :alt: Supported Python versions
 
-.. image:: https://github.com/MoseleyBioinformaticsLab/MDH/actions/workflows/build.yml/badge.svg
-   :target: https://github.com/MoseleyBioinformaticsLab/MDH/actions/workflows/build.yml
-   :alt: Build status
 
 MDH package provides facilities for creation and harmonization of compounds and reactions.
 

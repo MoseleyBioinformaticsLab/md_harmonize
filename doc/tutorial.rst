@@ -1,12 +1,12 @@
 The MDH Tutorial
 ================
 
-The `MDH` is intended to harmonize compound and reaction across public metabolic databases. It provides functionalities to:
-    * Update KEGG database.
-    * Curate compound molfile representation.
-    * Construct compound/reaction entity.
+The `MDH` is intended to harmonize compounds and reactions across public metabolic databases. It provides functionalities to:
+    * Update a local copy of the KEGG metabolic databases.
+    * Curate compound molfile representations.
+    * Construct compound/reaction entities.
     * To detect aromatic substructures in a compound.
-    * Parse KEGG RClass representation to generate atom mappings between compounds.
+    * Parse KEGG RClass representations to generate atom mappings between compounds.
     * Harmonize compounds/reactions across databases.
 
 In this document, each usage will be explained in details.
@@ -16,15 +16,15 @@ The MDH API tutorial
 
 Data preparation
 ----------------
-The raw KEGG, MetaCyc and HMD is available on zenodo https://doi.org/10.5281/zenodo.7384576. Please download the data first and keep the hierarchy of directory. The following data is included in the directory:
-    * KEGG compound molfile, compound kcf, rclass, and reaction.
-    * MetaCyc compound molfile, atom-mapping and reactions.
-    * HMD compound molfile.
+The raw KEGG, MetaCyc, and HMDB is available on zenodo https://doi.org/10.5281/zenodo.7384576. Please download the data first and keep the hierarchy of directory. The following data is included in the directory:
+    * KEGG compound molfiles, compound kcf's, rclasses, and reactions.
+    * MetaCyc compound molfiles, atom-mapping and reactions.
+    * HMDB compound molfiles.
 
 Using MDH to download KEGG databases
 -------------------------------------
 
-The `MDH` provides function to update the KEGG databases, including compound kcf/molfile, reaction, and rclass.
+Updates the KEGG metabolic databases, including compound kcf/molfile, reaction, and rclass.
 
 .. code-block:: console
 
@@ -33,18 +33,18 @@ The `MDH` provides function to update the KEGG databases, including compound kcf
 Using MDH to curate compound molfile representation
 ----------------------------------------------------
 
-The `MDH` provides function to curate molfile representations, eg: add H.
+Curates molfile representations, eg: add H.
 
 .. code-block:: console
 
     python3 -m mdh standardize <database_names> <working_directory>
 
-Note: Multiple database names can be provided with "," separation, eg: KEGG,MetaCyc.
+Note: Multiple database names can be provided with comma separation, eg: KEGG,MetaCyc.
 
 Using MDH to construct compound/reaction entity
 -----------------------------------------------
 
-The `MDH` provides function to construct compound/reaction entities.
+Constructs compound/reaction entities.
 
 Compound construction:
 
@@ -69,7 +69,7 @@ Reaction construction:
 Using MDH to extract aromatic substructures from compounds
 ----------------------------------------------------------
 
-The `MDH` provides function to extract aromatic substructures from compounds using either indigo/BASS to construct
+Extracts aromatic substructures from compounds using either Indigo or BASS to construct
 aromatic manager that can be used to detect aromatic substructures in the compound.
 
 .. code-block:: console
@@ -83,7 +83,7 @@ Options
 Using MDH to harmonize compounds/reactions across databases
 -----------------------------------------------------------
 
-The `MDH` provides function to harmonize compounds/reactions across metabolic databases.
+Harmonizes compounds/reactions across metabolic databases.
 
 .. code-block:: console
 

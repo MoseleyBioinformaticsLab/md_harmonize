@@ -4,9 +4,8 @@ User Guide
 Description
 ~~~~~~~~~~~
 
-MDH was created to achieve creation and harmonization of compounds and reactions in
-the public metabolic databases. It is a command line tool that provides harmonize
-compounds/reactions in the public metabolic databases.
+MDH was created to harmonize compounds and reactions in the public metabolic databases. It is a command line tool
+directly supporting harmonization of KEGG, MetaCyc, and HMDB, but has an API for expanding to other metabolic databases.
 
 
 Installation

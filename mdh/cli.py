@@ -55,7 +55,7 @@ def construct_compound_via_molfile(molfile: str) -> Optional[compound.Compound]:
     :return: the :class:`~mdh.compound.Compound` entity.
     """
     if os.path.exists(molfile) and os.path.getsize(molfile) != 0:
-        return compound.Compound.create(molfile)
+        return compound.Compound.molfile_name(molfile)
     return None
 
 
@@ -207,7 +207,7 @@ def parse_reactions(compounds: dict, reactions: list) -> list:
 
     for reaction in reactions:
         reaction.one_side = [compounds[name] for name in reaction.one_side if name in compounds]
-        reaction.the_other_side = [compounds[name] for name in reaction.the_other_side if name in compounds]
+        reaction.other_side = [compounds[name] for name in reaction.other_side if name in compounds]
     return reactions
 
 

@@ -3,7 +3,6 @@
 
 
 """
-Routines for working with MDH.
 
 This package includes the following modules.
 

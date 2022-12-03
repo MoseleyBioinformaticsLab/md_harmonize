@@ -220,7 +220,7 @@ def reaction_parser(reaction_text: list) -> dict:
 
 def create_reactions(reaction_file: str, atom_mapping_file: str) -> list:
     """
-    To create MetaCyc reaction entities.
+    To molfile_name MetaCyc reaction entities.
 
     :param reaction_file: the path to the reaction file.
     :param atom_mapping_file: the path to the atom mapping file.

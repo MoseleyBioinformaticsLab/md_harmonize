@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.abspath('.'))
 
 from mdh import __version__
 
-project = 'MDH'
+project = 'mdh'
 copyright = '2022, Huan Jin & Hunter Moseley'
 author = 'Huan Jin & Hunter Moseley'
 

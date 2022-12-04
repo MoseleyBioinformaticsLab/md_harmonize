@@ -9,9 +9,9 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('../mdh'))
+sys.path.insert(0, os.path.abspath('.'))
 
-from mdh import __version__
+from . import __version__
 
 project = 'mdh'
 copyright = '2022, Huan Jin & Hunter Moseley'

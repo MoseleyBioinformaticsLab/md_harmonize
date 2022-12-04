@@ -4,21 +4,21 @@ User Guide
 Description
 ~~~~~~~~~~~
 
-MDH was created to harmonize compounds and reactions in the public metabolic databases. It is a command line tool
+md_harmonize was created to harmonize compounds and reactions in the public metabolic databases. It is a command line tool
 directly supporting harmonization of KEGG, MetaCyc, and HMDB, but has an API for expanding to other metabolic databases.
 
 
 Installation
 ~~~~~~~~~~~~
 
-The MDH package runs under Python 3.7+. Use pip_ to install.
+The md_harmonize package runs under Python 3.7+. Use pip_ to install.
 
 Install on Linux, Mac OS X
 --------------------------
 
 .. code:: bash
 
-   python3 -m pip install MDH
+   python3 -m pip install md-harmonize
 
 
 Get the source code
@@ -36,7 +36,7 @@ You can clone the public repository:
 Dependencies
 ~~~~~~~~~~~~
 
-MDH requires the following Python libraries:
+md_harmonize requires the following Python libraries:
 
     * docopt_ for creating the command-line interface.
     * jsonpickle_ for saving Python objects in a JSON serializable form and outputting to a file.
@@ -55,21 +55,21 @@ The raw data from KEGG and MetaCyc databases can be accessed from this URL: http
 Basic usage
 ~~~~~~~~~~~
 
-MDH provides functions to achieve compound and reaction harmonization across public metabolic databases. Details about
+md_harmonize provides functions to achieve compound and reaction harmonization across public metabolic databases. Details about
 the usages are in the :doc:`tutorial`.
 
 .. code-block:: console
 
  Usage:
-    mdh -h | --help
-    mdh --version
-    mdh download <database_names> <working_directory>
-    mdh standardize <database_names> <working_directory>
-    mdh aromatize <database_names> <working_directory> <save_file> [--pickle] [--aromatic_manager=<aromatic_manager_file>]
-    mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom] [--pickle] [--split=k]
-    mdh initialize_reaction <database_names> <working_directory> [--pickle]
-    mdh harmonize_compound <database_names> <working_directory> [--pickle]
-    mdh harmonize_reaction <database_names> <working_directory> [--pickle]
+    md_harmonize -h | --help
+    md_harmonize --version
+    md_harmonize download <database_names> <working_directory>
+    md_harmonize standardize <database_names> <working_directory>
+    md_harmonize aromatize <database_names> <working_directory> <save_file> [--pickle] [--aromatic_manager=<aromatic_manager_file>]
+    md_harmonize initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom] [--pickle] [--split=k]
+    md_harmonize initialize_reaction <database_names> <working_directory> [--pickle]
+    md_harmonize harmonize_compound <database_names> <working_directory> [--pickle]
+    md_harmonize harmonize_reaction <database_names> <working_directory> [--pickle]
 
  Options:
     -h, --help           Show this screen.

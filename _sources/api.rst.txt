@@ -1,52 +1,52 @@
-The MDH API Reference
+The md_harmonize API Reference
 =====================
 
-.. automodule:: mdh
+.. automodule:: md_harmonize
 
 
-.. automodule:: mdh.compound
+.. automodule:: md_harmonize.compound
     :member-order: bysource
     :members:
     :special-members:
     :exclude-members: __weakref__, __str__
 
 
-.. automodule:: mdh.reaction
+.. automodule:: md_harmonize.reaction
     :member-order: bysource
     :members:
     :special-members:
     :exclude-members: __weakref__, __str__
 
 
-.. automodule:: mdh.KEGG_database_scraper
+.. automodule:: md_harmonize.KEGG_database_scraper
     :member-order: bysource
     :members:
     :special-members:
     :exclude-members: __weakref__, __str__
 
 
-.. automodule:: mdh.KEGG_parser
+.. automodule:: md_harmonize.KEGG_parser
     :member-order: bysource
     :members:
     :special-members:
     :exclude-members: __weakref__, __str__
 
 
-.. automodule:: mdh.MetaCyc_parser
+.. automodule:: md_harmonize.MetaCyc_parser
     :member-order: bysource
     :members:
     :special-members:
     :exclude-members: __weakref__, __str__
 
 
-.. automodule:: mdh.aromatics
+.. automodule:: md_harmonize.aromatics
     :member-order: bysource
     :members:
     :special-members:
     :exclude-members: __weakref__, __str__
 
 
-.. automodule:: mdh.harmonization
+.. automodule:: md_harmonize.harmonization
     :member-order: bysource
     :members:
     :special-members:

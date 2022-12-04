@@ -1,7 +1,7 @@
-The MDH Tutorial
+The md_harmonize Tutorial
 ================
 
-The `MDH` is intended to harmonize compounds and reactions across public metabolic databases. It provides functionalities to:
+The `md_harmonize` is intended to harmonize compounds and reactions across public metabolic databases. It provides functionalities to:
     * Update a local copy of the KEGG metabolic databases.
     * Curate compound molfile representations.
     * Construct compound/reaction entities.
@@ -11,7 +11,7 @@ The `MDH` is intended to harmonize compounds and reactions across public metabol
 
 In this document, each usage will be explained in details.
 
-The MDH API tutorial
+The md_harmonize API tutorial
 ~~~~~~~~~~~~~~~~~~~~
 
 Data preparation
@@ -21,27 +21,27 @@ The raw KEGG, MetaCyc, and HMDB is available on zenodo https://doi.org/10.5281/z
     * MetaCyc compound molfiles, atom-mapping and reactions.
     * HMDB compound molfiles.
 
-Using MDH to download KEGG databases
+Using md_harmonize to download KEGG databases
 -------------------------------------
 
 Updates the KEGG metabolic databases, including compound kcf/molfile, reaction, and rclass.
 
 .. code-block:: console
 
-    mdh download KEGG <working_directory>
+    md_harmonize download KEGG <working_directory>
 
-Using MDH to curate compound molfile representation
+Using md_harmonize to curate compound molfile representation
 ----------------------------------------------------
 
 Curates molfile representations, eg: add H.
 
 .. code-block:: console
 
-    mdh standardize <database_names> <working_directory>
+    md_harmonize standardize <database_names> <working_directory>
 
 Note: Multiple database names can be provided with comma separation, eg: KEGG,MetaCyc.
 
-Using MDH to construct compound/reaction entity
+Using md_harmonize to construct compound/reaction entity
 -----------------------------------------------
 
 Constructs compound/reaction entities.
@@ -50,7 +50,7 @@ Compound construction:
 
 .. code-block:: console
 
-    mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom]
+    md_harmonize initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom]
 
 
 Options
@@ -64,9 +64,9 @@ Reaction construction:
 
 .. code-block:: console
 
-    mdh initialize_reaction <database_names> <working_directory>
+    md_harmonize initialize_reaction <database_names> <working_directory>
 
-Using MDH to extract aromatic substructures from compounds
+Using md_harmonize to extract aromatic substructures from compounds
 ----------------------------------------------------------
 
 Extracts aromatic substructures from compounds using either Indigo or BASS to construct
@@ -74,21 +74,21 @@ aromatic manager that can be used to detect aromatic substructures in the compou
 
 .. code-block:: console
 
-    mdh aromatize <database_names> <working_directory> <save_file> [--aromatic_manager=<aromatic_manager_file>]
+    md_harmonize aromatize <database_names> <working_directory> <save_file> [--aromatic_manager=<aromatic_manager_file>]
 
 Options
 -------
 --aromatic_manager option to indicate a pre-constructed aromatic manager is provided and newly discovered aromatic substructures will be added to aromatic manager.
 
-Using MDH to harmonize compounds/reactions across databases
+Using md_harmonize to harmonize compounds/reactions across databases
 -----------------------------------------------------------
 
 Harmonizes compounds/reactions across metabolic databases.
 
 .. code-block:: console
 
-    mdh harmonize_compound <database_names> <working_directory>
-    mdh harmonize_reaction <database_names> <working_directory>
+    md_harmonize harmonize_compound <database_names> <working_directory>
+    md_harmonize harmonize_reaction <database_names> <working_directory>
 
 
 

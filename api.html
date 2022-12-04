@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>The MDH API Reference &#8212; mdh 1.0.0.2 documentation</title>
+    <title>The md_harmonize API Reference &#8212; md_harmonize 1.0.0.3 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -15,7 +15,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="License" href="license.html" />
-    <link rel="prev" title="The MDH Tutorial" href="tutorial.html" />
+    <link rel="prev" title="The md_harmonize Tutorial" href="tutorial.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -32,16 +32,16 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="module-mdh">
-<span id="the-mdh-api-reference"></span><h1>The MDH API Reference<a class="headerlink" href="#module-mdh" title="Permalink to this headline">¶</a></h1>
-<p>This package includes the following modules.</p>
-<span class="target" id="module-mdh.reaction"></span><div class="section" id="mdh-reaction">
-<h2>mdh.reaction<a class="headerlink" href="#mdh-reaction" title="Permalink to this headline">¶</a></h2>
-<p>This module provides the <a class="reference internal" href="#mdh.reaction.Reaction" title="mdh.reaction.Reaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reaction</span></code></a> class entity.</p>
+  <div class="section" id="the-md-harmonize-api-reference">
+<h1>The md_harmonize API Reference<a class="headerlink" href="#the-md-harmonize-api-reference" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-md_harmonize"></span><p>This package includes the following modules.</p>
+<span class="target" id="module-md_harmonize.reaction"></span><div class="section" id="md-harmonize-reaction">
+<h2>md_harmonize.reaction<a class="headerlink" href="#md-harmonize-reaction" title="Permalink to this headline">¶</a></h2>
+<p>This module provides the <a class="reference internal" href="#md_harmonize.reaction.Reaction" title="md_harmonize.reaction.Reaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reaction</span></code></a> class entity.</p>
 <dl class="class">
-<dt id="mdh.reaction.Reaction">
-<em class="property">class </em><code class="sig-prename descclassname">mdh.reaction.</code><code class="sig-name descname">Reaction</code><span class="sig-paren">(</span><em class="sig-param">reaction_name: str</em>, <em class="sig-param">one_side: list</em>, <em class="sig-param">other_side: list</em>, <em class="sig-param">ecs: dict</em>, <em class="sig-param">atom_mappings: list</em>, <em class="sig-param">coefficients: dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mdh/reaction.html#Reaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mdh.reaction.Reaction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reaction class describes the <a class="reference internal" href="#mdh.reaction.Reaction" title="mdh.reaction.Reaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reaction</span></code></a> entity.</p>
+<dt id="md_harmonize.reaction.Reaction">
+<em class="property">class </em><code class="sig-prename descclassname">md_harmonize.reaction.</code><code class="sig-name descname">Reaction</code><span class="sig-paren">(</span><em class="sig-param">reaction_name: str</em>, <em class="sig-param">one_side: list</em>, <em class="sig-param">other_side: list</em>, <em class="sig-param">ecs: dict</em>, <em class="sig-param">atom_mappings: list</em>, <em class="sig-param">coefficients: dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/md_harmonize/reaction.html#Reaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#md_harmonize.reaction.Reaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reaction class describes the <a class="reference internal" href="#md_harmonize.reaction.Reaction" title="md_harmonize.reaction.Reaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reaction</span></code></a> entity.</p>
 <p>Reaction initializer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -56,8 +56,8 @@
 </dd>
 </dl>
 <dl class="method">
-<dt id="mdh.reaction.Reaction.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">reaction_name: str</em>, <em class="sig-param">one_side: list</em>, <em class="sig-param">other_side: list</em>, <em class="sig-param">ecs: dict</em>, <em class="sig-param">atom_mappings: list</em>, <em class="sig-param">coefficients: dict</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/mdh/reaction.html#Reaction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mdh.reaction.Reaction.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="md_harmonize.reaction.Reaction.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">reaction_name: str</em>, <em class="sig-param">one_side: list</em>, <em class="sig-param">other_side: list</em>, <em class="sig-param">ecs: dict</em>, <em class="sig-param">atom_mappings: list</em>, <em class="sig-param">coefficients: dict</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/md_harmonize/reaction.html#Reaction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#md_harmonize.reaction.Reaction.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reaction initializer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -74,8 +74,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="mdh.reaction.Reaction.name">
-<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#mdh.reaction.Reaction.name" title="Permalink to this definition">¶</a></dt>
+<dt id="md_harmonize.reaction.Reaction.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#md_harmonize.reaction.Reaction.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>To get the reaction name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -84,6 +84,191 @@
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+</div>
+<span class="target" id="module-md_harmonize.KEGG_database_scraper"></span><div class="section" id="md-harmonize-kegg-database-scraper">
+<h2>md_harmonize.KEGG_database_scraper<a class="headerlink" href="#md-harmonize-kegg-database-scraper" title="Permalink to this headline">¶</a></h2>
+<p>This module provides functions to download KEGG data (including compound, reaction, kcf, and rclass) from the KEGG (REST) API.</p>
+<p>The URLs can change.</p>
+<dl class="function">
+<dt id="md_harmonize.KEGG_database_scraper.entry_list">
+<code class="sig-prename descclassname">md_harmonize.KEGG_database_scraper.</code><code class="sig-name descname">entry_list</code><span class="sig-paren">(</span><em class="sig-param">target_url: str</em><span class="sig-paren">)</span> &#x2192; list<a class="reference internal" href="_modules/md_harmonize/KEGG_database_scraper.html#entry_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#md_harmonize.KEGG_database_scraper.entry_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>To get the list of entity name to download.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>target_url</strong> – the url to fetch.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the list of entry names.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="md_harmonize.KEGG_database_scraper.update_entity">
+<code class="sig-prename descclassname">md_harmonize.KEGG_database_scraper.</code><code class="sig-name descname">update_entity</code><span class="sig-paren">(</span><em class="sig-param">entries: list</em>, <em class="sig-param">sub_directory: str</em>, <em class="sig-param">directory: str</em>, <em class="sig-param">suffix: str = ''</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/md_harmonize/KEGG_database_scraper.html#update_entity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#md_harmonize.KEGG_database_scraper.update_entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>To download the KEGG entity (compound, reaction, or rclass) and save it into a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>entries</strong> – the list of entry names to download.</p></li>
+<li><p><strong>sub_directory</strong> – the subdirectory to save the downloaded file.</p></li>
+<li><p><strong>directory</strong> – the main directory to save the downloaded file.</p></li>
+<li><p><strong>suffix</strong> – the suffix needed for download, like the mol for compound molfile and kcf for compound kcf file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="md_harmonize.KEGG_database_scraper.curate_molfile">
+<code class="sig-prename descclassname">md_harmonize.KEGG_database_scraper.</code><code class="sig-name descname">curate_molfile</code><span class="sig-paren">(</span><em class="sig-param">file_path: str</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/md_harmonize/KEGG_database_scraper.html#curate_molfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#md_harmonize.KEGG_database_scraper.curate_molfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>To curate the molfile representation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file_path</strong> – the path to the molfile.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="md_harmonize.KEGG_database_scraper.download">
+<code class="sig-prename descclassname">md_harmonize.KEGG_database_scraper.</code><code class="sig-name descname">download</code><span class="sig-paren">(</span><em class="sig-param">directory: str</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/md_harmonize/KEGG_database_scraper.html#download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#md_harmonize.KEGG_database_scraper.download" title="Permalink to this definition">¶</a></dt>
+<dd><p>To download all the KEGG required files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>directory</strong> – the directory to store the data.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<span class="target" id="module-md_harmonize.MetaCyc_parser"></span><div class="section" id="md-harmonize-metacyc-parser">
+<h2>md_harmonize.MetaCyc_parser<a class="headerlink" href="#md-harmonize-metacyc-parser" title="Permalink to this headline">¶</a></h2>
+<p>This module provides functions to parse MetaCyc text data.</p>
+<p>Note: All MetaCyc reactions atom_mappings are stored in a single text file.</p>
+<dl class="function">
+<dt id="md_harmonize.MetaCyc_parser.reaction_side_parser">
+<code class="sig-prename descclassname">md_harmonize.MetaCyc_parser.</code><code class="sig-name descname">reaction_side_parser</code><span class="sig-paren">(</span><em class="sig-param">reaction_side: str</em><span class="sig-paren">)</span> &#x2192; dict<a class="reference internal" href="_modules/md_harmonize/MetaCyc_parser.html#reaction_side_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#md_harmonize.MetaCyc_parser.reaction_side_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is to parse FROM_SIDE or TO_SIDE in the reaction.</p>
+<p>eg: FROM-SIDE - (CPD-9147 0 8) (OXYGEN-MOLECULE 9 10)</p>
+<p>Information includes compound name and the start and end atom index in this compound used for atom mappings.
+The order of the atoms are the orders in the compound molfile.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>reaction_side</strong> – the text description of reaction side.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the dictionary of compounds and the corresponding start and end atom index in the atom mappings.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="md_harmonize.MetaCyc_parser.generate_one_to_one_mappings">
+<code class="sig-prename descclassname">md_harmonize.MetaCyc_parser.</code><code class="sig-name descname">generate_one_to_one_mappings</code><span class="sig-paren">(</span><em class="sig-param">from_side: dict</em>, <em class="sig-param">to_side: dict</em>, <em class="sig-param">indices: str</em><span class="sig-paren">)</span> &#x2192; list<a class="reference internal" href="_modules/md_harmonize/MetaCyc_parser.html#generate_one_to_one_mappings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#md_harmonize.MetaCyc_parser.generate_one_to_one_mappings" title="Permalink to this definition">¶</a></dt>
+<dd><p>To generate the one to one atom mappings between two the sides of a metabolic reaction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>from_side</strong> – the dictionary of compounds with their corresponding start and end atom indices in the from_side.</p></li>
+<li><p><strong>to_side</strong> – the dictionary of compounds with their corresponding start and end atom indices in the to_side.</p></li>
+<li><p><strong>indices</strong> – the string representation of mapped atoms.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the list of mapped atoms between the two sides (from_index, to_index).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="md_harmonize.MetaCyc_parser.atom_mappings_parser">
+<code class="sig-prename descclassname">md_harmonize.MetaCyc_parser.</code><code class="sig-name descname">atom_mappings_parser</code><span class="sig-paren">(</span><em class="sig-param">atom_mapping_text: list</em><span class="sig-paren">)</span> &#x2192; dict<a class="reference internal" href="_modules/md_harmonize/MetaCyc_parser.html#atom_mappings_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#md_harmonize.MetaCyc_parser.atom_mappings_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is to parse the MetaCyc reaction with atom mappings.</p>
+<p>eg:</p>
+<p>REACTION - RXN-11981</p>
+<p>NTH-ATOM-MAPPING - 1</p>
+<p>MAPPING-TYPE - NO-HYDROGEN-ENCODING</p>
+<p>FROM-SIDE - (CPD-12950 0 23) (WATER 24 24)</p>
+<p>TO-SIDE - (CPD-12949 0 24)</p>
+<p>INDICES - 0 1 2 3 5 4 7 6 9 10 11 13 12 14 15 16 17 8 18 19 21 20 22 24 23</p>
+<p>note: the INDICES are atom mappings between two sides of the reaction.
+TO-SIDE[i] is mapped to FROM-SIDE[idx] for i, idx in enumerate(INDICES).
+Pay attention to the direction!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>atom_mapping_text</strong> – the text descriptions of reactions with atom mappings.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the dictionary of reactions with atom mappings.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="md_harmonize.MetaCyc_parser.reaction_parser">
+<code class="sig-prename descclassname">md_harmonize.MetaCyc_parser.</code><code class="sig-name descname">reaction_parser</code><span class="sig-paren">(</span><em class="sig-param">reaction_text: list</em><span class="sig-paren">)</span> &#x2192; dict<a class="reference internal" href="_modules/md_harmonize/MetaCyc_parser.html#reaction_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#md_harmonize.MetaCyc_parser.reaction_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is used to parse MetaCyc reaction.</p>
+<p>eg:</p>
+<p>UNIQUE-ID - RXN-13583</p>
+<p>TYPES - Redox-Half-Reactions</p>
+<p>ATOM-MAPPINGS - (:NO-HYDROGEN-ENCODING (1 0 2) (((WATER 0 0) (HYDROXYLAMINE 1 2)) ((NITRITE 0 2))))</p>
+<p>CREDITS - SRI</p>
+<p>CREDITS - caspi</p>
+<p>IN-PATHWAY - HAONITRO-RXN</p>
+<p>LEFT - NITRITE</p>
+<p>^COMPARTMENT - CCO-IN</p>
+<p>LEFT - PROTON</p>
+<p>^COEFFICIENT - 5</p>
+<p>^COMPARTMENT - CCO-IN</p>
+<p>LEFT - E-</p>
+<p>^COEFFICIENT - 4</p>
+<p>ORPHAN? - :NO</p>
+<p>PHYSIOLOGICALLY-RELEVANT? - T</p>
+<p>REACTION-BALANCE-STATUS - :BALANCED</p>
+<p>REACTION-DIRECTION - LEFT-TO-RIGHT</p>
+<p>RIGHT - HYDROXYLAMINE</p>
+<p>^COMPARTMENT - CCO-IN</p>
+<p>RIGHT - WATER</p>
+<p>^COMPARTMENT - CCO-IN</p>
+<p>STD-REDUCTION-POTENTIAL - 0.1</p>
+<p>//</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>reaction_text</strong> – the text descriptions of MetaCyc reactions.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the dict of parsed MetaCyc reactions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="md_harmonize.MetaCyc_parser.create_reactions">
+<code class="sig-prename descclassname">md_harmonize.MetaCyc_parser.</code><code class="sig-name descname">create_reactions</code><span class="sig-paren">(</span><em class="sig-param">reaction_file: str</em>, <em class="sig-param">atom_mapping_file: str</em><span class="sig-paren">)</span> &#x2192; list<a class="reference internal" href="_modules/md_harmonize/MetaCyc_parser.html#create_reactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#md_harmonize.MetaCyc_parser.create_reactions" title="Permalink to this definition">¶</a></dt>
+<dd><p>To molfile_name MetaCyc reaction entities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reaction_file</strong> – the path to the reaction file.</p></li>
+<li><p><strong>atom_mapping_file</strong> – the path to the atom mapping file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the list of constructed <a class="reference internal" href="#md_harmonize.reaction.Reaction" title="md_harmonize.reaction.Reaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reaction</span></code></a> entities.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -96,7 +281,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">mdh</a></h1>
+<h1 class="logo"><a href="index.html">md_harmonize</a></h1>
 
 
 
@@ -109,9 +294,11 @@
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="guide.html">User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html">The MDH Tutorial</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">The MDH API Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#mdh-reaction">mdh.reaction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">The md_harmonize Tutorial</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The md_harmonize API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#md-harmonize-reaction">md_harmonize.reaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#md-harmonize-kegg-database-scraper">md_harmonize.KEGG_database_scraper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#md-harmonize-metacyc-parser">md_harmonize.MetaCyc_parser</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
@@ -121,7 +308,7 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="tutorial.html" title="previous chapter">The MDH Tutorial</a></li>
+      <li>Previous: <a href="tutorial.html" title="previous chapter">The md_harmonize Tutorial</a></li>
       <li>Next: <a href="license.html" title="next chapter">License</a></li>
   </ul></li>
 </ul>

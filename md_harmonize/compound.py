@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
 """
-mdh.compound
-~~~~~~~~~~~~
+md_harmonize.compound
+~~~~~~~~~~~~~~~~~~~~~
 
 This module provides the :class:`~mdh.compound.Atom` class, the :class:`~mdh.compound.Bond` class,
 and the :class:`~mdh.compound.Compound` class to construct a compound entity. Most of the instance

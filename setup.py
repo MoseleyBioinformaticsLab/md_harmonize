@@ -35,7 +35,7 @@ EXTENSIONS = [
 ]
 
 setup(
-        name='MDH',
+        name='mdh',
         version=find_version(),
         packages=find_packages(exclude=['doc', 'docs', 'vignettes']),
         author='Huan Jin, Hunter N.B. Moseley',

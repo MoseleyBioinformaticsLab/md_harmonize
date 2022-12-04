@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 
 """
 MDH command-line interface
@@ -462,12 +461,12 @@ def main():
 
 if __name__ == "__main__":
 
-    import cProfile
-    profiler = cProfile.Profile()
-    profiler.enable()
+    # import cProfile
+    # profiler = cProfile.Profile()
+    # profiler.enable()
     main()
-    profiler.disable()
-    profiler.print_stats()
+    # profiler.disable()
+    # profiler.print_stats()
 
 
 

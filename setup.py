@@ -46,6 +46,7 @@ setup(
         url='',
         ext_modules=EXTENSIONS,
         cmdclass={'build_ext': Cython.Build.build_ext},
+        package_data={'mdh': ['supplements/*.json']},
         install_requires=REQUIRES,
         long_description=readme(),
         platforms='any',

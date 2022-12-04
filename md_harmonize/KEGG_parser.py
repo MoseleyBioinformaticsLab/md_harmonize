@@ -2,7 +2,7 @@
 
 """
 md_harmonize.KEGG_parser
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 This module provides functions to parse KEGG data (including compound, reaction, kcf, and rclass).
 

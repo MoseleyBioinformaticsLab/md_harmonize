@@ -2,7 +2,7 @@
 
 """
 md_harmonize.aromatics
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 This module provides the :class:`~md_harmonize.aromatics.AromaticManager` class entity.
 

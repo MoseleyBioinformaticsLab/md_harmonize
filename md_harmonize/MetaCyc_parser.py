@@ -3,7 +3,8 @@
 """
 
 md_harmonize.MetaCyc_parser
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 This module provides functions to parse MetaCyc text data.
 
 Note: All MetaCyc reactions atom_mappings are stored in a single text file.

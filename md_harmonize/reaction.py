@@ -2,7 +2,7 @@
 
 """
 md_harmonize.reaction
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 This module provides the :class:`~md_harmonize.reaction.Reaction` class entity.
 

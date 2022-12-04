@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """
 md_harmonize.harmonization
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This module provides the :class:`~md_harmonize.harmonization.HarmonizedEdge` class,
 the :class:`~md_harmonize.harmonization.HarmonizedCompoundEdge` class,

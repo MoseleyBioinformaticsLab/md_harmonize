@@ -21,7 +21,7 @@ publication: https://github.com/MoseleyBioinformaticsLab/MDH.git
 Installation
 ~~~~~~~~~~~~
 
-'md_harmonize' runs under Python 3.6+ and is available through python3-pip.
+'md_harmonize' runs under Python 3.7+ and is available through python3-pip.
 Install via pip or clone the git repo and install the following dependencies and
 you are ready to go!
 

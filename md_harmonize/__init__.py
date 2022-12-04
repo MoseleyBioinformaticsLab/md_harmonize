@@ -8,4 +8,4 @@ This package includes the following modules.
 
 """
 
-__version__ = "1.0.0.4"
+__version__ = "1.0.0.5"

@@ -1,17 +1,17 @@
 
 """
-MDH command-line interface
+md_harmonize command-line interface
 
 Usage:
-    mdh -h | --help
-    mdh --version
-    mdh download <database_names> <working_directory>
-    mdh standardize <database_names> <working_directory>
-    mdh aromatize <database_names> <working_directory> <save_file> [--pickle] [--aromatic_manager=<aromatic_manager_file>]
-    mdh initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom] [--pickle] [--split=k]
-    mdh initialize_reaction <database_names> <working_directory> [--pickle]
-    mdh harmonize_compound <database_names> <working_directory> [--pickle]
-    mdh harmonize_reaction <database_names> <working_directory> [--pickle]
+    md_harmonize -h | --help
+    md_harmonize --version
+    md_harmonize download <database_names> <working_directory>
+    md_harmonize standardize <database_names> <working_directory>
+    md_harmonize aromatize <database_names> <working_directory> <save_file> [--pickle] [--aromatic_manager=<aromatic_manager_file>]
+    md_harmonize initialize_compound <database_names> <working_directory> <aromatic_manager_file> [--parse_kegg_atom] [--pickle] [--split=k]
+    md_harmonize initialize_reaction <database_names> <working_directory> [--pickle]
+    md_harmonize harmonize_compound <database_names> <working_directory> [--pickle]
+    md_harmonize harmonize_reaction <database_names> <working_directory> [--pickle]
 
 Options:
     -h, --help           Show this screen.
@@ -54,7 +54,7 @@ def construct_compound_via_molfile(molfile: str) -> Optional[compound.Compound]:
     To construct compound based on the molfile representation.
 
     :param molfile: the molfile representation of the compound
-    :return: the :class:`~mdh.compound.Compound` entity.
+    :return: the :class:`~md_harmonize.compound.Compound` entity.
     """
     if os.path.exists(molfile) and os.path.getsize(molfile) != 0:
         return compound.Compound.molfile_name(molfile)
@@ -66,7 +66,7 @@ def construct_compound_via_kcf(file: str) -> Optional[compound.Compound]:
     To construct compound based on the kcf representation.
 
     :param file: the kcf representation of the compound.
-    :return: the :class:`~mdh.compound.Compound` entity.
+    :return: the :class:`~md_harmonize.compound.Compound` entity.
     """
     if os.path.exists(file) and os.path.getsize(file) != 0:
         return parser_dict['KEGG'].create_compound_kcf(file)
@@ -78,7 +78,7 @@ def construct_compound_via_components(compound_components: list) -> Optional[com
     To construct compound based on the compound components.
 
     :param compound_components: the compound components.
-    :return: the :class:`~mdh.compound.Compound` entity.
+    :return: the :class:`~md_harmonize.compound.Compound` entity.
     """
     try:
         this_compound = compound.Compound(compound_components[0], compound_components[1], compound_components[2])

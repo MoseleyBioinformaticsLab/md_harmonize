@@ -1,17 +1,17 @@
 #!/usr/bin/python3
 
 """
-mdh.reaction
+md_harmonize.reaction
 ~~~~~~~~~~~~
 
-This module provides the :class:`~mdh.reaction.Reaction` class entity.
+This module provides the :class:`~md_harmonize.reaction.Reaction` class entity.
 
 """
 
 
 class Reaction:
 
-    """ Reaction class describes the :class:`~mdh.reaction.Reaction` entity. """
+    """ Reaction class describes the :class:`~md_harmonize.reaction.Reaction` entity. """
 
     def __init__(self, reaction_name: str, one_side: list, other_side: list, ecs: dict, atom_mappings: list,
                  coefficients: dict) -> None:
@@ -19,8 +19,8 @@ class Reaction:
         Reaction initializer.
 
         :param reaction_name: the reaction name.
-        :param one_side: the list of :class:`~mdh.compound.Compound` entities in one side of the reaction.
-        :param other_side: the list of :class:`~mdh.compound.Compound` entities in the other side of the reaction.
+        :param one_side: the list of :class:`~md_harmonize.compound.Compound` entities in one side of the reaction.
+        :param other_side: the list of :class:`~md_harmonize.compound.Compound` entities in the other side of the reaction.
         :param ecs: the dict of Enzyme Commission numbers (EC numbers) of the reaction.
         :param atom_mappings: the list of atom mappings between two sides of the reaction.
         :param coefficients: the dictionary of compound names and their corresponding coefficients in the reaction.

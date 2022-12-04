@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """
-mdh.KEGG_database_scraper
+md_harmonize.KEGG_database_scraper
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This module provides functions to download KEGG data (including compound, reaction, kcf, and rclass) from the KEGG (REST) API.

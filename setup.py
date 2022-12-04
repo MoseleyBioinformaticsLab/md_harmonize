@@ -7,7 +7,7 @@ import numpy
 
 
 def find_version():
-    with open('mdh/__init__.py', 'r') as fd:
+    with open('md_harmonize/__init__.py', 'r') as fd:
         version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', fd.read(), re.MULTILINE).group(1)
         if not version:
             raise RuntimeError('Cannot find version information')
@@ -31,11 +31,11 @@ REQUIRES = [
 
 
 EXTENSIONS = [
-    Extension("mdh.BASS", sources=["mdh/BASS.pyx"], extra_compile_args=['-O3'], include_dirs=[numpy.get_include()])
+    Extension("md_harmonize.BASS", sources=["md_harmonize/BASS.pyx"], extra_compile_args=['-O3'], include_dirs=[numpy.get_include()])
 ]
 
 setup(
-        name='mdh',
+        name='md_harmonize',
         version=find_version(),
         packages=find_packages(exclude=['doc', 'docs', 'vignettes']),
         author='Huan Jin, Hunter N.B. Moseley',
@@ -46,7 +46,7 @@ setup(
         url='',
         ext_modules=EXTENSIONS,
         cmdclass={'build_ext': Cython.Build.build_ext},
-        package_data={'mdh': ['supplements/*.json']},
+        package_data={'md_harmonize': ['supplements/*.json']},
         install_requires=REQUIRES,
         long_description=readme(),
         platforms='any',
@@ -62,5 +62,5 @@ setup(
             'Programming Language :: Python :: 3.9',
             'Programming Language :: Python :: 3.10',
             ],
-        entry_points={"console_scripts": ["mdh = mdh.__main__:main"]},
+        entry_points={"console_scripts": ["md_harmonize = md_harmonize.__main__:main"]},
 )

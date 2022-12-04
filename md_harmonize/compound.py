@@ -4,8 +4,8 @@
 md_harmonize.compound
 ~~~~~~~~~~~~~~~~~~~~~
 
-This module provides the :class:`~mdh.compound.Atom` class, the :class:`~mdh.compound.Bond` class,
-and the :class:`~mdh.compound.Compound` class to construct a compound entity. Most of the instance
+This module provides the :class:`~md_harmonize.compound.Atom` class, the :class:`~md_harmonize.compound.Bond` class,
+and the :class:`~md_harmonize.compound.Compound` class to construct a compound entity. Most of the instance
 variables of these three classes are based on CTFile fields.
 
 """
@@ -31,7 +31,7 @@ from datetime import datetime
 
 class Atom:
 
-    """ Atom class describes the :class:`~mdh.compound.Atom` entity in the compound. """
+    """ Atom class describes the :class:`~md_harmonize.compound.Atom` entity in the compound. """
 
     def __init__(self, atom_symbol: str, atom_number: int, x: str = "0", y: str = "0", z: str = "0",
                  mass_difference: str = "0", charge: str = "0", atom_stereo_parity: str = "0",
@@ -209,7 +209,7 @@ class Atom:
 
 class Bond:
 
-    """ Bond class describes the :class:`~mdh.compound.Bond` entity in the compound. """
+    """ Bond class describes the :class:`~md_harmonize.compound.Bond` entity in the compound. """
 
     def __init__(self, first_atom_number: str, second_atom_number: str, bond_type: str, bond_stereo: str = "0",
                  bond_topology: str = "0", reacting_center_status: str = "0"):
@@ -283,14 +283,14 @@ class Bond:
 
 class Compound:
 
-    """ Compound class describes the :class:`~mdh.compound.Compound` entity. """
+    """ Compound class describes the :class:`~md_harmonize.compound.Compound` entity. """
 
     def __init__(self, compound_name: str, atoms: list, bonds: list) -> None:
         """Compound initializer.
 
         :param compound_name: the compound name.
-        :param atoms: a list of :class:`~mdh.compound.Atom` entities in the compound.
-        :param bonds: a list of :class:`~mdh.compound.Bond` entities in the compound.
+        :param atoms: a list of :class:`~md_harmonize.compound.Atom` entities in the compound.
+        :param bonds: a list of :class:`~md_harmonize.compound.Bond` entities in the compound.
     """
         self.compound_name = compound_name
         self.atoms = atoms
@@ -1589,7 +1589,7 @@ class Compound:
         """
         To determine the relationship of two compounds with the same structure.
 
-        :param the_other_compound: the other :class:`~mdh.compound.Compound` entity.
+        :param the_other_compound: the other :class:`~md_harmonize.compound.Compound` entity.
         :return: the relationship and the atom mappings between the two compounds.
     """
         relationship, mis_count = self.compare_chemical_details(self.get_chemical_details(),
@@ -1603,7 +1603,7 @@ class Compound:
 
         Assume the two compounds have the same structure, so we can achieve atom mappings through atom colors.
 
-        :param the_other_compound: the other :class:`~mdh.compound.Compound` entity.
+        :param the_other_compound: the other :class:`~md_harmonize.compound.Compound` entity.
         :return: the atom mappings between the two compounds.
     """
         one_to_one_mappings = collections.defaultdict(list)
@@ -1617,7 +1617,7 @@ class Compound:
         """
         To find the optimal atom mappings for compound pairs that are resonant type.
 
-        :param the_other_compound: the other :class:`~mdh.compound.Compound` entity.
+        :param the_other_compound: the other :class:`~md_harmonize.compound.Compound` entity.
         :param mappings: the list of atom mappings between the two compounds detected by BASS.
         :return: the relationship and the atom mappings between the two compounds.
     """
@@ -1685,7 +1685,7 @@ class Compound:
         """
         To determine the relationship of two compounds with interchangeable circular and linear representations with time limit.
 
-        :param other_compound: the other :class:`~mdh.compound.Compound` entity.
+        :param other_compound: the other :class:`~md_harmonize.compound.Compound` entity.
         :param seconds: the timeout limit.
         :return: the relationship and the atom mappings between the two compounds.
         """
@@ -1704,7 +1704,7 @@ class Compound:
         Finally, check if the updated structure is the same with the other compound. And determine the relationship
         between the two compounds as well as generate the atom mappings.
 
-        :param other_compound: the other :class:`~mdh.compound.Compound` entity.
+        :param other_compound: the other :class:`~md_harmonize.compound.Compound` entity.
         :return: the relationship and the atom mappings between the two compounds.
     """
         # default one compound should have a cycle.
@@ -1828,7 +1828,7 @@ class Compound:
         3) Based on the above validation criteria, we have to make sure that the R linkages in the other compound is the
         subset of the R linkages in this compound.
         
-        :param other_compound: the other :class:`~mdh.compound.Compound` entity.
+        :param other_compound: the other :class:`~md_harmonize.compound.Compound` entity.
         :param one_rs: the R groups in the compound.
         :param mapping: the atom mappings between the mapped parts of the two compounds.
         :return: bool whether the atom mappings are valid.
@@ -1866,7 +1866,7 @@ class Compound:
         layer atom coloring identifier).
         2) bond are formed by the atoms described above.
 
-        :param other_compound: the other :class:`~mdh.compound.Compound` entity.
+        :param other_compound: the other :class:`~md_harmonize.compound.Compound` entity.
         :param mapping: the mapped atoms between the two compounds.
         :return: the count of chemical details that cannot be mapped.
     """
@@ -1909,7 +1909,7 @@ class Compound:
         The priority: generic-specific, loose. 
         The relationship cannot be equivalent.
 
-        :param other_compound: the other :class:`~mdh.compound.Compound` entity.
+        :param other_compound: the other :class:`~md_harmonize.compound.Compound` entity.
         :param one_rs: the list of R groups in the compound.
         :param mappings: the atom mappings of the mapped parts in the two compounds.
         :return: the relationship and atom mappings between the two compounds.
@@ -1944,7 +1944,7 @@ class Compound:
         """
         To find the relationship and the atom mappings between the two compounds that have r_groups type with a time limit.
 
-        :param other_compound: the other :class:`~mdh.compound.Compound` entity.
+        :param other_compound: the other :class:`~md_harmonize.compound.Compound` entity.
         :param seconds: the timeout limit.
         :return: the relationship and the atom mappings between the two compounds.
         """
@@ -1970,7 +1970,7 @@ class Compound:
         4) We need to map the unmatched branches in the specific compound to the corresponding R group in the generic
         compound.
 
-        :param other_compound: the other :class:`~mdh.compound.Compound` entity.
+        :param other_compound: the other :class:`~md_harmonize.compound.Compound` entity.
         :return: the relationship and the atom mappings between the two compounds.
     """
         # self is the substructure, more generic, contain less chemical details. Apart from R groups, self is supposed
@@ -2008,7 +2008,7 @@ class Compound:
         To map the unmatched branches in the specific compound to the corresponding R group in the generic compound.
 
         :param one_rs: the list of R groups in the compound.
-        :param other_compound: the other :class:`~mdh.compound.Compound` entity.
+        :param other_compound: the other :class:`~md_harmonize.compound.Compound` entity.
         :param mappings: the atom mappings of the mapped parts in the two compounds.
         :return: the full atom mappings between the two compounds.
     """

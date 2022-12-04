@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
 """
-mdh.MetaCyc_parser
+
+md_harmonize.MetaCyc_parser
 ~~~~~~~~~~~~~~~~~~
 This module provides functions to parse MetaCyc text data.
 
@@ -224,7 +225,7 @@ def create_reactions(reaction_file: str, atom_mapping_file: str) -> list:
 
     :param reaction_file: the path to the reaction file.
     :param atom_mapping_file: the path to the atom mapping file.
-    :return: the list of constructed :class:`~mdh.reaction.Reaction` entities.
+    :return: the list of constructed :class:`~md_harmonize.reaction.Reaction` entities.
     """
     reaction_dict = reaction_parser(tools.open_text(reaction_file, encoding='cp1252').split("\n"))
     atom_mappings = atom_mappings_parser(tools.open_text(atom_mapping_file).split("\n"))

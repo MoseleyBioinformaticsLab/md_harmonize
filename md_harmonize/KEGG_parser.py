@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """
-mdh.KEGG_parser
+md_harmonize.KEGG_parser
 ~~~~~~~~~~~~~~~
 
 This module provides functions to parse KEGG data (including compound, reaction, kcf, and rclass).
@@ -417,7 +417,7 @@ class RpairParser:
         Remove the bonds connecting to different atoms. For each reaction center, multiple atoms can be the different
         atoms. We need to get all the combinations.
         
-        :param this_compound: the :class:`~mdh.compound.Compound` entity.
+        :param this_compound: the :class:`~md_harmonize.compound.Compound` entity.
         :param center_atom_numbers: the list of atom numbers for center atom in the compound.
         :param reaction_centers: the list of reaction center descriptions for the compound.
         :return: the list of bonds (represented by the atom numbers in the bond) that needs to be removed based on the RDM descriptions.
@@ -486,7 +486,7 @@ class RpairParser:
         Detect all the components in the compound after removing some bonds.
         Basic idea is the breadth first search algorithm.
 
-        :param this_compound: the :class:`~mdh.compound.Compound` entity.
+        :param this_compound: the :class:`~md_harmonize.compound.Compound` entity.
         :param removed_bonds: the list of removed bonds (represented by the atom numbers in the bond) in the compound.
         :param center_atom_numbers: the list of atom numbers of the center atoms in the compound.
         :return: the list of components of the compound represented by a list of atom numbers.
@@ -539,10 +539,10 @@ class RpairParser:
     @staticmethod
     def construct_component(this_compound: compound.Compound, atom_numbers: list, removed_bonds: list) -> compound.Compound:
         """
-        Construct a :class:`~mdh.compound.Compound` entity for the component based on the atom index and removed
+        Construct a :class:`~md_harmonize.compound.Compound` entity for the component based on the atom index and removed
         bonds, facilitating the following atom mappings.
 
-        :param this_compound: the :class:`~mdh.compound.Compound` entity.
+        :param this_compound: the :class:`~md_harmonize.compound.Compound` entity.
         :param atom_numbers: the list of atom numbers in the component.
         :param removed_bonds: the list of removed bonds (represented by the atom numbers in the bond) in the compound.
         :return: the constructed component compound.
@@ -710,11 +710,11 @@ def create_compound_kcf(kcf_file: str) -> Optional[compound.Compound]:
 # To avoid parsing the same rclass repeatedly, let's parse the rclass first, and look it up when we need.
 def create_reactions(reaction_directory: str, atom_mappings: dict) -> list:
     """
-    Create KEGG :class:`~mdh.reaction.Reaction` entities.
+    Create KEGG :class:`~md_harmonize.reaction.Reaction` entities.
 
     :param reaction_directory: the directory that stores all the reaction files.
     :param atom_mappings: the compound pair name and its atom mappings.
-    :return: the constructed :class:`~mdh.reaction.Reaction` entities.
+    :return: the constructed :class:`~md_harmonize.reaction.Reaction` entities.
     """
     # here we create compounds, rlcass descriptions, and reactions.
     reaction_files = glob.glob(reaction_directory+"*")
@@ -851,7 +851,7 @@ def create_atom_mappings(rclass_directory: str, compounds: dict, seconds: int = 
     Generate the atom mappings between compounds based on RCLASS definitions.
 
     :param rclass_directory: the directory that stores the rclass files.
-    :param compounds: a dictionary of :class:`~mdh.compound.Compound` entities.
+    :param compounds: a dictionary of :class:`~md_harmonize.compound.Compound` entities.
     :param seconds: the timeout limit.
     :return: the atom mappings of compound pairs.
     """

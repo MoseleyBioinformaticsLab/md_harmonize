@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
 """
-mdh.aromatics
+md_harmonize.aromatics
 ~~~~~~~~~~~~~
 
-This module provides the :class:`~mdh.aromatics.AromaticManager` class entity.
+This module provides the :class:`~md_harmonize.aromatics.AromaticManager` class entity.
 
 """
 
@@ -151,7 +151,7 @@ class AromaticManager:
     # def detect_aromatic_substructures_timeout(self, cpd: compound.Compound) -> None:
     #     """
     #     To detect the aromatic substructures in the compound and stop the search on timeout.
-    #     :param cpd: the :class:`~mdh.compound.Compound` entity.
+    #     :param cpd: the :class:`~md_harmonize.compound.Compound` entity.
     #     :return: None.
     #     """
     #
@@ -167,7 +167,7 @@ class AromaticManager:
         """
         Detect the aromatic substructures in the compound and stop the search on timeout.
 
-        :param cpd: the :class:`~mdh.compound.Compound` entity.
+        :param cpd: the :class:`~md_harmonize.compound.Compound` entity.
         :return: None.
         """
         try:
@@ -181,7 +181,7 @@ class AromaticManager:
         """
         Detect all the aromatic substructures in the cpd, and update the bond type of aromatic bonds.
 
-        :param cpd: the :class:`~mdh.compound.Compound` entity.
+        :param cpd: the :class:`~md_harmonize.compound.Compound` entity.
         :return: None.
         """
         cpd.update_color_tuple()
@@ -214,7 +214,7 @@ class AromaticManager:
         Construct the aromatic substructure entity based on the aromatic atoms.
         Here, we also include outside atoms that are connected to aromatic rings with double bonds.
 
-        :param cpd: the :class:`~mdh.compound.Compound` entity.
+        :param cpd: the :class:`~md_harmonize.compound.Compound` entity.
         :param aromatic_cycles: the list of aromatic cycles represented by atom numbers in the compound.
         :return: the list of constructed aromatic substructures.
         """
@@ -250,7 +250,7 @@ class AromaticManager:
         """
         Detect the aromatic substructures in a compound based on the aromatic atoms. This only applies to KEGG kcf file.
 
-        :param cpd: the :class:`~mdh.compound.Compound` entity.
+        :param cpd: the :class:`~md_harmonize.compound.Compound` entity.
         :return: the list of aromatic cycles represented by atom numbers.
         """
         aromatic_elements = ["C", "N"]

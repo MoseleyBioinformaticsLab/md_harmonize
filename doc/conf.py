@@ -11,7 +11,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath('.'))
 
-from . import __version__
+from mdh import __version__
 
 project = 'mdh'
 copyright = '2022, Huan Jin & Hunter Moseley'

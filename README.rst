@@ -1,5 +1,5 @@
-MDH
-===
+md_harmonize
+============
 
 .. image:: https://img.shields.io/pypi/v/MDH.svg
    :target: https://pypi.org/project/MDH
@@ -10,7 +10,7 @@ MDH
    :alt: Supported Python versions
 
 
-MDH package provides facilities for creation and harmonization of compounds and reactions.
+md_harmonize package provides facilities for creation and harmonization of compounds and reactions.
 
 Citation
 ~~~~~~~~
@@ -21,7 +21,7 @@ publication: https://github.com/MoseleyBioinformaticsLab/MDH.git
 Installation
 ~~~~~~~~~~~~
 
-'MDH' runs under Python 3.6+ and is available through python3-pip.
+'md_harmonize' runs under Python 3.6+ and is available through python3-pip.
 Install via pip or clone the git repo and install the following dependencies and
 you are ready to go!
 
@@ -33,7 +33,7 @@ Pip installation
 
 .. code:: bash
 
-   python3 -m pip install MDH
+   python3 -m pip install md-harmonize
 
 GitHub Package installation
 ---------------------------
@@ -41,12 +41,6 @@ GitHub Package installation
 .. code:: bash
 
    git clone https://github.com/MoseleyBioinformaticsLab/MDH.git
-
-
-Quickstart
-~~~~~~~~~~
-
-Using MDH to download data (limited to KEGG database).
 
 License
 ~~~~~~~

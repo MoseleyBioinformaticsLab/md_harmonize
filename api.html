@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>The MDH API Reference &#8212; mdh 1.0.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="License" href="license.html" />
+    <link rel="prev" title="The MDH Tutorial" href="tutorial.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-mdh">
+<span id="the-mdh-api-reference"></span><h1>The MDH API Reference<a class="headerlink" href="#module-mdh" title="Permalink to this headline">¶</a></h1>
+<p>This package includes the following modules.</p>
+<span class="target" id="module-mdh.reaction"></span><div class="section" id="mdh-reaction">
+<h2>mdh.reaction<a class="headerlink" href="#mdh-reaction" title="Permalink to this headline">¶</a></h2>
+<p>This module provides the <a class="reference internal" href="#mdh.reaction.Reaction" title="mdh.reaction.Reaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reaction</span></code></a> class entity.</p>
+<dl class="class">
+<dt id="mdh.reaction.Reaction">
+<em class="property">class </em><code class="sig-prename descclassname">mdh.reaction.</code><code class="sig-name descname">Reaction</code><span class="sig-paren">(</span><em class="sig-param">reaction_name: str</em>, <em class="sig-param">one_side: list</em>, <em class="sig-param">other_side: list</em>, <em class="sig-param">ecs: dict</em>, <em class="sig-param">atom_mappings: list</em>, <em class="sig-param">coefficients: dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mdh/reaction.html#Reaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mdh.reaction.Reaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reaction class describes the <a class="reference internal" href="#mdh.reaction.Reaction" title="mdh.reaction.Reaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reaction</span></code></a> entity.</p>
+<p>Reaction initializer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reaction_name</strong> – the reaction name.</p></li>
+<li><p><strong>one_side</strong> – the list of <code class="xref py py-class docutils literal notranslate"><span class="pre">Compound</span></code> entities in one side of the reaction.</p></li>
+<li><p><strong>other_side</strong> – the list of <code class="xref py py-class docutils literal notranslate"><span class="pre">Compound</span></code> entities in the other side of the reaction.</p></li>
+<li><p><strong>ecs</strong> – the dict of Enzyme Commission numbers (EC numbers) of the reaction.</p></li>
+<li><p><strong>atom_mappings</strong> – the list of atom mappings between two sides of the reaction.</p></li>
+<li><p><strong>coefficients</strong> – the dictionary of compound names and their corresponding coefficients in the reaction.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="mdh.reaction.Reaction.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">reaction_name: str</em>, <em class="sig-param">one_side: list</em>, <em class="sig-param">other_side: list</em>, <em class="sig-param">ecs: dict</em>, <em class="sig-param">atom_mappings: list</em>, <em class="sig-param">coefficients: dict</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/mdh/reaction.html#Reaction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mdh.reaction.Reaction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reaction initializer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reaction_name</strong> – the reaction name.</p></li>
+<li><p><strong>one_side</strong> – the list of <code class="xref py py-class docutils literal notranslate"><span class="pre">Compound</span></code> entities in one side of the reaction.</p></li>
+<li><p><strong>other_side</strong> – the list of <code class="xref py py-class docutils literal notranslate"><span class="pre">Compound</span></code> entities in the other side of the reaction.</p></li>
+<li><p><strong>ecs</strong> – the dict of Enzyme Commission numbers (EC numbers) of the reaction.</p></li>
+<li><p><strong>atom_mappings</strong> – the list of atom mappings between two sides of the reaction.</p></li>
+<li><p><strong>coefficients</strong> – the dictionary of compound names and their corresponding coefficients in the reaction.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mdh.reaction.Reaction.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#mdh.reaction.Reaction.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>To get the reaction name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the reaction name.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">mdh</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">The MDH Tutorial</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The MDH API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#mdh-reaction">mdh.reaction</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="tutorial.html" title="previous chapter">The MDH Tutorial</a></li>
+      <li>Next: <a href="license.html" title="next chapter">License</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Huan Jin & Hunter Moseley.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/api.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

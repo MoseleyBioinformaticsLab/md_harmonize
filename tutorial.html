@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>The MDH Tutorial &#8212; mdh 1.0.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="The MDH API Reference" href="api.html" />
+    <link rel="prev" title="User Guide" href="guide.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="the-mdh-tutorial">
+<h1>The MDH Tutorial<a class="headerlink" href="#the-mdh-tutorial" title="Permalink to this headline">¶</a></h1>
+<dl class="simple">
+<dt>The <cite>MDH</cite> is intended to harmonize compounds and reactions across public metabolic databases. It provides functionalities to:</dt><dd><ul class="simple">
+<li><p>Update a local copy of the KEGG metabolic databases.</p></li>
+<li><p>Curate compound molfile representations.</p></li>
+<li><p>Construct compound/reaction entities.</p></li>
+<li><p>To detect aromatic substructures in a compound.</p></li>
+<li><p>Parse KEGG RClass representations to generate atom mappings between compounds.</p></li>
+<li><p>Harmonize compounds/reactions across databases.</p></li>
+</ul>
+</dd>
+</dl>
+<p>In this document, each usage will be explained in details.</p>
+<div class="section" id="the-mdh-api-tutorial">
+<h2>The MDH API tutorial<a class="headerlink" href="#the-mdh-api-tutorial" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="data-preparation">
+<h3>Data preparation<a class="headerlink" href="#data-preparation" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>The raw KEGG, MetaCyc, and HMDB is available on zenodo <a class="reference external" href="https://doi.org/10.5281/zenodo.7384576">https://doi.org/10.5281/zenodo.7384576</a>. Please download the data first and keep the hierarchy of directory. The following data is included in the directory:</dt><dd><ul class="simple">
+<li><p>KEGG compound molfiles, compound kcf’s, rclasses, and reactions.</p></li>
+<li><p>MetaCyc compound molfiles, atom-mapping and reactions.</p></li>
+<li><p>HMDB compound molfiles.</p></li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="using-mdh-to-download-kegg-databases">
+<h3>Using MDH to download KEGG databases<a class="headerlink" href="#using-mdh-to-download-kegg-databases" title="Permalink to this headline">¶</a></h3>
+<p>Updates the KEGG metabolic databases, including compound kcf/molfile, reaction, and rclass.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">mdh download KEGG &lt;working_directory&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-mdh-to-curate-compound-molfile-representation">
+<h3>Using MDH to curate compound molfile representation<a class="headerlink" href="#using-mdh-to-curate-compound-molfile-representation" title="Permalink to this headline">¶</a></h3>
+<p>Curates molfile representations, eg: add H.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">mdh standardize &lt;database_names&gt; &lt;working_directory&gt;</span>
+</pre></div>
+</div>
+<p>Note: Multiple database names can be provided with comma separation, eg: KEGG,MetaCyc.</p>
+</div>
+<div class="section" id="using-mdh-to-construct-compound-reaction-entity">
+<h3>Using MDH to construct compound/reaction entity<a class="headerlink" href="#using-mdh-to-construct-compound-reaction-entity" title="Permalink to this headline">¶</a></h3>
+<p>Constructs compound/reaction entities.</p>
+<p>Compound construction:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">mdh initialize_compound &lt;database_names&gt; &lt;working_directory&gt; &lt;aromatic_manager_file&gt; [--parse_kegg_atom]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="options">
+<h3>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h3>
+<p>–parse-kegg-atom:
+The parse-kegg-atom option is used for parsing KEGG atom mapping between compounds based on KEGG RClass definitions.</p>
+<p>Reaction construction:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">mdh initialize_reaction &lt;database_names&gt; &lt;working_directory&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-mdh-to-extract-aromatic-substructures-from-compounds">
+<h3>Using MDH to extract aromatic substructures from compounds<a class="headerlink" href="#using-mdh-to-extract-aromatic-substructures-from-compounds" title="Permalink to this headline">¶</a></h3>
+<p>Extracts aromatic substructures from compounds using either Indigo or BASS to construct
+aromatic manager that can be used to detect aromatic substructures in the compound.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">mdh aromatize &lt;database_names&gt; &lt;working_directory&gt; &lt;save_file&gt; [--aromatic_manager=&lt;aromatic_manager_file&gt;]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id1">
+<h3>Options<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>–aromatic_manager option to indicate a pre-constructed aromatic manager is provided and newly discovered aromatic substructures will be added to aromatic manager.</p>
+</div>
+<div class="section" id="using-mdh-to-harmonize-compounds-reactions-across-databases">
+<h3>Using MDH to harmonize compounds/reactions across databases<a class="headerlink" href="#using-mdh-to-harmonize-compounds-reactions-across-databases" title="Permalink to this headline">¶</a></h3>
+<p>Harmonizes compounds/reactions across metabolic databases.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">mdh harmonize_compound &lt;database_names&gt; &lt;working_directory&gt;</span>
+<span class="go">mdh harmonize_reaction &lt;database_names&gt; &lt;working_directory&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">mdh</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The MDH Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-mdh-api-tutorial">The MDH API tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">The MDH API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="guide.html" title="previous chapter">User Guide</a></li>
+      <li>Next: <a href="api.html" title="next chapter">The MDH API Reference</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Huan Jin & Hunter Moseley.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/tutorial.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

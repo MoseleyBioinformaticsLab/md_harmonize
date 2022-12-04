@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>User Guide &#8212; mdh 1.0.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="The MDH Tutorial" href="tutorial.html" />
+    <link rel="prev" title="Welcome to MDH’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="user-guide">
+<h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>MDH was created to harmonize compounds and reactions in the public metabolic databases. It is a command line tool
+directly supporting harmonization of KEGG, MetaCyc, and HMDB, but has an API for expanding to other metabolic databases.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>The MDH package runs under Python 3.7+. Use <a class="reference external" href="https://pip.pypa.io/">pip</a> to install.</p>
+<div class="section" id="install-on-linux-mac-os-x">
+<h3>Install on Linux, Mac OS X<a class="headerlink" href="#install-on-linux-mac-os-x" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 -m pip install MDH
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="get-the-source-code">
+<h2>Get the source code<a class="headerlink" href="#get-the-source-code" title="Permalink to this headline">¶</a></h2>
+<p>Code is available on GitHub: <a class="reference external" href="https://github.com/MoseleyBioinformaticsLab/MDH.git">https://github.com/MoseleyBioinformaticsLab/MDH.git</a></p>
+<p>You can clone the public repository:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ https://github.com/MoseleyBioinformaticsLab/MDH.git
+</pre></div>
+</div>
+</div>
+<div class="section" id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>MDH requires the following Python libraries:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://pypi.org/project/docopt/">docopt</a> for creating the command-line interface.</p></li>
+<li><p><a class="reference external" href="https://github.com/jsonpickle/jsonpickle">jsonpickle</a> for saving Python objects in a JSON serializable form and outputting to a file.</p></li>
+<li><p><a class="reference external" href="https://github.com/numpy/numpy">numpy</a> and <a class="reference external" href="https://github.com/cython/cython">cython</a> for speeding optimization.</p></li>
+<li><p><a class="reference external" href="https://github.com/MoseleyBioinformaticsLab/ctfile">ctfile</a> for parsing compound molfile representation.</p></li>
+<li><p><a class="reference external" href="https://github.com/epam/Indigo">indigo</a> for detecting aromatic atoms in the compound.</p></li>
+<li><p><a class="reference external" href="https://pypi.org/project/Pebble/">pebble</a> for multiprocessing of cythonized calculation.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="data">
+<h2>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h2>
+<p>The raw data from KEGG and MetaCyc databases can be accessed from this URL: <a class="reference external" href="https://doi.org/10.5281/zenodo.7384576">https://doi.org/10.5281/zenodo.7384576</a></p>
+</div>
+<div class="section" id="basic-usage">
+<h2>Basic usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
+<p>MDH provides functions to achieve compound and reaction harmonization across public metabolic databases. Details about
+the usages are in the <a class="reference internal" href="tutorial.html"><span class="doc">The MDH Tutorial</span></a>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Usage:</span>
+<span class="go">   mdh -h | --help</span>
+<span class="go">   mdh --version</span>
+<span class="go">   mdh download &lt;database_names&gt; &lt;working_directory&gt;</span>
+<span class="go">   mdh standardize &lt;database_names&gt; &lt;working_directory&gt;</span>
+<span class="go">   mdh aromatize &lt;database_names&gt; &lt;working_directory&gt; &lt;save_file&gt; [--pickle] [--aromatic_manager=&lt;aromatic_manager_file&gt;]</span>
+<span class="go">   mdh initialize_compound &lt;database_names&gt; &lt;working_directory&gt; &lt;aromatic_manager_file&gt; [--parse_kegg_atom] [--pickle] [--split=k]</span>
+<span class="go">   mdh initialize_reaction &lt;database_names&gt; &lt;working_directory&gt; [--pickle]</span>
+<span class="go">   mdh harmonize_compound &lt;database_names&gt; &lt;working_directory&gt; [--pickle]</span>
+<span class="go">   mdh harmonize_reaction &lt;database_names&gt; &lt;working_directory&gt; [--pickle]</span>
+
+<span class="go">Options:</span>
+<span class="go">   -h, --help           Show this screen.</span>
+<span class="go">   --version            Show version.</span>
+<span class="go">   --aromatic_manager=&lt;aromatic_manager_file&gt;   A pre-constructed aromatic manager is provided.</span>
+<span class="go">   --pickle             Use pickle to save the results, otherwise use jsonpickle.</span>
+<span class="go">   --parse_kegg_atom    To parse KEGG atom mapping between compounds.</span>
+<span class="go">   --split=k              Split compounds to speed up construction.</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">mdh</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#description">Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#get-the-source-code">Get the source code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data">Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">The MDH Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">The MDH API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to MDH’s documentation!</a></li>
+      <li>Next: <a href="tutorial.html" title="next chapter">The MDH Tutorial</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Huan Jin & Hunter Moseley.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/guide.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

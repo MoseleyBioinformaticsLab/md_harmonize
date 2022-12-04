@@ -53,6 +53,4 @@ The MDH API Reference
     :exclude-members: __weakref__
 
 
-.. automodule:: mdh.cli
 
-.. autofunction:: cli

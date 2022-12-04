@@ -23,10 +23,10 @@ REQUIRES = [
         "docopt",
         "jsonpickle",
         "numpy",
-        "cython",
+        "Cython",
         "epam.indigo",
         "ctfile",
-        "pebble"
+        "Pebble"
 ]
 
 

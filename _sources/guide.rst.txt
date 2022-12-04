@@ -81,11 +81,11 @@ the usages are in the :doc:`tutorial`.
 
 
 .. _GitHub: https://github.com/MoseleyBioinformaticsLab/MDH
-.. _jsonpickle: https://github.com/jsonpickle/jsonpickle
+.. _jsonpickle: https://pypi.org/project/jsonpickle/
 .. _pip: https://pip.pypa.io/
 .. _docopt: https://pypi.org/project/docopt/
-.. _cython: https://github.com/cython/cython
-.. _numpy: https://github.com/numpy/numpy
-.. _ctfile: https://github.com/MoseleyBioinformaticsLab/ctfile
-.. _indigo: https://github.com/epam/Indigo
+.. _cython: https://pypi.org/project/Cython/
+.. _numpy: https://pypi.org/project/numpy/
+.. _ctfile: https://pypi.org/project/ctfile/
+.. _indigo: https://pypi.org/project/epam.indigo/
 .. _pebble: https://pypi.org/project/Pebble/

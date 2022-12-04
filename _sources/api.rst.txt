@@ -1,5 +1,5 @@
 The md_harmonize API Reference
-=====================
+==============================
 
 .. automodule:: md_harmonize
 

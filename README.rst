@@ -1,12 +1,12 @@
 md_harmonize
 ============
 
-.. image:: https://img.shields.io/pypi/v/MDH.svg
-   :target: https://pypi.org/project/MDH
+.. image:: https://img.shields.io/pypi/v/md_harmonize.svg
+   :target: https://pypi.org/project/md-harmonize/
    :alt: Current library version
 
-.. image:: https://img.shields.io/pypi/pyversions/MDH.svg
-   :target: https://pypi.org/project/MDH
+.. image:: https://img.shields.io/pypi/pyversions/md_harmonize.svg
+   :target: https://pypi.org/project/md-harmonize
    :alt: Supported Python versions
 
 

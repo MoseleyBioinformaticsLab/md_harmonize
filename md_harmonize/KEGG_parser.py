@@ -350,7 +350,7 @@ class RpairParser:
         """
         Example of rclass definition:
 
-        C8x-C8y:*-C1c:N5y+S2x-N5y+S2x
+        C8x-C8y:\*-C1c:N5y+S2x-N5y+S2x
 
         The RDM pattern is defined as KEGG atom type changes at the reaction center (R), the difference region (D),
         and the matched region (M) for each reactant pair. It characterizes chemical structure transformation patterns

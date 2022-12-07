@@ -781,9 +781,9 @@ class Compound:
 
     def structure_matrix(self, resonance: bool = False, backbone: bool = False) -> numpy.ndarray:
         """
-         To construct graph structural matrix of this compound.
-         matrix[i][j] = 0 suggests the two atoms are not connected directly.
-         Other integer represented the bond type connecting the two atoms.
+        To construct graph structural matrix of this compound.
+        matrix[i][j] = 0 suggests the two atoms are not connected directly.
+        Other integer represented the bond type connecting the two atoms.
 
         :param resonance: bool whether to ignore the difference between single and double bonds.
         :param backbone: bool whether to ignore bond types. This is for parsing atoms mappings from KEGG RCLASS.

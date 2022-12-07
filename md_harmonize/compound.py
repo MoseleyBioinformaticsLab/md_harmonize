@@ -16,7 +16,6 @@ import heapq
 from typing import *
 from pathlib import Path
 import ctfile
-from . import BASS
 import itertools 
 from .supplement import not_r_groups
 from .supplement import standard_bond_counts
@@ -24,9 +23,11 @@ from .supplement import atomic_weights
 from .supplement import metal_symbols
 from .supplement import index_to_charge
 from . import tools
-
 from datetime import datetime
-# from .supplement import charge_to_index
+try:
+    from . import BASS
+except ImportError:
+    from . import uncythonized_BASS as BASS
 
 
 class Atom:

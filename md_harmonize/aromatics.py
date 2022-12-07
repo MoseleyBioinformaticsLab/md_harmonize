@@ -10,9 +10,11 @@ This module provides the :class:`~md_harmonize.aromatics.AromaticManager` class 
 
 from . import tools
 from . import compound
-from . import BASS
 from indigo import *
-
+try:
+    from . import BASS
+except ImportError:
+    from . import uncythonized_BASS as BASS
 
 class AromaticManager:
 

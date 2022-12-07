@@ -1040,17 +1040,6 @@ class Compound:
         branches are not the same, we call them heavy side and light side (heavy side containing atoms with heavier
         atomic weights). We determine the bond stereochemistry by checking if the two heavy sides lie on the same part
         of the divided plane.
-        H   L   H   H
-
-        \___/   \___/
-
-        ___     ___
-
-        /   \   /   \
-
-        L   H   L   L
-
-        trans   cis
         
         :param bond: the bond entity.
         :return: the calculated bond stereochemistry.

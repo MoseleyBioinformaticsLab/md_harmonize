@@ -788,7 +788,7 @@ class Compound:
         :param resonance: bool whether to ignore the difference between single and double bonds.
         :param backbone: bool whether to ignore bond types. This is for parsing atoms mappings from KEGG RCLASS.
         :return: the constructed structure matrix for this compound.
-    """
+        """
         matrix = numpy.zeros((len(self.heavy_atoms), len(self.heavy_atoms)), dtype=numpy.uint8)
         for bond in self.bonds:
             atom_1, atom_2 = bond.first_atom_number, bond.second_atom_number
@@ -924,7 +924,7 @@ class Compound:
         :param the_other: the mappings compound entity.
         :param r_distance: to take account of the position of R groups.
         :param seconds: the timeout limit.
-        :return:the list of valid atom mappings between the two compound structures.
+        :return: the list of valid atom mappings between the two compound structures.
         """
         try:
             mapping = tools.timeout(self.map_resonance_helper, (the_other, r_distance,), seconds=seconds)

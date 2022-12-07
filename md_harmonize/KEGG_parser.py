@@ -195,7 +195,8 @@ reaction_center = collections.namedtuple('reaction_center', ['i', 'kat', 'label'
 
 class RpairParser:
 
-    """This is to get one-to-one atom mappings between two compounds based on the rclass definition.
+    """
+    This is to get one-to-one atom mappings between two compounds based on the rclass definition.
 
         Several steps are involved in this process:
 

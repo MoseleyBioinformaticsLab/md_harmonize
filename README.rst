@@ -16,12 +16,12 @@ Citation
 ~~~~~~~~
 
 Please cite the GitHub repository until our manuscript is accepted for
-publication: https://github.com/MoseleyBioinformaticsLab/MDH.git
+publication: https://github.com/MoseleyBioinformaticsLab/md_harmonize.git
 
 Installation
 ~~~~~~~~~~~~
 
-'md_harmonize' runs under Python 3.7+ and is available through python3-pip.
+md_harmonize runs under Python 3.7+ and is available through python3-pip.
 Install via pip or clone the git repo and install the following dependencies and
 you are ready to go!
 
@@ -40,7 +40,7 @@ GitHub Package installation
 
 .. code:: bash
 
-   git clone https://github.com/MoseleyBioinformaticsLab/MDH.git
+   git clone git@github.com:MoseleyBioinformaticsLab/md_harmonize.git
 
 License
 ~~~~~~~

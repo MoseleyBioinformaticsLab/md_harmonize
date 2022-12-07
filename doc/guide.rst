@@ -24,13 +24,13 @@ Install on Linux, Mac OS X
 Get the source code
 ~~~~~~~~~~~~~~~~~~~
 
-Code is available on GitHub: https://github.com/MoseleyBioinformaticsLab/MDH.git
+Code is available on GitHub: https://github.com/MoseleyBioinformaticsLab/md_harmonize.git
 
 You can clone the public repository:
 
 .. code:: bash
 
-   $ https://github.com/MoseleyBioinformaticsLab/MDH.git
+   $ https://github.com/MoseleyBioinformaticsLab/md_harmonize.git
 
 
 Dependencies

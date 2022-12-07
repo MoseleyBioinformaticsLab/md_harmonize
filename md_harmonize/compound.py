@@ -933,11 +933,9 @@ class Compound:
         Check if the resonant mappings are valid between the two compound structures. If the mapped atoms don't share
         the same local coloring identifier, we check if the difference is caused by the position of double bonds.
         Find the three atoms involved in the resonant structure and check if one of the atoms is not C.
-                N (a)            N (a)
-
-                / \\             // \
-
-            (b) C   N (c)    (b) C   N (c)
+        N (a)            N (a)
+        / \\             // \
+        (b) C   N (c)    (b) C   N (c)
 
         In addition, the self compound is supposed to be more generic, which means has fewer atoms. Therefore, atoms in
         self compound can all be mapped to the other compound.

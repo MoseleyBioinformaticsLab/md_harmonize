@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools", "wheel", "setuptools_scm[toml]>=6.2", "numpy", "Cython"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "md_harmonize"
+description = "Harmonize compounds and reactions across public metabolic databases."
+readme = "README.rst"
+requires-python = ">=3.7"
+keywords = ["metabolic database", "harmonization"]
+license = {file = "LICENSE"}
+classifiers = [
+   'Environment :: Console',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Topic :: Scientific/Engineering :: Bio-Informatics',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+]
+dynamic = ["version", "dependencies"]
+
+[project.urls]
+"Homepage" = "https://github.com/MoseleyBioinformaticsLab/md_harmonize"
+"Documentation" = "https://moseleybioinformaticslab.github.io/md_harmonize/"
+"GitHub" = "https://github.com/MoseleyBioinformaticsLab/md_harmonize"
+
+[tool.setuptools.dynamic]
+dependencies = {file = "requirements.txt"}
+version = {attr = "md_harmonize.__version__"}
+
+[project.scripts]
+messes = "md_harmonize.__main__:main"
+
+[tool.setuptools.cmdclass]
+build_py = "_custom_build.build_py"

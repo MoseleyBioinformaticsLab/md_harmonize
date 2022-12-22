@@ -35,6 +35,9 @@ Pip installation
 
    python3 -m pip install md-harmonize
 
+Note: please add ~/.local/bin/ to the environmental PATH variant in bash_profile if you install the package with --user.
+
+
 GitHub Package installation
 ---------------------------
 

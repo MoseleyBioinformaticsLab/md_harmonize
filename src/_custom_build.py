@@ -15,7 +15,7 @@ class build_py(_build_py):
         self.distribution.ext_modules.append(
             Extension(
                 "md_harmonize.BASS",
-                sources=["md_harmonize/BASS.pyx"],
+                sources=["src/md_harmonize/BASS.pyx"],
                 include_dirs=[numpy.get_include()]
             )
         )

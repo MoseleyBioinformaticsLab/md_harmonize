@@ -37,4 +37,4 @@ version = {attr = "md_harmonize.__version__"}
 md_harmonize = "md_harmonize.__main__:main"
 
 [tool.setuptools.cmdclass]
-build_py = "src/_custom_build.build_py"
+build_py = "_custom_build.build_py"

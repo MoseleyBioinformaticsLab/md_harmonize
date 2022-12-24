@@ -31,10 +31,10 @@ dynamic = ["version", "dependencies"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = "requirements.txt"}
-version = {attr = "src/md_harmonize/md_harmonize.__version__"}
+version = {attr = "md_harmonize.__version__"}
 
 [project.scripts]
-md_harmonize = "src/md_harmonize/md_harmonize.__main__:main"
+md_harmonize = "md_harmonize.__main__:main"
 
 [tool.setuptools.cmdclass]
 build_py = "src/_custom_build.build_py"

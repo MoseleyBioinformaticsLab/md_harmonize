@@ -30,13 +30,14 @@ Install on Linux
 
 Pip installation
 ----------------
-
+        
 .. code:: bash
 
    python3 -m pip install md-harmonize
 
-Note: please add ~/.local/bin/ to the environmental PATH variant in bash_profile if you install the package with --user.
-
+Note: 
+   Please add ~/.local/bin/ to the environmental PATH variant in bash_profile if you install the package with --user.
+   python3-devel  is required for package installation. 
 
 GitHub Package installation
 ---------------------------

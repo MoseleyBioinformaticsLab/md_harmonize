@@ -1435,7 +1435,7 @@ class Compound:
                                                                                 excluded=excluded_index)
                     self.atoms[atom_index].color = atom_color
             not_valid = self.invalid_symmetric_atoms(atoms_to_color, excluded_index, bond_stereo=bond_stereo,
-                                                     resonance=resonance)
+                                                     resonance=resonance, backbone=backbone)
 
     def color_metal(self, bond_stereo: bool = False, resonance: bool = True, backbone: bool = False) -> None:
         """

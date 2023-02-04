@@ -64,7 +64,8 @@ class Atom:
         self.z = float(z.strip())
         self.atom_symbol = atom_symbol.strip()
         self.mass_difference = mass_difference.strip()
-        self.charge = index_to_charge[charge.strip()] if charge.strip() in index_to_charge else 0
+        #self.charge = index_to_charge[charge.strip()] if charge.strip() in index_to_charge else 0
+        self.charge = charge
         self.atom_stereo_parity = atom_stereo_parity.strip() if atom_stereo_parity.strip() != "3" else "0"
         self.hydrogen_count = hydrogen_count.strip()
         self.stereo_care_box = stereo_care_box.strip()
@@ -88,6 +89,7 @@ class Atom:
         self.is_r = True if ("A" in self.atom_symbol or "R" in self.atom_symbol or "*" in self.atom_symbol or
                              self.atom_symbol == "X") and self.atom_symbol not in not_r_groups else False
         self.default_symbol = "R" if self.is_r else self.atom_symbol
+
 
     def update_symbol(self, symbol: str) -> str:
         """

@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>md_harmonize.compound &#8212; md_harmonize 1.0.3 documentation</title>
+    <title>md_harmonize.compound &#8212; md_harmonize 1.0.4 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -97,7 +97,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom_symbol</span> <span class="o">=</span> <span class="n">atom_symbol</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mass_difference</span> <span class="o">=</span> <span class="n">mass_difference</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="n">index_to_charge</span><span class="p">[</span><span class="n">charge</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span> <span class="k">if</span> <span class="n">charge</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">in</span> <span class="n">index_to_charge</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="c1">#self.charge = index_to_charge[charge.strip()] if charge.strip() in index_to_charge else 0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="n">charge</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom_stereo_parity</span> <span class="o">=</span> <span class="n">atom_stereo_parity</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">if</span> <span class="n">atom_stereo_parity</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;3&quot;</span> <span class="k">else</span> <span class="s2">&quot;0&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hydrogen_count</span> <span class="o">=</span> <span class="n">hydrogen_count</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stereo_care_box</span> <span class="o">=</span> <span class="n">stereo_care_box</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -121,6 +122,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">is_r</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;A&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_symbol</span> <span class="ow">or</span> <span class="s2">&quot;R&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_symbol</span> <span class="ow">or</span> <span class="s2">&quot;*&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_symbol</span> <span class="ow">or</span>
                              <span class="bp">self</span><span class="o">.</span><span class="n">atom_symbol</span> <span class="o">==</span> <span class="s2">&quot;X&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_symbol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">not_r_groups</span> <span class="k">else</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_symbol</span> <span class="o">=</span> <span class="s2">&quot;R&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_r</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_symbol</span></div>
+
 
 <div class="viewcode-block" id="Atom.update_symbol"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.update_symbol">[docs]</a>    <span class="k">def</span> <span class="nf">update_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>

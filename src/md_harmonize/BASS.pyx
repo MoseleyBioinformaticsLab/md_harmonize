@@ -22,7 +22,7 @@ np.ndarray[np.uint8_t, ndim=2] structure_matrix_2, np.ndarray[np.uint16_t, ndim=
     cdef int row = 0
     cdef bint equal
     cdef np.ndarray[np.uint8_t, ndim=1] used = np.zeros(num_cols+1, dtype=np.uint8)
-    cdef np.ndarray[np.long_t, ndim=1] mapping = np.array([-1 for _ in range(num_rows + 1)])
+    cdef np.ndarray[np.int64_t, ndim=1] mapping = np.array([-1 for _ in range(num_rows + 1)])
     cdef list isomorphs = []
 
     if not num_rows > num_cols:

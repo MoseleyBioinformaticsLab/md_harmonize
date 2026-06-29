@@ -16,7 +16,8 @@ import heapq
 from typing import *
 from pathlib import Path
 import ctfile
-import itertools 
+import itertools
+import logging as log
 from .supplement import not_r_groups
 from .supplement import standard_bond_counts
 from .supplement import atomic_weights
@@ -1411,6 +1412,8 @@ class Compound:
     """
         not_valid = self.invalid_symmetric_atoms(atoms_to_color, excluded_index, bond_stereo=bond_stereo,
                                                  resonance=resonance, backbone=backbone)
+        n_iters = 0
+        max_iters = len(atoms_to_color) + 1
         while not_valid:
             atom_color_with_neighbors = self.generate_atom_color_with_neighbors(atoms_to_color, excluded=excluded_index,
                                                                                 zero_core_color=False,
@@ -1438,6 +1441,11 @@ class Compound:
                     self.atoms[atom_index].color = atom_color
             not_valid = self.invalid_symmetric_atoms(atoms_to_color, excluded_index, bond_stereo=bond_stereo,
                                                      resonance=resonance, backbone=backbone)
+            n_iters += 1
+            if n_iters == max_iters:
+                log.warning(
+                    f'The curation of invalid symmetric atoms was halted for compound of ID {self.name} to avoid an infinite loop.')
+                break
 
     def color_metal(self, bond_stereo: bool = False, resonance: bool = True, backbone: bool = False) -> None:
         """

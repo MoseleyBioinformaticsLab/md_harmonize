@@ -1,10 +1,11 @@
 __pycache__/
 build/
-doc/_*
-doc/.buildinfo
+docs/_*
+docs/.buildinfo
 dist/
 .idea/
 *.so
 *.c
 *.egg-info
 .DS_Store
+src/md_harmonize/_version.py

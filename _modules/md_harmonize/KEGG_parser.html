@@ -1,24 +1,24 @@
-
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <title>md_harmonize.KEGG_parser &#8212; md_harmonize 1.0.4 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>md_harmonize.KEGG_parser &#8212; md_harmonize 1.0.5 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=d55fa986"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
+
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  
 
   </head><body>
   
@@ -41,19 +41,21 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">compound</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">reaction</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">tools</span>
-<span class="kn">import</span> <span class="nn">concurrent.futures</span> <span class="k">as</span> <span class="nn">CF</span>
-<span class="kn">import</span> <span class="nn">pebble</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">compound</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">reaction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">tools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">CF</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pebble</span>
 
 
-<div class="viewcode-block" id="kegg_data_parser"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.kegg_data_parser">[docs]</a><span class="k">def</span> <span class="nf">kegg_data_parser</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="kegg_data_parser">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.kegg_data_parser">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">kegg_data_parser</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is to parse KEGG data (reaction, rclass, compound) file to a dictionary.</span>
 
 <span class="sd">    eg:</span>
@@ -124,8 +126,11 @@
     <span class="k">return</span> <span class="n">reaction_dict</span></div>
 
 
-<div class="viewcode-block" id="parse_equation"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.parse_equation">[docs]</a><span class="k">def</span> <span class="nf">parse_equation</span><span class="p">(</span><span class="n">equation</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="parse_equation">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.parse_equation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_equation</span><span class="p">(</span><span class="n">equation</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is to parse the KEGG reaction equation.</span>
 
 <span class="sd">    eg:</span>
@@ -150,8 +155,11 @@
     <span class="k">return</span> <span class="n">one_side_coefficients</span><span class="p">,</span> <span class="n">the_other_side_coefficients</span></div>
 
 
-<div class="viewcode-block" id="kegg_kcf_parser"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.kegg_kcf_parser">[docs]</a><span class="k">def</span> <span class="nf">kegg_kcf_parser</span><span class="p">(</span><span class="n">kcf</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="kegg_kcf_parser">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.kegg_kcf_parser">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">kegg_kcf_parser</span><span class="p">(</span><span class="n">kcf</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is to parse KEGG kcf file to a dictionary.</span>
 
 <span class="sd">    eg:</span>
@@ -222,13 +230,16 @@
     <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;compound_name&quot;</span><span class="p">:</span> <span class="n">compound_name</span><span class="p">,</span> <span class="s2">&quot;atoms&quot;</span><span class="p">:</span> <span class="n">atoms</span><span class="p">,</span> <span class="s2">&quot;bonds&quot;</span><span class="p">:</span> <span class="n">bonds</span><span class="p">}</span></div>
 
 
+
 <span class="c1"># Define the reaction center in the rclass definition.</span>
 <span class="n">reaction_center</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;reaction_center&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="s1">&#39;kat&#39;</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="s1">&#39;match&#39;</span><span class="p">,</span> <span class="s1">&#39;difference&#39;</span><span class="p">])</span>
 
 
-<div class="viewcode-block" id="RpairParser"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser">[docs]</a><span class="k">class</span> <span class="nc">RpairParser</span><span class="p">:</span>
+<div class="viewcode-block" id="RpairParser">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RpairParser</span><span class="p">:</span>
 
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is to get one-to-one atom mappings between two compounds based on the rclass definition.</span>
 
 <span class="sd">        Several steps are involved in this process:</span>
@@ -269,9 +280,11 @@
 <span class="sd">        mapping with minimal changes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="RpairParser.__init__"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rclass_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rclass_definitions</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">one_compound</span><span class="p">:</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">,</span>
+<div class="viewcode-block" id="RpairParser.__init__">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rclass_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rclass_definitions</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">one_compound</span><span class="p">:</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">,</span>
                  <span class="n">other_compound</span><span class="p">:</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        RpairParser initializer.</span>
 
 <span class="sd">        :param rclass_name: the rclass name.</span>
@@ -283,9 +296,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">rclass_definitions</span> <span class="o">=</span> <span class="n">rclass_definitions</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">one_compound</span> <span class="o">=</span> <span class="n">one_compound</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">other_compound</span> <span class="o">=</span> <span class="n">other_compound</span></div>
+
     
-<div class="viewcode-block" id="RpairParser.map_atom_by_colors"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.map_atom_by_colors">[docs]</a>    <span class="k">def</span> <span class="nf">map_atom_by_colors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RpairParser.map_atom_by_colors">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.map_atom_by_colors">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">map_atom_by_colors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Roughly map the atoms between the two compounds by the atom color.</span>
 
 <span class="sd">        :return: the dict of mapped atom index between the two compounds.</span>
@@ -301,8 +317,11 @@
             <span class="k">return</span> <span class="p">{}</span>
         <span class="k">return</span> <span class="n">mapped</span></div>
 
-<div class="viewcode-block" id="RpairParser.map_whole_compound"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.map_whole_compound">[docs]</a>    <span class="k">def</span> <span class="nf">map_whole_compound</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RpairParser.map_whole_compound">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.map_whole_compound">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">map_whole_compound</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Map two compounds if the two compounds can be roughly mapped by the atom color.</span>
 
 <span class="sd">        :return: the dict of mapped atom in the two compounds.</span>
@@ -324,10 +343,13 @@
                 <span class="n">min_idx</span> <span class="o">=</span> <span class="n">i</span>
                 <span class="n">min_miscount</span> <span class="o">=</span> <span class="n">miscount</span>
         <span class="k">return</span> <span class="n">pre_matches</span><span class="p">[</span><span class="n">min_idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">min_idx</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="p">{}</span></div>
+
     
-<div class="viewcode-block" id="RpairParser.generate_kat_neighbors"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.generate_kat_neighbors">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">generate_kat_neighbors</span><span class="p">(</span><span class="n">this_compound</span><span class="p">:</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RpairParser.generate_kat_neighbors">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.generate_kat_neighbors">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_kat_neighbors</span><span class="p">(</span><span class="n">this_compound</span><span class="p">:</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate the atom neighbors represented by KEGG atom type for each atom in the compound.</span>
 <span class="sd">        This is used to find the center atom.</span>
 <span class="sd">        We used KEGG atom type since the descriptions of atoms in the rclass definitions using KEGG atom type.</span>
@@ -343,9 +365,12 @@
             <span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">atom</span><span class="o">.</span><span class="n">kat</span><span class="p">,</span> <span class="n">kat_neighbors</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">atoms</span></div>
 
-<div class="viewcode-block" id="RpairParser.find_target_atom"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.find_target_atom">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">find_target_atom</span><span class="p">(</span><span class="n">atoms</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RpairParser.find_target_atom">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.find_target_atom">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_target_atom</span><span class="p">(</span><span class="n">atoms</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find the target atoms from a list of candidate atoms.</span>
 
 <span class="sd">        :param atoms: a list of atoms to search from.</span>
@@ -358,10 +383,13 @@
                 <span class="n">target_index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">target_index</span></div>
 
-<div class="viewcode-block" id="RpairParser.create_reaction_centers"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.create_reaction_centers">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">create_reaction_centers</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">kat</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">difference</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">the_other_difference</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">match</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+
+<div class="viewcode-block" id="RpairParser.create_reaction_centers">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.create_reaction_centers">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_reaction_centers</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">kat</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">difference</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">the_other_difference</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">match</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
                                 <span class="n">the_other_match</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create the center atom based on its connected atoms and its counterpart atom in the other compound.</span>
 
 <span class="sd">        :param i: the ith rclass definition.</span>
@@ -379,8 +407,11 @@
         <span class="n">label</span> <span class="o">=</span> <span class="p">(</span><span class="n">kat</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">neighbors</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">reaction_center</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">kat</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">match</span><span class="p">,</span> <span class="n">difference</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RpairParser.find_center_atoms"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.find_center_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">find_center_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RpairParser.find_center_atoms">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.find_center_atoms">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_center_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Example of rclass definition:</span>
 
 <span class="sd">        C8x-C8y:\*-C1c:N5y+S2x-N5y+S2x</span>
@@ -416,9 +447,12 @@
             <span class="n">right_center_candidates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">right_atom_index</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">left_center_candidates</span><span class="p">,</span> <span class="n">right_center_candidates</span><span class="p">,</span> <span class="n">left_reaction_centers</span><span class="p">,</span> <span class="n">right_reaction_centers</span></div>
 
-<div class="viewcode-block" id="RpairParser.get_center_list"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.get_center_list">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">get_center_list</span><span class="p">(</span><span class="n">center_atom_index</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RpairParser.get_center_list">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.get_center_list">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_center_list</span><span class="p">(</span><span class="n">center_atom_index</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate all the combinations of reaction centers.</span>
 <span class="sd">        </span>
 <span class="sd">        :param center_atom_index: list of atom index list for each reaction centers. eg: three reaction centers: [[0, 1, 2], [5, 6], [10, 11]].</span>
@@ -426,8 +460,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">combines</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">def</span> <span class="nf">dfs</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">seen</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="sd">&quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">dfs</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">seen</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Use the depth first search algorithm to generate all the combinations of reaction centers.</span>
 
 <span class="sd">            :param i: the current atom index.</span>
@@ -445,9 +479,12 @@
         <span class="n">dfs</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">[])</span>
         <span class="k">return</span> <span class="n">combines</span></div>
 
-<div class="viewcode-block" id="RpairParser.remove_different_bonds"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.remove_different_bonds">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">remove_different_bonds</span><span class="p">(</span><span class="n">this_compound</span><span class="p">:</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">,</span> <span class="n">center_atom_numbers</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">reaction_centers</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RpairParser.remove_different_bonds">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.remove_different_bonds">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_different_bonds</span><span class="p">(</span><span class="n">this_compound</span><span class="p">:</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">,</span> <span class="n">center_atom_numbers</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">reaction_centers</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove the bonds connecting to different atoms. For each reaction center, multiple atoms can be the different</span>
 <span class="sd">        atoms. We need to get all the combinations.</span>
 <span class="sd">        </span>
@@ -471,8 +508,11 @@
                     <span class="n">removed_bonds</span> <span class="o">=</span> <span class="n">removed_bonds_update</span>
         <span class="k">return</span> <span class="n">removed_bonds</span></div>
 
-<div class="viewcode-block" id="RpairParser.generate_atom_mappings"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.generate_atom_mappings">[docs]</a>    <span class="k">def</span> <span class="nf">generate_atom_mappings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RpairParser.generate_atom_mappings">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.generate_atom_mappings">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_atom_mappings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate the one-to-one atom mappings of the compound pair.</span>
 
 <span class="sd">        :return: the list of atom mappings.</span>
@@ -514,9 +554,12 @@
                                         <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">other_compound</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">to_idx</span><span class="p">)))</span>
         <span class="k">return</span> <span class="n">one_to_one_mappings</span></div>
 
-<div class="viewcode-block" id="RpairParser.detect_components"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.detect_components">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">detect_components</span><span class="p">(</span><span class="n">this_compound</span><span class="p">:</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">,</span> <span class="n">removed_bonds</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">center_atom_numbers</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RpairParser.detect_components">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.detect_components">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">detect_components</span><span class="p">(</span><span class="n">this_compound</span><span class="p">:</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">,</span> <span class="n">removed_bonds</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">center_atom_numbers</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Detect all the components in the compound after removing some bonds.</span>
 <span class="sd">        Basic idea is the breadth first search algorithm.</span>
 
@@ -551,9 +594,12 @@
                 <span class="n">components</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">components</span></div>
 
-<div class="viewcode-block" id="RpairParser.pair_components"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.pair_components">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">pair_components</span><span class="p">(</span><span class="n">left_components</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">right_components</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RpairParser.pair_components">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.pair_components">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pair_components</span><span class="p">(</span><span class="n">left_components</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">right_components</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The two compounds are divided into separate components due to the difference atoms. We need to pair each component</span>
 <span class="sd">        in one compound to its counterpart component in the other compound.</span>
 <span class="sd">        Here we roughly pair the components based on the number of atoms in the component. Therefore, every component in</span>
@@ -570,9 +616,12 @@
                     <span class="n">component_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">left_component</span><span class="p">,</span> <span class="n">right_component</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">component_pairs</span></div>
 
-<div class="viewcode-block" id="RpairParser.construct_component"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.construct_component">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">construct_component</span><span class="p">(</span><span class="n">this_compound</span><span class="p">:</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">,</span> <span class="n">atom_numbers</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">removed_bonds</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RpairParser.construct_component">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.construct_component">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">construct_component</span><span class="p">(</span><span class="n">this_compound</span><span class="p">:</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">,</span> <span class="n">atom_numbers</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">removed_bonds</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct a :class:`~md_harmonize.compound.Compound` entity for the component based on the atom index and removed</span>
 <span class="sd">        bonds, facilitating the following atom mappings.</span>
 
@@ -599,9 +648,12 @@
         <span class="n">this_compound</span> <span class="o">=</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">(</span><span class="s2">&quot;partial_compound&quot;</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">bonds</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">this_compound</span></div>
 
-<div class="viewcode-block" id="RpairParser.preliminary_atom_mappings_check"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.preliminary_atom_mappings_check">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">preliminary_atom_mappings_check</span><span class="p">(</span><span class="n">left_component</span><span class="p">:</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">,</span> <span class="n">right_component</span><span class="p">:</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RpairParser.preliminary_atom_mappings_check">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.preliminary_atom_mappings_check">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">preliminary_atom_mappings_check</span><span class="p">(</span><span class="n">left_component</span><span class="p">:</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">,</span> <span class="n">right_component</span><span class="p">:</span> <span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Roughly evaluate if the atoms between the two components can be mapped.</span>
 <span class="sd">        We compare if the every atom color in the left component has its counterpart in the right component.</span>
 <span class="sd">        Here, we only consider the backbone of the structure.</span>
@@ -622,8 +674,11 @@
                         <span class="k">break</span>
         <span class="k">return</span> <span class="n">left</span> <span class="o">==</span> <span class="n">mapped</span></div>
 
-<div class="viewcode-block" id="RpairParser.map_components"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.map_components">[docs]</a>    <span class="k">def</span> <span class="nf">map_components</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">left_removed_bonds</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">right_removed_bonds</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">left_centers</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">right_centers</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RpairParser.map_components">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.map_components">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">map_components</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">left_removed_bonds</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">right_removed_bonds</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">left_centers</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">right_centers</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find optimal map for every component in the compound pair.</span>
 
 <span class="sd">        :param left_removed_bonds: the list of removed bonds in one compound.</span>
@@ -660,8 +715,11 @@
                 <span class="n">atom_mappings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">optimal_one_to_one_mappings</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">combine_atom_mappings</span><span class="p">(</span><span class="n">atom_mappings</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RpairParser.combine_atom_mappings"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.combine_atom_mappings">[docs]</a>    <span class="k">def</span> <span class="nf">combine_atom_mappings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_mappings</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RpairParser.combine_atom_mappings">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.combine_atom_mappings">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">combine_atom_mappings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_mappings</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Combine the atom mappings of all the components.</span>
 <span class="sd">        We just mentioned in the pair_components function that every component can have several mappings.</span>
 <span class="sd">        Here, we choose the optimal mapping with the least count of changed atom local identifier. And make sure</span>
@@ -687,9 +745,12 @@
                         <span class="n">collective_mappings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">atom_mappings</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">collective_mappings</span></div>
 
-<div class="viewcode-block" id="RpairParser.validate_component_atom_mappings"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.validate_component_atom_mappings">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">validate_component_atom_mappings</span><span class="p">(</span><span class="n">left_centers</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">right_centers</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">component_atom_mappings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RpairParser.validate_component_atom_mappings">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.validate_component_atom_mappings">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_component_atom_mappings</span><span class="p">(</span><span class="n">left_centers</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">right_centers</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">component_atom_mappings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if mapped the atoms can correspond to the mapped reaction center atoms.</span>
 <span class="sd">        </span>
 <span class="sd">        :param left_centers: the list of center atom indices in the left compound.</span>
@@ -702,8 +763,11 @@
                 <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="RpairParser.count_changed_atom_identifiers"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.count_changed_atom_identifiers">[docs]</a>    <span class="k">def</span> <span class="nf">count_changed_atom_identifiers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">one_to_one_mappings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RpairParser.count_changed_atom_identifiers">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.RpairParser.count_changed_atom_identifiers">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">count_changed_atom_identifiers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">one_to_one_mappings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Count the mapped atoms with changed local atom identifier. The different atoms (D in RCLASS definitions)</span>
 <span class="sd">        can cause change of local environment, which can change the atom identifier.</span>
 
@@ -717,11 +781,15 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">one_compound</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">idx_1</span><span class="p">]</span><span class="o">.</span><span class="n">color_layers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">other_compound</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">idx_2</span><span class="p">]</span><span class="o">.</span><span class="n">color_layers</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
                 <span class="k">continue</span>
             <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="n">count</span></div></div>
+        <span class="k">return</span> <span class="n">count</span></div>
+</div>
 
 
-<div class="viewcode-block" id="create_compound_kcf"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.create_compound_kcf">[docs]</a><span class="k">def</span> <span class="nf">create_compound_kcf</span><span class="p">(</span><span class="n">kcf_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="create_compound_kcf">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.create_compound_kcf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_compound_kcf</span><span class="p">(</span><span class="n">kcf_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">compound</span><span class="o">.</span><span class="n">Compound</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Construct compound entity based on the KEGG kcf file.</span>
 
 <span class="sd">    :param kcf_file: the path to the kcf file.</span>
@@ -740,10 +808,13 @@
     <span class="k">return</span> <span class="n">this_compound</span></div>
 
 
+
 <span class="c1"># when we create the kegg reaction, we need to parse the atom mappings based on rclass!</span>
 <span class="c1"># To avoid parsing the same rclass repeatedly, let&#39;s parse the rclass first, and look it up when we need.</span>
-<div class="viewcode-block" id="create_reactions"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.create_reactions">[docs]</a><span class="k">def</span> <span class="nf">create_reactions</span><span class="p">(</span><span class="n">reaction_directory</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">atom_mappings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="create_reactions">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.create_reactions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_reactions</span><span class="p">(</span><span class="n">reaction_directory</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">atom_mappings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create KEGG :class:`~md_harmonize.reaction.Reaction` entities.</span>
 
 <span class="sd">    :param reaction_directory: the directory that stores all the reaction files.</span>
@@ -803,6 +874,7 @@
     <span class="k">return</span> <span class="n">reactions</span></div>
 
 
+
 <span class="c1"># def compound_pair_mappings(rclass_name: str, rclass_definitions: list, one_compound: compound.Compound,</span>
 <span class="c1">#                            the_other_compound: compound.Compound) -&gt; tuple:</span>
 <span class="c1">#     &quot;&quot;&quot;</span>
@@ -856,8 +928,10 @@
 <span class="c1">#         print(&quot;parsing of this {0} {1} {2} cost {3}&quot;.format(rclass_name, one_compound.compound_name, the_other_compound.compound_name, consumed.total_seconds()))</span>
 <span class="c1">#         return one_compound.name + &quot;_&quot; + the_other_compound.name, []</span>
 
-<div class="viewcode-block" id="compound_pair_mappings"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.compound_pair_mappings">[docs]</a><span class="k">def</span> <span class="nf">compound_pair_mappings</span><span class="p">(</span><span class="n">pair_component</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="compound_pair_mappings">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.compound_pair_mappings">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compound_pair_mappings</span><span class="p">(</span><span class="n">pair_component</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the atom mappings between two compounds based on the rclass definitions.</span>
 
 <span class="sd">    :param pair_component: a tuple containing the rclass_name, rclass_definitions, one_compound and the_other_compound.</span>
@@ -880,8 +954,11 @@
     <span class="k">return</span> <span class="n">one_compound</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">other_compound</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atom_mappings</span></div>
 
 
-<div class="viewcode-block" id="create_atom_mappings"><a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.create_atom_mappings">[docs]</a><span class="k">def</span> <span class="nf">create_atom_mappings</span><span class="p">(</span><span class="n">rclass_directory</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">compounds</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1200</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="create_atom_mappings">
+<a class="viewcode-back" href="../../api.html#md_harmonize.KEGG_parser.create_atom_mappings">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_atom_mappings</span><span class="p">(</span><span class="n">rclass_directory</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">compounds</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1200</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the atom mappings between compounds based on RCLASS definitions.</span>
 
 <span class="sd">    :param rclass_directory: the directory that stores the rclass files.</span>
@@ -935,13 +1012,14 @@
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;empty mappings&quot;</span><span class="p">,</span> <span class="n">rclass_name</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">atom_mappings</span></div>
+
 </pre></div>
 
           </div>
           
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <h1 class="logo"><a href="../../index.html">md_harmonize</a></h1>
 
@@ -952,8 +1030,17 @@
 
 
 
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../guide.html">User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">The md_harmonize Tutorial</a></li>
@@ -970,16 +1057,6 @@
   </ul></li>
 </ul>
 </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
 
 
 
@@ -993,11 +1070,11 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2022, Huan Jin & Hunter Moseley.
+      &#169;2022, Huan Jin & Hunter Moseley.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
     </div>
 

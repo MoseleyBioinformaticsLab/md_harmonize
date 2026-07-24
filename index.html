@@ -1,25 +1,26 @@
-
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <title>Welcome to MDH’s documentation! &#8212; md_harmonize 1.0.4 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Welcome to MDH’s documentation! &#8212; md_harmonize 1.0.5 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=d55fa986"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="User Guide" href="guide.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
+
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  
 
   </head><body>
   
@@ -31,10 +32,10 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="welcome-to-mdh-s-documentation">
-<h1>Welcome to MDH’s documentation!<a class="headerlink" href="#welcome-to-mdh-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <section id="welcome-to-mdh-s-documentation">
+<h1>Welcome to MDH’s documentation!<a class="headerlink" href="#welcome-to-mdh-s-documentation" title="Link to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="guide.html">User Guide</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="guide.html#description">Description</a></li>
@@ -51,33 +52,64 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">The md_harmonize API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api.html#md-harmonize-compound">md_harmonize.compound</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.compound.Atom"><code class="docutils literal notranslate"><span class="pre">Atom</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.compound.Bond"><code class="docutils literal notranslate"><span class="pre">Bond</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.compound.Compound"><code class="docutils literal notranslate"><span class="pre">Compound</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#md-harmonize-reaction">md_harmonize.reaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.reaction.Reaction"><code class="docutils literal notranslate"><span class="pre">Reaction</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#md-harmonize-kegg-database-scraper">md_harmonize.KEGG_database_scraper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.KEGG_database_scraper.entry_list"><code class="docutils literal notranslate"><span class="pre">entry_list()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.KEGG_database_scraper.update_entity"><code class="docutils literal notranslate"><span class="pre">update_entity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.KEGG_database_scraper.curate_molfile"><code class="docutils literal notranslate"><span class="pre">curate_molfile()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.KEGG_database_scraper.download"><code class="docutils literal notranslate"><span class="pre">download()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#md-harmonize-kegg-parser">md_harmonize.KEGG_parser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.KEGG_parser.kegg_data_parser"><code class="docutils literal notranslate"><span class="pre">kegg_data_parser()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.KEGG_parser.parse_equation"><code class="docutils literal notranslate"><span class="pre">parse_equation()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.KEGG_parser.kegg_kcf_parser"><code class="docutils literal notranslate"><span class="pre">kegg_kcf_parser()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.KEGG_parser.reaction_center"><code class="docutils literal notranslate"><span class="pre">reaction_center</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.KEGG_parser.RpairParser"><code class="docutils literal notranslate"><span class="pre">RpairParser</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.KEGG_parser.create_compound_kcf"><code class="docutils literal notranslate"><span class="pre">create_compound_kcf()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.KEGG_parser.create_reactions"><code class="docutils literal notranslate"><span class="pre">create_reactions()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.KEGG_parser.compound_pair_mappings"><code class="docutils literal notranslate"><span class="pre">compound_pair_mappings()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.KEGG_parser.create_atom_mappings"><code class="docutils literal notranslate"><span class="pre">create_atom_mappings()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#md-harmonize-metacyc-parser">md_harmonize.MetaCyc_parser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.MetaCyc_parser.reaction_side_parser"><code class="docutils literal notranslate"><span class="pre">reaction_side_parser()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.MetaCyc_parser.generate_one_to_one_mappings"><code class="docutils literal notranslate"><span class="pre">generate_one_to_one_mappings()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.MetaCyc_parser.atom_mappings_parser"><code class="docutils literal notranslate"><span class="pre">atom_mappings_parser()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.MetaCyc_parser.reaction_parser"><code class="docutils literal notranslate"><span class="pre">reaction_parser()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.MetaCyc_parser.create_reactions"><code class="docutils literal notranslate"><span class="pre">create_reactions()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#md-harmonize-aromatics">md_harmonize.aromatics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.aromatics.AromaticManager"><code class="docutils literal notranslate"><span class="pre">AromaticManager</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#md-harmonize-harmonization">md_harmonize.harmonization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.harmonization.HarmonizedEdge"><code class="docutils literal notranslate"><span class="pre">HarmonizedEdge</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.harmonization.HarmonizedCompoundEdge"><code class="docutils literal notranslate"><span class="pre">HarmonizedCompoundEdge</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.harmonization.HarmonizedReactionEdge"><code class="docutils literal notranslate"><span class="pre">HarmonizedReactionEdge</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.harmonization.HarmonizationManager"><code class="docutils literal notranslate"><span class="pre">HarmonizationManager</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.harmonization.CompoundHarmonizationManager"><code class="docutils literal notranslate"><span class="pre">CompoundHarmonizationManager</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.harmonization.ReactionHarmonizationManager"><code class="docutils literal notranslate"><span class="pre">ReactionHarmonizationManager</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.harmonization.harmonize_compound_list"><code class="docutils literal notranslate"><span class="pre">harmonize_compound_list()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#md_harmonize.harmonization.harmonize_reaction_list"><code class="docutils literal notranslate"><span class="pre">harmonize_reaction_list()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 </ul>
 </div>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">¶</a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
-</div>
+</section>
 
 
           </div>
           
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <h1 class="logo"><a href="#">md_harmonize</a></h1>
 
@@ -88,8 +120,17 @@
 
 
 
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="guide.html">User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">The md_harmonize Tutorial</a></li>
@@ -105,16 +146,6 @@
   </ul></li>
 </ul>
 </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
 
 
 
@@ -128,11 +159,11 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2022, Huan Jin & Hunter Moseley.
+      &#169;2022, Huan Jin & Hunter Moseley.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
       |
       <a href="_sources/index.rst.txt"

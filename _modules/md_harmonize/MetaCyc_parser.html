@@ -1,24 +1,24 @@
-
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <title>md_harmonize.MetaCyc_parser &#8212; md_harmonize 1.0.4 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>md_harmonize.MetaCyc_parser &#8212; md_harmonize 1.0.5 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=d55fa986"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
+
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  
 
   </head><body>
   
@@ -44,15 +44,17 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">tools</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">reaction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">tools</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">reaction</span>
 
 
-<div class="viewcode-block" id="reaction_side_parser"><a class="viewcode-back" href="../../api.html#md_harmonize.MetaCyc_parser.reaction_side_parser">[docs]</a><span class="k">def</span> <span class="nf">reaction_side_parser</span><span class="p">(</span><span class="n">reaction_side</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="reaction_side_parser">
+<a class="viewcode-back" href="../../api.html#md_harmonize.MetaCyc_parser.reaction_side_parser">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">reaction_side_parser</span><span class="p">(</span><span class="n">reaction_side</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is to parse FROM_SIDE or TO_SIDE in the reaction.</span>
 
 <span class="sd">    eg: FROM-SIDE - (CPD-9147 0 8) (OXYGEN-MOLECULE 9 10)</span>
@@ -88,8 +90,11 @@
     <span class="k">return</span> <span class="n">compounds</span></div>
 
 
-<div class="viewcode-block" id="generate_one_to_one_mappings"><a class="viewcode-back" href="../../api.html#md_harmonize.MetaCyc_parser.generate_one_to_one_mappings">[docs]</a><span class="k">def</span> <span class="nf">generate_one_to_one_mappings</span><span class="p">(</span><span class="n">from_side</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">to_side</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="generate_one_to_one_mappings">
+<a class="viewcode-back" href="../../api.html#md_harmonize.MetaCyc_parser.generate_one_to_one_mappings">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_one_to_one_mappings</span><span class="p">(</span><span class="n">from_side</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">to_side</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    To generate the one to one atom mappings between two the sides of a metabolic reaction.</span>
 
 <span class="sd">    :param from_side: the dictionary of compounds with their corresponding start and end atom indices in the from_side.</span>
@@ -119,8 +124,11 @@
     <span class="k">return</span> <span class="n">one_to_one_mappings</span></div>
 
 
-<div class="viewcode-block" id="atom_mappings_parser"><a class="viewcode-back" href="../../api.html#md_harmonize.MetaCyc_parser.atom_mappings_parser">[docs]</a><span class="k">def</span> <span class="nf">atom_mappings_parser</span><span class="p">(</span><span class="n">atom_mapping_text</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="atom_mappings_parser">
+<a class="viewcode-back" href="../../api.html#md_harmonize.MetaCyc_parser.atom_mappings_parser">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">atom_mappings_parser</span><span class="p">(</span><span class="n">atom_mapping_text</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is to parse the MetaCyc reaction with atom mappings.</span>
 
 <span class="sd">    eg:</span>
@@ -165,8 +173,11 @@
     <span class="k">return</span> <span class="n">reaction_dicts</span></div>
 
 
-<div class="viewcode-block" id="reaction_parser"><a class="viewcode-back" href="../../api.html#md_harmonize.MetaCyc_parser.reaction_parser">[docs]</a><span class="k">def</span> <span class="nf">reaction_parser</span><span class="p">(</span><span class="n">reaction_text</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="reaction_parser">
+<a class="viewcode-back" href="../../api.html#md_harmonize.MetaCyc_parser.reaction_parser">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">reaction_parser</span><span class="p">(</span><span class="n">reaction_text</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is used to parse MetaCyc reaction.</span>
 
 <span class="sd">    eg:</span>
@@ -253,8 +264,11 @@
     <span class="k">return</span> <span class="n">reaction_dicts</span></div>
 
 
-<div class="viewcode-block" id="create_reactions"><a class="viewcode-back" href="../../api.html#md_harmonize.MetaCyc_parser.create_reactions">[docs]</a><span class="k">def</span> <span class="nf">create_reactions</span><span class="p">(</span><span class="n">reaction_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">atom_mapping_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="create_reactions">
+<a class="viewcode-back" href="../../api.html#md_harmonize.MetaCyc_parser.create_reactions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_reactions</span><span class="p">(</span><span class="n">reaction_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">atom_mapping_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    To molfile_name MetaCyc reaction entities.</span>
 
 <span class="sd">    :param reaction_file: the path to the reaction file.</span>
@@ -292,13 +306,14 @@
                                            <span class="n">this_mappings</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">reactions</span></div>
 
+
 </pre></div>
 
           </div>
           
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <h1 class="logo"><a href="../../index.html">md_harmonize</a></h1>
 
@@ -309,8 +324,17 @@
 
 
 
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../guide.html">User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">The md_harmonize Tutorial</a></li>
@@ -327,16 +351,6 @@
   </ul></li>
 </ul>
 </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
 
 
 
@@ -350,11 +364,11 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2022, Huan Jin & Hunter Moseley.
+      &#169;2022, Huan Jin & Hunter Moseley.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
     </div>
 

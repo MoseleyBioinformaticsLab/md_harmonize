@@ -1,24 +1,24 @@
-
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <title>md_harmonize.compound &#8212; md_harmonize 1.0.4 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>md_harmonize.compound &#8212; md_harmonize 1.0.5 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=d55fa986"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
+
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  
 
   </head><body>
   
@@ -43,36 +43,41 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">import</span> <span class="nn">heapq</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span> <span class="nn">ctfile</span>
-<span class="kn">import</span> <span class="nn">itertools</span> 
-<span class="kn">from</span> <span class="nn">.supplement</span> <span class="kn">import</span> <span class="n">not_r_groups</span>
-<span class="kn">from</span> <span class="nn">.supplement</span> <span class="kn">import</span> <span class="n">standard_bond_counts</span>
-<span class="kn">from</span> <span class="nn">.supplement</span> <span class="kn">import</span> <span class="n">atomic_weights</span>
-<span class="kn">from</span> <span class="nn">.supplement</span> <span class="kn">import</span> <span class="n">metal_symbols</span>
-<span class="kn">from</span> <span class="nn">.supplement</span> <span class="kn">import</span> <span class="n">index_to_charge</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">tools</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">heapq</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ctfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">log</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.supplement</span><span class="w"> </span><span class="kn">import</span> <span class="n">not_r_groups</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.supplement</span><span class="w"> </span><span class="kn">import</span> <span class="n">standard_bond_counts</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.supplement</span><span class="w"> </span><span class="kn">import</span> <span class="n">atomic_weights</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.supplement</span><span class="w"> </span><span class="kn">import</span> <span class="n">metal_symbols</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.supplement</span><span class="w"> </span><span class="kn">import</span> <span class="n">index_to_charge</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">tools</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">BASS</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">BASS</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">uncythonized_BASS</span> <span class="k">as</span> <span class="n">BASS</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">uncythonized_BASS</span> <span class="k">as</span> <span class="n">BASS</span>
 
 
-<div class="viewcode-block" id="Atom"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom">[docs]</a><span class="k">class</span> <span class="nc">Atom</span><span class="p">:</span>
+<div class="viewcode-block" id="Atom">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Atom</span><span class="p">:</span>
 
-    <span class="sd">&quot;&quot;&quot; Atom class describes the :class:`~md_harmonize.compound.Atom` entity in the compound. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Atom class describes the :class:`~md_harmonize.compound.Atom` entity in the compound. &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Atom.__init__"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">atom_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+<div class="viewcode-block" id="Atom.__init__">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">atom_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
                  <span class="n">mass_difference</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">charge</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">atom_stereo_parity</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
                  <span class="n">hydrogen_count</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">stereo_care_box</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">valence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">h0designator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
                  <span class="n">atom_atom_mapping_number</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">inversion_retention_flag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">exact_change_flag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
                  <span class="n">kat</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">in_cycle</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Atom initializer.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Atom initializer.</span>
 
 <span class="sd">        :param atom_symbol: atom_symbol.</span>
 <span class="sd">        :param atom_number: atom_number.</span>
@@ -124,8 +129,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">default_symbol</span> <span class="o">=</span> <span class="s2">&quot;R&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_r</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_symbol</span></div>
 
 
-<div class="viewcode-block" id="Atom.update_symbol"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.update_symbol">[docs]</a>    <span class="k">def</span> <span class="nf">update_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Atom.update_symbol">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.update_symbol">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To update the atom symbol.</span>
 
 <span class="sd">        :param symbol: the updated atom symbol.</span>
@@ -134,8 +142,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">atom_symbol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_symbol</span> <span class="o">=</span> <span class="n">symbol</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_symbol</span></div>
 
-<div class="viewcode-block" id="Atom.update_atom_number"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.update_atom_number">[docs]</a>    <span class="k">def</span> <span class="nf">update_atom_number</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Atom.update_atom_number">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.update_atom_number">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_atom_number</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To update the atom number.</span>
 
 <span class="sd">        :param index: the updated atom number.</span>
@@ -144,8 +155,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">atom_number</span> <span class="o">=</span> <span class="n">index</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_number</span></div>
 
-<div class="viewcode-block" id="Atom.remove_neighbors"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.remove_neighbors">[docs]</a>    <span class="k">def</span> <span class="nf">remove_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Atom.remove_neighbors">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.remove_neighbors">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To remove neighbors from the atom.</span>
 
 <span class="sd">        :param neighbors: the list of neighbors that will be removed from this atom.</span>
@@ -156,8 +170,11 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">atom_index</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span></div>
 
-<div class="viewcode-block" id="Atom.add_neighbors"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.add_neighbors">[docs]</a>    <span class="k">def</span> <span class="nf">add_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Atom.add_neighbors">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.add_neighbors">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To add neighbors to the atom.</span>
 
 <span class="sd">        :param neighbors: the list of neighbors that will be added to this atom.</span>
@@ -168,8 +185,11 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom_index</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span></div>
 
-<div class="viewcode-block" id="Atom.update_stereochemistry"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.update_stereochemistry">[docs]</a>    <span class="k">def</span> <span class="nf">update_stereochemistry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stereo</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Atom.update_stereochemistry">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.update_stereochemistry">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_stereochemistry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stereo</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To update the atom stereochemistry.</span>
 
 <span class="sd">        :param stereo: the updated atom stereochemistry.</span>
@@ -177,9 +197,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom_stereo_parity</span> <span class="o">=</span> <span class="n">stereo</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_stereo_parity</span></div>
+
     
-<div class="viewcode-block" id="Atom.color_atom"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.color_atom">[docs]</a>    <span class="k">def</span> <span class="nf">color_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isotope_resolved</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">charge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">atom_stereo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Atom.color_atom">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.color_atom">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">color_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isotope_resolved</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">charge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">atom_stereo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To generate the atom color of the zero layer.</span>
 
 <span class="sd">        :param isotope_resolved: If true, add isotope information when constructing colors.</span>
@@ -198,8 +221,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">color_0</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">color_0</span></div>
 
-<div class="viewcode-block" id="Atom.reset_color"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.reset_color">[docs]</a>    <span class="k">def</span> <span class="nf">reset_color</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Atom.reset_color">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.reset_color">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_color</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reset the atom color.</span>
 
 <span class="sd">        :return: None.</span>
@@ -207,9 +233,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">color_0</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">color_layers</span> <span class="o">=</span> <span class="p">{}</span></div>
+
     
-<div class="viewcode-block" id="Atom.update_kat"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.update_kat">[docs]</a>    <span class="k">def</span> <span class="nf">update_kat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kat</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Atom.update_kat">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.update_kat">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_kat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kat</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To update the atom KEGG atom type.</span>
 
 <span class="sd">        :param kat: the KEGG atom type for this atom,</span>
@@ -218,8 +247,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">kat</span> <span class="o">=</span> <span class="n">kat</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">kat</span></div>
 
-<div class="viewcode-block" id="Atom.update_cycle"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.update_cycle">[docs]</a>    <span class="k">def</span> <span class="nf">update_cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cycle_status</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Atom.update_cycle">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.update_cycle">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cycle_status</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To update the cycle status of the atom</span>
 
 <span class="sd">        :param cycle_status: whether the atom is in cycle</span>
@@ -228,8 +260,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">in_cycle</span> <span class="o">=</span> <span class="n">cycle_status</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_cycle</span></div>
 
-<div class="viewcode-block" id="Atom.clone"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Atom.clone">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Atom.clone">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To clone the atom.</span>
 
 <span class="sd">        :return: the cloned atom.</span>
@@ -240,16 +275,22 @@
                     <span class="n">stereo_care_box</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stereo_care_box</span><span class="p">,</span> <span class="n">valence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">valence</span><span class="p">,</span> <span class="n">h0designator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">h0designator</span><span class="p">,</span>
                     <span class="n">atom_atom_mapping_number</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_atom_mapping_number</span><span class="p">,</span>
                     <span class="n">inversion_retention_flag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inversion_retention_flag</span><span class="p">,</span> <span class="n">exact_change_flag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exact_change_flag</span><span class="p">,</span>
-                    <span class="n">kat</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kat</span><span class="p">,</span> <span class="n">in_cycle</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">in_cycle</span><span class="p">)</span></div></div>
+                    <span class="n">kat</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kat</span><span class="p">,</span> <span class="n">in_cycle</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">in_cycle</span><span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="Bond"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Bond">[docs]</a><span class="k">class</span> <span class="nc">Bond</span><span class="p">:</span>
 
-    <span class="sd">&quot;&quot;&quot; Bond class describes the :class:`~md_harmonize.compound.Bond` entity in the compound. &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Bond">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Bond">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Bond</span><span class="p">:</span>
 
-<div class="viewcode-block" id="Bond.__init__"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Bond.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first_atom_number</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">second_atom_number</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">bond_stereo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Bond class describes the :class:`~md_harmonize.compound.Bond` entity in the compound. &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Bond.__init__">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Bond.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first_atom_number</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">second_atom_number</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">bond_stereo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
                  <span class="n">bond_topology</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">reacting_center_status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Bond initializer.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Bond initializer.</span>
 
 <span class="sd">        :param first_atom_number: the index of the first atom forming this bond.</span>
 <span class="sd">        :param second_atom_number: the index of the second atom forming this bond.</span>
@@ -265,9 +306,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">bond_stereo</span> <span class="o">=</span> <span class="n">bond_stereo</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">if</span> <span class="n">bond_stereo</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;4&quot;</span> <span class="ow">and</span> <span class="n">bond_stereo</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;8&quot;</span> <span class="k">else</span> <span class="s2">&quot;0&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bond_topology</span> <span class="o">=</span> <span class="n">bond_topology</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reacting_center_status</span> <span class="o">=</span> <span class="n">reacting_center_status</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+
  
-<div class="viewcode-block" id="Bond.update_bond_type"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Bond.update_bond_type">[docs]</a>    <span class="k">def</span> <span class="nf">update_bond_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Bond.update_bond_type">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Bond.update_bond_type">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_bond_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To update the bond type.</span>
 
 <span class="sd">        :param bond_type: the updated bond type.</span>
@@ -276,8 +320,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">bond_type</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">bond_type</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_type</span></div>
 
-<div class="viewcode-block" id="Bond.update_stereochemistry"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Bond.update_stereochemistry">[docs]</a>    <span class="k">def</span> <span class="nf">update_stereochemistry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stereo</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Bond.update_stereochemistry">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Bond.update_stereochemistry">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_stereochemistry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stereo</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To update the bond stereochemistry.</span>
 
 <span class="sd">        :param stereo: the updated bond stereochemistry.</span>
@@ -286,8 +333,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">bond_stereo</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">stereo</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_stereo</span></div>
 
-<div class="viewcode-block" id="Bond.update_first_atom"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Bond.update_first_atom">[docs]</a>    <span class="k">def</span> <span class="nf">update_first_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Bond.update_first_atom">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Bond.update_first_atom">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_first_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To update the first atom number of the bond.</span>
 
 <span class="sd">        :param index: the updated first atom number.</span>
@@ -296,8 +346,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">first_atom_number</span> <span class="o">=</span> <span class="n">index</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">first_atom_number</span></div>
 
-<div class="viewcode-block" id="Bond.update_second_atom"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Bond.update_second_atom">[docs]</a>    <span class="k">def</span> <span class="nf">update_second_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Bond.update_second_atom">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Bond.update_second_atom">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_second_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To update the second atom number of the bond.</span>
 
 <span class="sd">        :param index: the updated second atom number.</span>
@@ -306,23 +359,32 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">second_atom_number</span> <span class="o">=</span> <span class="n">index</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">second_atom_number</span></div>
 
-<div class="viewcode-block" id="Bond.clone"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Bond.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Bond.clone">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Bond.clone">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To clone the bond.</span>
 
 <span class="sd">        :return: the cloned bond.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Bond</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">first_atom_number</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">second_atom_number</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_type</span><span class="p">,</span>
                     <span class="n">bond_stereo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_stereo</span><span class="p">,</span> <span class="n">bond_topology</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_topology</span><span class="p">,</span>
-                    <span class="n">reacting_center_status</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reacting_center_status</span><span class="p">)</span></div></div>
+                    <span class="n">reacting_center_status</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reacting_center_status</span><span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="Compound"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound">[docs]</a><span class="k">class</span> <span class="nc">Compound</span><span class="p">:</span>
 
-    <span class="sd">&quot;&quot;&quot; Compound class describes the :class:`~md_harmonize.compound.Compound` entity. &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Compound">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Compound</span><span class="p">:</span>
 
-<div class="viewcode-block" id="Compound.__init__"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compound_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">atoms</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">bonds</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Compound initializer.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Compound class describes the :class:`~md_harmonize.compound.Compound` entity. &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.__init__">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compound_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">atoms</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">bonds</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compound initializer.</span>
 
 <span class="sd">        :param compound_name: the compound name.</span>
 <span class="sd">        :param atoms: a list of :class:`~md_harmonize.compound.Atom` entities in the compound.</span>
@@ -348,8 +410,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">calculate_distance_to_r_groups</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_distance_matrix</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To generate the string representation of the compound.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -360,26 +423,31 @@
             <span class="nb">str</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> </span><span class="si">{1}</span><span class="s2"> </span><span class="si">{2}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">first_atom_number</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">second_atom_number</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">bond_type</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">str</span>
 
-<div class="viewcode-block" id="Compound.encode"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Compound.encode">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.encode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To clone the compound.</span>
 
 <span class="sd">        :return: the cloned compound.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">],</span> <span class="p">[</span><span class="n">bond</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span> <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">]</span></div>
 
+
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To get the compound name.</span>
 
 <span class="sd">        :return: the compound name.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compound_name</span>
 
-<div class="viewcode-block" id="Compound.molfile_name"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.molfile_name">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">molfile_name</span><span class="p">(</span><span class="n">molfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Compound.molfile_name">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.molfile_name">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">molfile_name</span><span class="p">(</span><span class="n">molfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create the compound entity based on the molfile representation.</span>
 
 <span class="sd">        :param molfile: the filename of the molfile.</span>
@@ -401,9 +469,10 @@
             <span class="nb">print</span><span class="p">(</span><span class="n">compound_name</span> <span class="o">+</span> <span class="s2">&quot; cannot not be converted to ctifle object&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span></div>
 
+
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">formula</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">formula</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To construct the formula of this compound (only consider heavy atoms).</span>
 
 <span class="sd">        :return: string formula of the compound.</span>
@@ -419,8 +488,8 @@
         <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span> <span class="n">char</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">counter</span><span class="p">[</span><span class="n">char</span><span class="p">])</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">counter</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="p">])</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">composition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">composition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To get the atom symbols and bond types in the compound.</span>
 
 <span class="sd">        :return: the atom and bond information of the compound</span>
@@ -431,24 +500,29 @@
         <span class="k">return</span> <span class="n">atom_composition</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">r_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">r_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To get all the R groups in the compound.</span>
 
 <span class="sd">        :return: the list of index of all the R groups.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">index</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">is_r</span><span class="p">]</span>
 
-<div class="viewcode-block" id="Compound.contains_r_groups"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.contains_r_groups">[docs]</a>    <span class="k">def</span> <span class="nf">contains_r_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Compound.contains_r_groups">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.contains_r_groups">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">contains_r_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To check if the compound contains R group(s).</span>
 
 <span class="sd">        :return: bool whether the compound contains R group.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_groups</span> <span class="o">!=</span> <span class="p">[]</span></div>
 
-<div class="viewcode-block" id="Compound.has_isolated_atoms"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.has_isolated_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">has_isolated_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.has_isolated_atoms">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.has_isolated_atoms">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_isolated_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To check if the compound has atoms that have no connections to other atoms.</span>
 
 <span class="sd">        :return: bool whether the compound has isolated atoms.</span>
@@ -458,9 +532,10 @@
                 <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
+
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">metal_index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">metal_index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To get the metal elements in the compound.</span>
 
 <span class="sd">        :return: a list of atom numbers of metal elements.</span>
@@ -468,8 +543,8 @@
         <span class="k">return</span> <span class="p">[</span><span class="n">index</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">default_symbol</span> <span class="ow">in</span> <span class="n">metal_symbols</span><span class="p">]</span>
     
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">h_index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">h_index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To get all H in the compound.</span>
 
 <span class="sd">        :return: a list of atom numbers corresponding to H.</span>
@@ -477,8 +552,8 @@
         <span class="k">return</span> <span class="p">[</span><span class="n">index</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">default_symbol</span> <span class="o">==</span> <span class="s2">&quot;H&quot;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">heavy_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">heavy_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To get all the heavy atoms in the compound.</span>
 
 <span class="sd">        :return: a list of atom numbers corresponding to heavy atoms.</span>
@@ -486,8 +561,8 @@
         <span class="k">return</span> <span class="p">[</span><span class="n">atom</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">default_symbol</span> <span class="o">!=</span> <span class="s2">&quot;H&quot;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">index_of_heavy_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">index_of_heavy_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To map the atom number to index in the heavy atom list.</span>
 
 <span class="sd">        :return: the dictionary of atom number to atom index of heavy atoms.</span>
@@ -502,8 +577,10 @@
     <span class="c1">#             return False</span>
     <span class="c1">#     return True</span>
        
-<div class="viewcode-block" id="Compound.color_groups"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.color_groups">[docs]</a>    <span class="k">def</span> <span class="nf">color_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">excluded</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Compound.color_groups">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.color_groups">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">color_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">excluded</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To update the compound color groups after coloring.</span>
 
 <span class="sd">        :return: the dictionary of atom color with the list of atom number.</span>
@@ -516,8 +593,11 @@
                 <span class="n">color_groups</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">color</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">atom_number</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">color_groups</span></div>
 
-<div class="viewcode-block" id="Compound.detect_abnormal_atom"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.detect_abnormal_atom">[docs]</a>    <span class="k">def</span> <span class="nf">detect_abnormal_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.detect_abnormal_atom">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.detect_abnormal_atom">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">detect_abnormal_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To find the atoms with invalid bond counts.</span>
 
 <span class="sd">        :return: a list of atom numbers with invalid bond counts.</span>
@@ -535,8 +615,11 @@
                         <span class="n">abnormal_atoms</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">default_symbol</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">abnormal_atoms</span></div>
 
-<div class="viewcode-block" id="Compound.curate_invalid_n"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.curate_invalid_n">[docs]</a>    <span class="k">def</span> <span class="nf">curate_invalid_n</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.curate_invalid_n">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.curate_invalid_n">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">curate_invalid_n</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To curate the charge of invalid N atoms.</span>
 
 <span class="sd">        :return: None.</span>
@@ -551,6 +634,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">neighbor</span><span class="p">]</span><span class="o">.</span><span class="n">charge</span> <span class="o">-=</span> <span class="mi">1</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">bond_lookup</span><span class="p">[(</span><span class="n">atom</span><span class="o">.</span><span class="n">atom_number</span><span class="p">,</span> <span class="n">neighbor</span><span class="p">)]</span><span class="o">.</span><span class="n">update_stereochemistry</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">)</span></div>
 
+
     <span class="c1"># def metals(self):</span>
     <span class="c1">#     &quot;&quot;&quot;</span>
     <span class="c1">#     To get all the metals in the compound.</span>
@@ -563,8 +647,10 @@
     <span class="c1">#             metals[atom.default_symbol].append(index)</span>
     <span class="c1">#     return metals</span>
 
-<div class="viewcode-block" id="Compound.update_aromatic_bond_type"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.update_aromatic_bond_type">[docs]</a>    <span class="k">def</span> <span class="nf">update_aromatic_bond_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cycles</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Compound.update_aromatic_bond_type">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.update_aromatic_bond_type">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_aromatic_bond_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cycles</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the aromatic bond types.</span>
 <span class="sd">        Two cases: 1) change the bond in the aromatic ring to aromatic bond (bond type = 4); 2) change the double bond connecting to the aromatic ring to single bond.</span>
 
@@ -579,6 +665,7 @@
         <span class="n">bond_out_of_cycle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_double_bond_connecting_cycle</span><span class="p">(</span><span class="n">atom_in_cycle</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">bond_out_of_cycle</span><span class="p">:</span>
             <span class="n">bond</span><span class="o">.</span><span class="n">update_bond_type</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">)</span></div>
+
 
     <span class="c1"># def update_aromatic_bond(self, aromatic_bonds, aromatic_atoms):</span>
     <span class="c1">#    &quot;&quot;&quot;</span>
@@ -601,8 +688,10 @@
     <span class="c1">#    for bond in bond_out_of_cycle:</span>
     <span class="c1">#        bond.update_bond_type(&quot;1&quot;)</span>
 
-<div class="viewcode-block" id="Compound.extract_double_bond_connecting_cycle"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.extract_double_bond_connecting_cycle">[docs]</a>    <span class="k">def</span> <span class="nf">extract_double_bond_connecting_cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_in_cycle</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Compound.extract_double_bond_connecting_cycle">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.extract_double_bond_connecting_cycle">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">extract_double_bond_connecting_cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_in_cycle</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To extract the double bonds connecting to the atom in the aromatic cycles.</span>
 
 <span class="sd">        :param atom_in_cycle: the list of aromatic cycles represented by aromatic atom index.</span>
@@ -617,8 +706,11 @@
                         <span class="n">double_bond_connecting_cycle</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_lookup</span><span class="p">[(</span><span class="n">atom_index</span><span class="p">,</span> <span class="n">neighbor_index</span><span class="p">)])</span>
         <span class="k">return</span> <span class="n">double_bond_connecting_cycle</span></div>
 
-<div class="viewcode-block" id="Compound.extract_aromatic_bonds"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.extract_aromatic_bonds">[docs]</a>    <span class="k">def</span> <span class="nf">extract_aromatic_bonds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cycle</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.extract_aromatic_bonds">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.extract_aromatic_bonds">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">extract_aromatic_bonds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cycle</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract the aromatic bonds based on the atoms in the cycle.</span>
 
 <span class="sd">        :param cycle: the list of aromatic cycles represented by aromatic atom index.</span>
@@ -634,8 +726,11 @@
                 <span class="n">visited</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
         <span class="k">return</span> <span class="n">aromatic_bonds</span></div>
 
-<div class="viewcode-block" id="Compound.separate_connected_components"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.separate_connected_components">[docs]</a>    <span class="k">def</span> <span class="nf">separate_connected_components</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bonds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">set</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.separate_connected_components">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.separate_connected_components">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">separate_connected_components</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bonds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">set</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This is used in constructing the aromatic substructures detected by the Indigo method.</span>
 <span class="sd">        A compound can have several disjoint aromatic substructures. Here, we need to find the disjoint parts.</span>
 <span class="sd">        The basic idea is union-find. We union atoms that are connected by a bond.</span>
@@ -650,12 +745,12 @@
 
         <span class="n">parent_index</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">}</span>
 
-        <span class="k">def</span> <span class="nf">find_parent</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">find_parent</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">parent_index</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
                 <span class="n">parent_index</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">find_parent</span><span class="p">(</span><span class="n">parent_index</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
             <span class="k">return</span> <span class="n">parent_index</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
-        <span class="k">def</span> <span class="nf">union</span><span class="p">(</span><span class="n">p_1</span><span class="p">,</span> <span class="n">p_2</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">union</span><span class="p">(</span><span class="n">p_1</span><span class="p">,</span> <span class="n">p_2</span><span class="p">):</span>
             <span class="n">parent_index</span><span class="p">[</span><span class="n">p_1</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_2</span>
 
         <span class="k">for</span> <span class="n">atom_i</span><span class="p">,</span> <span class="n">atom_j</span> <span class="ow">in</span> <span class="n">bonds</span><span class="p">:</span>
@@ -670,8 +765,11 @@
             <span class="n">groups</span><span class="p">[</span><span class="n">p_i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">groups</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Compound.connected_components"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.connected_components">[docs]</a>    <span class="k">def</span> <span class="nf">connected_components</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.connected_components">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.connected_components">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">connected_components</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Detect the connected components in the compound structure (using the breadth first search).</span>
 <span class="sd">        Cases when not all the atoms are connected together.</span>
 
@@ -694,8 +792,11 @@
                 <span class="n">group_id</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">components</span></div>
 
-<div class="viewcode-block" id="Compound.calculate_distance_to_r_groups"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.calculate_distance_to_r_groups">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_distance_to_r_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.calculate_distance_to_r_groups">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.calculate_distance_to_r_groups">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_distance_to_r_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To calculate the distance of each atom to its nearest R group (using the dijkstra&#39;s algorithm).</span>
 
 <span class="sd">        :return: None:</span>
@@ -722,8 +823,11 @@
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dist</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">heavy_atoms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">distance_to_r</span> <span class="o">=</span> <span class="n">dist</span></div>
 
-<div class="viewcode-block" id="Compound.find_cycles"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.find_cycles">[docs]</a>    <span class="k">def</span> <span class="nf">find_cycles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">short_circuit</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">40</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.find_cycles">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.find_cycles">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_cycles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">short_circuit</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">40</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To find the cycles in the compound.</span>
 
 <span class="sd">        :param short_circuit: whether to take short path.</span>
@@ -738,6 +842,7 @@
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cycles in compound </span><span class="si">{0}</span><span class="s2"> can hardly be detected: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
             <span class="k">pass</span>
         <span class="k">return</span> <span class="p">[]</span></div>
+
 
     <span class="c1"># def find_cycles(self, short_circuit: bool = False, cutoff: int = 40, seconds: int = 50) -&gt; None:</span>
     <span class="c1">#     &quot;&quot;&quot;</span>
@@ -755,8 +860,10 @@
     <span class="c1">#         print(&quot;Cycles in compound {0} can hardly be detected: {1}&quot;.format(self.name, e))</span>
     <span class="c1">#         pass</span>
 
-<div class="viewcode-block" id="Compound.find_cycles_helper"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.find_cycles_helper">[docs]</a>    <span class="k">def</span> <span class="nf">find_cycles_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">short_circuit</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">40</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Compound.find_cycles_helper">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.find_cycles_helper">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_cycles_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">short_circuit</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">40</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executing function to find the cycles in the compound.</span>
 
 <span class="sd">        :param short_circuit: whether to take short path.</span>
@@ -765,7 +872,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">not_cyclic</span><span class="p">,</span> <span class="n">cyclic</span><span class="p">,</span> <span class="n">all_cycles</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
 
-        <span class="k">def</span> <span class="nf">prune</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">prune</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">terminate</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="k">for</span> <span class="n">prune_atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
@@ -777,7 +884,7 @@
                 <span class="k">if</span> <span class="n">terminate</span><span class="p">:</span>
                     <span class="k">break</span>
 
-        <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="n">start_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="n">start_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 
             <span class="c1"># the paths is a list of list, which means each path is a list.</span>
             <span class="n">paths</span><span class="p">,</span> <span class="n">cycles</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">([[</span><span class="n">start_index</span><span class="p">]]),</span> <span class="p">[]</span>
@@ -815,8 +922,11 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">has_cycle</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">sorted</span><span class="p">(</span><span class="n">i</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">all_cycles</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span><span class="p">])]</span></div>
 
-<div class="viewcode-block" id="Compound.structure_matrix"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.structure_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">structure_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resonance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">backbone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.structure_matrix">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.structure_matrix">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">structure_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resonance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">backbone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To construct graph structural matrix of this compound.</span>
 <span class="sd">        matrix[i][j] = 0 suggests the two atoms are not connected directly.</span>
 <span class="sd">        Other integer represented the bond type connecting the two atoms.</span>
@@ -838,9 +948,10 @@
                 <span class="n">matrix</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index_of_heavy_atoms</span><span class="p">[</span><span class="n">atom_2</span><span class="p">]][</span><span class="bp">self</span><span class="o">.</span><span class="n">index_of_heavy_atoms</span><span class="p">[</span><span class="n">atom_1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">bond_type</span>
         <span class="k">return</span> <span class="n">matrix</span></div>
 
+
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">distance_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">distance_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To construct the distance matrix of the compound (using the Floyd Warshall Algorithm).</span>
 <span class="sd">        distance[i][j] suggests the distance between atom i and j.</span>
 
@@ -865,8 +976,10 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_distance_matrix</span> <span class="o">=</span> <span class="n">distance_matrix</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_distance_matrix</span>
     
-<div class="viewcode-block" id="Compound.update_color_tuple"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.update_color_tuple">[docs]</a>    <span class="k">def</span> <span class="nf">update_color_tuple</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resonance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Compound.update_color_tuple">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.update_color_tuple">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_color_tuple</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resonance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To update the color tuple of the atoms in the compound. This color tuple includes information of its neighboring</span>
 <span class="sd">        atoms and bonds. Here, we don&#39;t need to consider backbone since this part was initially designed for aromatic</span>
 <span class="sd">        substructure detection and only double and single bonds are considered.</span>
@@ -889,10 +1002,13 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">atom</span><span class="o">.</span><span class="n">color_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="n">elements</span><span class="p">[</span><span class="s2">&quot;C&quot;</span><span class="p">],</span> <span class="n">elements</span><span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">],</span> <span class="n">elements</span><span class="p">[</span><span class="s2">&quot;S&quot;</span><span class="p">],</span> <span class="n">elements</span><span class="p">[</span><span class="s2">&quot;O&quot;</span><span class="p">],</span> <span class="n">bond_types</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">],</span>
                                     <span class="n">bond_types</span><span class="p">[</span><span class="s2">&quot;2&quot;</span><span class="p">])</span></div>
+
     
-<div class="viewcode-block" id="Compound.find_mappings"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.find_mappings">[docs]</a>    <span class="k">def</span> <span class="nf">find_mappings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_other</span><span class="p">,</span> <span class="n">resonance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">r_distance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<div class="viewcode-block" id="Compound.find_mappings">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.find_mappings">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_mappings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_other</span><span class="p">,</span> <span class="n">resonance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">r_distance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                       <span class="n">backbone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find the one to one atom mappings between two compounds using the BASS algorithm. The other compound  is supposed be</span>
 <span class="sd">        contained in the self compound.</span>
 
@@ -921,9 +1037,12 @@
             <span class="n">one_to_one_mappings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_mappings</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">one_to_one_mappings</span></div>
 
-<div class="viewcode-block" id="Compound.find_mappings_reversed"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.find_mappings_reversed">[docs]</a>    <span class="k">def</span> <span class="nf">find_mappings_reversed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_other</span><span class="p">,</span> <span class="n">resonance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">r_distance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+
+<div class="viewcode-block" id="Compound.find_mappings_reversed">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.find_mappings_reversed">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_mappings_reversed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_other</span><span class="p">,</span> <span class="n">resonance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">r_distance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                                <span class="n">backbone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find the one to one atom mappings between two compounds using the BASS algorithm. The self compound is supposed to</span>
 <span class="sd">        be contained in the other compound.</span>
 
@@ -953,8 +1072,11 @@
             <span class="n">one_to_one_mappings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_mappings</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">one_to_one_mappings</span></div>
 
-<div class="viewcode-block" id="Compound.map_resonance"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.map_resonance">[docs]</a>    <span class="k">def</span> <span class="nf">map_resonance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_other</span><span class="p">,</span> <span class="n">r_distance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.map_resonance">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.map_resonance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">map_resonance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_other</span><span class="p">,</span> <span class="n">r_distance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if the resonant mappings are valid between two compound structures.</span>
 
 <span class="sd">        :param the_other: the mappings compound entity.</span>
@@ -968,8 +1090,11 @@
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exception</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[]</span></div>
 
-<div class="viewcode-block" id="Compound.map_resonance_helper"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.map_resonance_helper">[docs]</a>    <span class="k">def</span> <span class="nf">map_resonance_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_other</span><span class="p">,</span> <span class="n">r_distance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.map_resonance_helper">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.map_resonance_helper">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">map_resonance_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_other</span><span class="p">,</span> <span class="n">r_distance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if the resonant mappings are valid between the two compound structures. If the mapped atoms don&#39;t share</span>
 <span class="sd">        the same local coloring identifier, we check if the difference is caused by the position of double bonds.</span>
 <span class="sd">        Find the three atoms involved in the resonant structure and check if one of the atoms is not C.</span>
@@ -1047,8 +1172,11 @@
                 <span class="n">valid_mappings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_mappings</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">valid_mappings</span></div>
 
-<div class="viewcode-block" id="Compound.find_double_bond_linked_atom"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.find_double_bond_linked_atom">[docs]</a>    <span class="k">def</span> <span class="nf">find_double_bond_linked_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.find_double_bond_linked_atom">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.find_double_bond_linked_atom">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_double_bond_linked_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find the atom that is doubly linked to the target atom i.</span>
 
 <span class="sd">        :param i: the ith atom in the compound.</span>
@@ -1059,8 +1187,11 @@
                 <span class="k">return</span> <span class="n">neighbor_index</span>
         <span class="k">return</span> <span class="o">-</span><span class="mi">1</span></div>
 
-<div class="viewcode-block" id="Compound.define_bond_stereochemistry"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.define_bond_stereochemistry">[docs]</a>    <span class="k">def</span> <span class="nf">define_bond_stereochemistry</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.define_bond_stereochemistry">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.define_bond_stereochemistry">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">define_bond_stereochemistry</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Define the stereochemistry of double bonds in the compound.</span>
 
 <span class="sd">        :return: None.</span>
@@ -1068,9 +1199,12 @@
         <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">bond</span><span class="o">.</span><span class="n">bond_type</span> <span class="o">==</span> <span class="s2">&quot;2&quot;</span><span class="p">:</span>
                 <span class="n">bond</span><span class="o">.</span><span class="n">update_stereochemistry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calculate_bond_stereochemistry</span><span class="p">(</span><span class="n">bond</span><span class="p">))</span></div>
+
     
-<div class="viewcode-block" id="Compound.calculate_bond_stereochemistry"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.calculate_bond_stereochemistry">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_bond_stereochemistry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bond</span><span class="p">:</span> <span class="n">Bond</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Compound.calculate_bond_stereochemistry">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.calculate_bond_stereochemistry">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_bond_stereochemistry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bond</span><span class="p">:</span> <span class="n">Bond</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the stereochemistry of the double bond based on its geometric properties. The line of the double bond divides</span>
 <span class="sd">        the plane into two parts. For the atoms forming the double bond, it normally has two branches. If the two</span>
 <span class="sd">        branches are not the same, we call them heavy side and light side (heavy side containing atoms with heavier</span>
@@ -1115,9 +1249,12 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="o">-</span><span class="mi">1</span></div>
 
-<div class="viewcode-block" id="Compound.calculate_y_coordinate"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.calculate_y_coordinate">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">calculate_y_coordinate</span><span class="p">(</span><span class="n">slope</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">atom</span><span class="p">:</span> <span class="n">Atom</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.calculate_y_coordinate">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.calculate_y_coordinate">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_y_coordinate</span><span class="p">(</span><span class="n">slope</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">atom</span><span class="p">:</span> <span class="n">Atom</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the y coordinate of the atom based on the linear function: y = slope * x + b</span>
 
 <span class="sd">        :param slope: the slope of the targeted line.</span>
@@ -1127,8 +1264,11 @@
 <span class="sd">    &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">atom</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">slope</span> <span class="o">+</span> <span class="n">b</span></div>
 
-<div class="viewcode-block" id="Compound.collect_atomic_weights_of_neighbors"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.collect_atomic_weights_of_neighbors">[docs]</a>    <span class="k">def</span> <span class="nf">collect_atomic_weights_of_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.collect_atomic_weights_of_neighbors">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.collect_atomic_weights_of_neighbors">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">collect_atomic_weights_of_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To collect the atomic weights of the current layer&#39;s neighbors.</span>
 
 <span class="sd">        :param neighbors: the list of atom numbers of neighbors.</span>
@@ -1138,8 +1278,11 @@
         <span class="n">neighbor_atomic_weights</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">neighbor_atomic_weights</span></div>
 
-<div class="viewcode-block" id="Compound.compare_branch_weights"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.compare_branch_weights">[docs]</a>    <span class="k">def</span> <span class="nf">compare_branch_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">atom_forming_double_bond</span><span class="p">:</span> <span class="n">Atom</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.compare_branch_weights">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.compare_branch_weights">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compare_branch_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">atom_forming_double_bond</span><span class="p">:</span> <span class="n">Atom</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To determine the heavy and light branches that connect to the atom forming the double bond. This is based on</span>
 <span class="sd">        comparison of the atomic weights of the two branches (breadth first algorithm).</span>
 
@@ -1180,8 +1323,11 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">one_atom</span><span class="p">,</span> <span class="n">one_atom</span></div>
 
-<div class="viewcode-block" id="Compound.get_next_layer_neighbors"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.get_next_layer_neighbors">[docs]</a>    <span class="k">def</span> <span class="nf">get_next_layer_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cur_layer_neighbors</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">visited</span><span class="p">:</span> <span class="nb">set</span><span class="p">,</span> <span class="n">excluded</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.get_next_layer_neighbors">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.get_next_layer_neighbors">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_next_layer_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cur_layer_neighbors</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">visited</span><span class="p">:</span> <span class="nb">set</span><span class="p">,</span> <span class="n">excluded</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To get the next layer&#39;s neighbors.</span>
 
 <span class="sd">        :param cur_layer_neighbors: the list of atom numbers of the current layer.</span>
@@ -1199,10 +1345,13 @@
                     <span class="n">visited</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">next_neighbor</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">next_layer_neighbors</span></div>
 
-<div class="viewcode-block" id="Compound.color_compound"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.color_compound">[docs]</a>    <span class="k">def</span> <span class="nf">color_compound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r_groups</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">bond_stereo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">atom_stereo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+
+<div class="viewcode-block" id="Compound.color_compound">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.color_compound">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">color_compound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r_groups</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">bond_stereo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">atom_stereo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                        <span class="n">resonance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">isotope_resolved</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">charge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                        <span class="n">backbone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To color the compound.</span>
 
 <span class="sd">        :param r_groups:  If true, add R groups in the coloring.</span>
@@ -1224,9 +1373,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">curate_invalid_symmetric_atoms</span><span class="p">(</span><span class="n">atoms_to_color</span><span class="p">,</span> <span class="n">excluded_index</span><span class="o">=</span><span class="n">excluded_index</span><span class="p">,</span> <span class="n">bond_stereo</span><span class="o">=</span><span class="n">bond_stereo</span><span class="p">,</span>
                                             <span class="n">resonance</span><span class="o">=</span><span class="n">resonance</span><span class="p">,</span> <span class="n">backbone</span><span class="o">=</span><span class="n">backbone</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">color_metal</span><span class="p">(</span><span class="n">bond_stereo</span><span class="o">=</span><span class="n">bond_stereo</span><span class="p">,</span> <span class="n">resonance</span><span class="o">=</span><span class="n">resonance</span><span class="p">)</span></div>
+
     
-<div class="viewcode-block" id="Compound.reset_color"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.reset_color">[docs]</a>    <span class="k">def</span> <span class="nf">reset_color</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Compound.reset_color">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.reset_color">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_color</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To set the color of atoms in the compound to be empty.</span>
 
 <span class="sd">        :return: None:</span>
@@ -1234,9 +1386,12 @@
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
             <span class="n">atom</span><span class="o">.</span><span class="n">reset_color</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Compound.generate_atom_zero_layer_color"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.generate_atom_zero_layer_color">[docs]</a>    <span class="k">def</span> <span class="nf">generate_atom_zero_layer_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isotope_resolved</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">charge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+
+<div class="viewcode-block" id="Compound.generate_atom_zero_layer_color">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.generate_atom_zero_layer_color">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_atom_zero_layer_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isotope_resolved</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">charge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                                        <span class="n">atom_stereo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To generate the color identifier of zero layer for each atom. We don&#39;t consider H and metals here.</span>
 
 <span class="sd">        :param isotope_resolved: If true, add isotope detail when constructing colors.</span>
@@ -1247,10 +1402,13 @@
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
             <span class="n">atom</span><span class="o">.</span><span class="n">color_atom</span><span class="p">(</span><span class="n">isotope_resolved</span><span class="o">=</span><span class="n">isotope_resolved</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="n">charge</span><span class="p">,</span> <span class="n">atom_stereo</span><span class="o">=</span><span class="n">atom_stereo</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Compound.generate_atom_color_with_neighbors"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.generate_atom_color_with_neighbors">[docs]</a>    <span class="k">def</span> <span class="nf">generate_atom_color_with_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_index</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">excluded</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">zero_core_color</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+
+<div class="viewcode-block" id="Compound.generate_atom_color_with_neighbors">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.generate_atom_color_with_neighbors">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_atom_color_with_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_index</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">excluded</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">zero_core_color</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
                                            <span class="n">zero_neighbor_color</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">resonance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                                            <span class="n">bond_stereo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">backbone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To generate the atom color with its neighbors. We add this color name when we try to incorporate neighbors&#39;</span>
 <span class="sd">        information in naming.</span>
 
@@ -1293,9 +1451,12 @@
             <span class="n">atom_color_with_neighbors</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom_color</span>
         <span class="k">return</span> <span class="n">atom_color_with_neighbors</span></div>
 
-<div class="viewcode-block" id="Compound.first_round_color"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.first_round_color">[docs]</a>    <span class="k">def</span> <span class="nf">first_round_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms_to_color</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">excluded_index</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">bond_stereo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+
+<div class="viewcode-block" id="Compound.first_round_color">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.first_round_color">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">first_round_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms_to_color</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">excluded_index</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">bond_stereo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                           <span class="n">resonance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">backbone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To do the first round of coloring this compound. We add neighbors&#39; information layer by layer to the atom&#39;s</span>
 <span class="sd">        color identifier until it has a unique identifier or all the atoms in the compound have been used for naming</span>
 <span class="sd">        (based on the breadth first search algorithm).</span>
@@ -1358,9 +1519,12 @@
                 <span class="n">atoms_to_color</span> <span class="o">=</span> <span class="n">atom_to_color_update</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
-<div class="viewcode-block" id="Compound.invalid_symmetric_atoms"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.invalid_symmetric_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">invalid_symmetric_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms_to_color</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">excluded_index</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">bond_stereo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+
+<div class="viewcode-block" id="Compound.invalid_symmetric_atoms">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.invalid_symmetric_atoms">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">invalid_symmetric_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms_to_color</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">excluded_index</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">bond_stereo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                                 <span class="n">resonance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">backbone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To check if atoms with the same color identifier are symmetric.</span>
 
 <span class="sd">        :param atoms_to_color: the list of atom numbers to be colored.</span>
@@ -1428,9 +1592,12 @@
                             <span class="n">flag</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="n">not_valid</span></div>
 
-<div class="viewcode-block" id="Compound.curate_invalid_symmetric_atoms"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.curate_invalid_symmetric_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">curate_invalid_symmetric_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms_to_color</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">excluded_index</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+
+<div class="viewcode-block" id="Compound.curate_invalid_symmetric_atoms">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.curate_invalid_symmetric_atoms">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">curate_invalid_symmetric_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms_to_color</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">excluded_index</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                                        <span class="n">bond_stereo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">resonance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">backbone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To curate the color identifiers of invalid symmetric atoms.</span>
 <span class="sd">        We recolor those invalid atoms using the full color identifiers of its neighbors layer by layer until the</span>
 <span class="sd">        difference can be captured.</span>
@@ -1444,6 +1611,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
         <span class="n">not_valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">invalid_symmetric_atoms</span><span class="p">(</span><span class="n">atoms_to_color</span><span class="p">,</span> <span class="n">excluded_index</span><span class="p">,</span> <span class="n">bond_stereo</span><span class="o">=</span><span class="n">bond_stereo</span><span class="p">,</span>
                                                  <span class="n">resonance</span><span class="o">=</span><span class="n">resonance</span><span class="p">,</span> <span class="n">backbone</span><span class="o">=</span><span class="n">backbone</span><span class="p">)</span>
+        <span class="n">n_iters</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">max_iters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">atoms_to_color</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="k">while</span> <span class="n">not_valid</span><span class="p">:</span>
             <span class="n">atom_color_with_neighbors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_atom_color_with_neighbors</span><span class="p">(</span><span class="n">atoms_to_color</span><span class="p">,</span> <span class="n">excluded</span><span class="o">=</span><span class="n">excluded_index</span><span class="p">,</span>
                                                                                 <span class="n">zero_core_color</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -1470,10 +1639,18 @@
                                                                                 <span class="n">excluded</span><span class="o">=</span><span class="n">excluded_index</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">atom_index</span><span class="p">]</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">atom_color</span>
             <span class="n">not_valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">invalid_symmetric_atoms</span><span class="p">(</span><span class="n">atoms_to_color</span><span class="p">,</span> <span class="n">excluded_index</span><span class="p">,</span> <span class="n">bond_stereo</span><span class="o">=</span><span class="n">bond_stereo</span><span class="p">,</span>
-                                                     <span class="n">resonance</span><span class="o">=</span><span class="n">resonance</span><span class="p">,</span> <span class="n">backbone</span><span class="o">=</span><span class="n">backbone</span><span class="p">)</span></div>
+                                                     <span class="n">resonance</span><span class="o">=</span><span class="n">resonance</span><span class="p">,</span> <span class="n">backbone</span><span class="o">=</span><span class="n">backbone</span><span class="p">)</span>
+            <span class="n">n_iters</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">n_iters</span> <span class="o">==</span> <span class="n">max_iters</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;The curation of invalid symmetric atoms was halted for compound of ID </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> to avoid an infinite loop.&#39;</span><span class="p">)</span>
+                <span class="k">break</span></div>
 
-<div class="viewcode-block" id="Compound.color_metal"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.color_metal">[docs]</a>    <span class="k">def</span> <span class="nf">color_metal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bond_stereo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">resonance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">backbone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.color_metal">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.color_metal">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">color_metal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bond_stereo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">resonance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">backbone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To color the metals in the compound. Here we just incorporate information of directly connected atoms.</span>
 
 <span class="sd">        :param bond_stereo: If true, add bond stereo detail when constructing colors.</span>
@@ -1489,9 +1666,12 @@
                                                                             <span class="n">backbone</span><span class="o">=</span><span class="n">backbone</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">atom_index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metal_index</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">atom_index</span><span class="p">]</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">atom_color_with_neighbors</span><span class="p">[</span><span class="n">atom_index</span><span class="p">]</span></div>
+
       
-<div class="viewcode-block" id="Compound.color_h"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.color_h">[docs]</a>    <span class="k">def</span> <span class="nf">color_h</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bond_stereo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">resonance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">backbone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Compound.color_h">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.color_h">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">color_h</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bond_stereo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">resonance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">backbone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To color the H in the compound. Here we just incorporate information of directly connected atoms.</span>
 
 <span class="sd">        :param bond_stereo:  If true, add bond stereo detail when constructing colors.</span>
@@ -1506,8 +1686,11 @@
         <span class="k">for</span> <span class="n">atom_index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_index</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">atom_index</span><span class="p">]</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">atom_color_with_neighbors</span><span class="p">[</span><span class="n">atom_index</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Compound.metal_color_identifier"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.metal_color_identifier">[docs]</a>    <span class="k">def</span> <span class="nf">metal_color_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">details</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.metal_color_identifier">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.metal_color_identifier">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">metal_color_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">details</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To generate the metal coloring string representation.</span>
 
 <span class="sd">        :param details: if true,  to use full metal color when constructing identifier.</span>
@@ -1518,9 +1701,12 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">color_counter</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">color_0</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metal_index</span><span class="p">])</span>
         <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;(</span><span class="si">{0}</span><span class="s2">)(</span><span class="si">{1}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">color_counter</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">color_counter</span><span class="p">)])</span></div>
+
     
-<div class="viewcode-block" id="Compound.h_color_identifier"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.h_color_identifier">[docs]</a>    <span class="k">def</span> <span class="nf">h_color_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">details</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Compound.h_color_identifier">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.h_color_identifier">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">h_color_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">details</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To generate the H coloring string representation.</span>
 
 <span class="sd">        :param details: if true, use the full H color when constructing identifier.</span>
@@ -1532,8 +1718,11 @@
             <span class="n">color_counter</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">color_0</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_index</span><span class="p">])</span>
         <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;(</span><span class="si">{0}</span><span class="s2">)(</span><span class="si">{1}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">color_counter</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">color_counter</span><span class="p">)])</span></div>
 
-<div class="viewcode-block" id="Compound.backbone_color_identifier"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.backbone_color_identifier">[docs]</a>    <span class="k">def</span> <span class="nf">backbone_color_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r_groups</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.backbone_color_identifier">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.backbone_color_identifier">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">backbone_color_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r_groups</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To generate the backbone coloring string representation for this compound. Exclude Hs and metals.</span>
 
 <span class="sd">        :param r_groups: whether to include the R group.</span>
@@ -1545,6 +1734,7 @@
         <span class="n">color_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">color_groups</span><span class="p">(</span><span class="n">excluded</span><span class="o">=</span><span class="n">excluded_index</span><span class="p">)</span>
         <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;(</span><span class="si">{0}</span><span class="s2">)(</span><span class="si">{1}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">color_groups</span><span class="p">[</span><span class="n">key</span><span class="p">]),</span> <span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">color_groups</span><span class="p">)])</span></div>
 
+
     <span class="c1"># To detect if this compound can be paired to the other compound.</span>
     <span class="c1"># Three cases: 1) Both compounds are specific compounds (no R groups); Just compare the coloring identifier.</span>
     <span class="c1">#              2) One compound contains R group(s);</span>
@@ -1552,8 +1742,10 @@
     <span class="c1"># If the two compounds can be paired, we need to determine their relationship by checking the chemical details (eg:</span>
     <span class="c1"># bond stereochemistry and atom stereochemistry.</span>
 
-<div class="viewcode-block" id="Compound.get_chemical_details"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.get_chemical_details">[docs]</a>    <span class="k">def</span> <span class="nf">get_chemical_details</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">excluded</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Compound.get_chemical_details">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.get_chemical_details">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_chemical_details</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">excluded</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To get the chemical details of the compound, which include the atom stereo chemistry and bond stereo chemistry.</span>
 <span class="sd">        This is to compare the compound with the same structures (or the same color identifiers).</span>
 
@@ -1575,9 +1767,12 @@
         <span class="n">chemical_details</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">chemical_details</span></div>
 
-<div class="viewcode-block" id="Compound.compare_chemical_details"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.compare_chemical_details">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">compare_chemical_details</span><span class="p">(</span><span class="n">one_chemical_details</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">the_other_chemical_details</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.compare_chemical_details">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.compare_chemical_details">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compare_chemical_details</span><span class="p">(</span><span class="n">one_chemical_details</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">the_other_chemical_details</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To compare the chemical details of the two compounds.</span>
 
 <span class="sd">        Then return the relationship between the two compounds.</span>
@@ -1611,8 +1806,11 @@
         <span class="k">elif</span> <span class="n">the_other_more</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">the_other_more</span><span class="p">)</span> <span class="c1"># the_other_compound is more specific than one_compound</span></div>
 
-<div class="viewcode-block" id="Compound.same_structure_relationship"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.same_structure_relationship">[docs]</a>    <span class="k">def</span> <span class="nf">same_structure_relationship</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_other_compound</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.same_structure_relationship">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.same_structure_relationship">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">same_structure_relationship</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_other_compound</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To determine the relationship of two compounds with the same structure.</span>
 
 <span class="sd">        :param the_other_compound: the other :class:`~md_harmonize.compound.Compound` entity.</span>
@@ -1623,8 +1821,11 @@
         <span class="c1"># return relationship and atom mappings.</span>
         <span class="k">return</span> <span class="n">relationship</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_atom_mapping_by_atom_color</span><span class="p">(</span><span class="n">the_other_compound</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Compound.generate_atom_mapping_by_atom_color"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.generate_atom_mapping_by_atom_color">[docs]</a>    <span class="k">def</span> <span class="nf">generate_atom_mapping_by_atom_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_other_compound</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.generate_atom_mapping_by_atom_color">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.generate_atom_mapping_by_atom_color">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_atom_mapping_by_atom_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_other_compound</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To generate the atom mappings between the two compounds.</span>
 
 <span class="sd">        Assume the two compounds have the same structure, so we can achieve atom mappings through atom colors.</span>
@@ -1639,8 +1840,11 @@
                     <span class="n">one_to_one_mappings</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">atom_number</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">the_other_idx</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">one_to_one_mappings</span></div>
 
-<div class="viewcode-block" id="Compound.optimal_resonant_mapping"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.optimal_resonant_mapping">[docs]</a>    <span class="k">def</span> <span class="nf">optimal_resonant_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_other_compound</span><span class="p">,</span> <span class="n">mappings</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.optimal_resonant_mapping">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.optimal_resonant_mapping">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">optimal_resonant_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_other_compound</span><span class="p">,</span> <span class="n">mappings</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To find the optimal atom mappings for compound pairs that are resonant type.</span>
 
 <span class="sd">        :param the_other_compound: the other :class:`~md_harmonize.compound.Compound` entity.</span>
@@ -1675,9 +1879,12 @@
             <span class="k">return</span> <span class="n">relationship</span><span class="p">,</span> <span class="p">{</span> <span class="n">key</span><span class="p">:</span> <span class="p">[</span><span class="n">final_mappings</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">final_mappings</span> <span class="p">}</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Compound.determine_relationship"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.determine_relationship">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">determine_relationship</span><span class="p">(</span><span class="n">unmapped_count</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.determine_relationship">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.determine_relationship">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">determine_relationship</span><span class="p">(</span><span class="n">unmapped_count</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To determine the relationship between two compounds when there are multiple possible atom mappings.</span>
 
 <span class="sd">        We try to map as many details as possible.</span>
@@ -1699,6 +1906,7 @@
             <span class="k">return</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="mi">2</span></div>
 
+
     <span class="c1"># def circular_pair_relationship(self, the_other_compound) -&gt; tuple:</span>
     <span class="c1">#</span>
     <span class="c1">#     try:</span>
@@ -1707,8 +1915,10 @@
     <span class="c1">#     except Exception as exception:</span>
     <span class="c1">#         return None, None</span>
 
-<div class="viewcode-block" id="Compound.circular_pair_relationship"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.circular_pair_relationship">[docs]</a>    <span class="k">def</span> <span class="nf">circular_pair_relationship</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_compound</span><span class="p">,</span> <span class="n">seconds</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Compound.circular_pair_relationship">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.circular_pair_relationship">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">circular_pair_relationship</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_compound</span><span class="p">,</span> <span class="n">seconds</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To determine the relationship of two compounds with interchangeable circular and linear representations with time limit.</span>
 
 <span class="sd">        :param other_compound: the other :class:`~md_harmonize.compound.Compound` entity.</span>
@@ -1722,8 +1932,11 @@
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exception</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Compound.circular_pair_relationship_helper"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.circular_pair_relationship_helper">[docs]</a>    <span class="k">def</span> <span class="nf">circular_pair_relationship_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_compound</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.circular_pair_relationship_helper">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.circular_pair_relationship_helper">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">circular_pair_relationship_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_compound</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To determine the relationship of two compounds with interchangeable circular and linear representations.</span>
 <span class="sd">        We first find the critical atoms that involve in the formation of the ring. There can be several possibilities.</span>
 <span class="sd">        Then we break the ring, and restore the double bond in the aldehyde group that forms the ring.</span>
@@ -1766,8 +1979,11 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Compound.break_cycle"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.break_cycle">[docs]</a>    <span class="k">def</span> <span class="nf">break_cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">critical_atoms</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.break_cycle">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.break_cycle">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">break_cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">critical_atoms</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To break the cycle caused by aldol reaction, which often occurs in the sugar.</span>
 <span class="sd">        Two steps are involved: 1) remove the neighbors. 2) restore the double bond in the aldehyde group.</span>
 
@@ -1783,8 +1999,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">color_compound</span><span class="p">(</span><span class="n">r_groups</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bond_stereo</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">atom_stereo</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">resonance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                             <span class="n">isotope_resolved</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Compound.restore_cycle"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.restore_cycle">[docs]</a>    <span class="k">def</span> <span class="nf">restore_cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">critical_atoms</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.restore_cycle">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.restore_cycle">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore_cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">critical_atoms</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To restore the ring caused by aldol reaction.</span>
 <span class="sd">        The reverse process of break_cycle.</span>
 
@@ -1799,8 +2018,11 @@
                             <span class="n">isotope_resolved</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                             <span class="n">charge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Compound.find_critical_atom_in_cycle"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.find_critical_atom_in_cycle">[docs]</a>    <span class="k">def</span> <span class="nf">find_critical_atom_in_cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.find_critical_atom_in_cycle">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.find_critical_atom_in_cycle">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_critical_atom_in_cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To find the C (atom_c) and O (atom_oo) in aldehyde group, as well as O (atom_o) in the hydroxy that are involved </span>
 <span class="sd">        in the ring formation. We need to break the bond between the atom_c and atom_o to form the linear transformation.</span>
 <span class="sd">        Please check one example of aldol reaction in the sugar if the description is not confusing.</span>
@@ -1819,8 +2041,11 @@
                             <span class="n">critical_atoms</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">atom_number</span><span class="p">,</span> <span class="n">neighbor_index</span><span class="p">,</span> <span class="n">next_neighbor_index</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">critical_atoms</span></div>
 
-<div class="viewcode-block" id="Compound.update_atom_symbol"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.update_atom_symbol">[docs]</a>    <span class="k">def</span> <span class="nf">update_atom_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">updated_symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.update_atom_symbol">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.update_atom_symbol">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_atom_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">updated_symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To update the atom symbols. This is often used to remove/restore R group.</span>
 
 <span class="sd">        :param index: the atom symbols of these indices to be updated.</span>
@@ -1830,8 +2055,11 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">index</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">update_symbol</span><span class="p">(</span><span class="n">updated_symbol</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Compound.validate_mapping_with_r"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.validate_mapping_with_r">[docs]</a>    <span class="k">def</span> <span class="nf">validate_mapping_with_r</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_compound</span><span class="p">,</span> <span class="n">one_rs</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">mapping</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.validate_mapping_with_r">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.validate_mapping_with_r">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_mapping_with_r</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_compound</span><span class="p">,</span> <span class="n">one_rs</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">mapping</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To validate the atom mappings with r groups. </span>
 <span class="sd">        Here are two things we need to pay attention to:</span>
 
@@ -1883,8 +2111,11 @@
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="Compound.compare_chemical_details_with_mapping"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.compare_chemical_details_with_mapping">[docs]</a>    <span class="k">def</span> <span class="nf">compare_chemical_details_with_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_compound</span><span class="p">,</span> <span class="n">mapping</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.compare_chemical_details_with_mapping">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.compare_chemical_details_with_mapping">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compare_chemical_details_with_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_compound</span><span class="p">,</span> <span class="n">mapping</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To compare the chemical details of mapped atoms of the two compounds.</span>
 <span class="sd">        This part targets compound pairs with resonance or r_group type.</span>
 <span class="sd">        Only parts of chemicals need to be checked.</span>
@@ -1926,8 +2157,11 @@
                     <span class="n">the_other_stereo_counts</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">one_stereo_counts</span><span class="p">,</span> <span class="n">the_other_stereo_counts</span></div>
 
-<div class="viewcode-block" id="Compound.optimal_mapping_with_r"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.optimal_mapping_with_r">[docs]</a>    <span class="k">def</span> <span class="nf">optimal_mapping_with_r</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_compound</span><span class="p">,</span> <span class="n">one_rs</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">mappings</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.optimal_mapping_with_r">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.optimal_mapping_with_r">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">optimal_mapping_with_r</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_compound</span><span class="p">,</span> <span class="n">one_rs</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">mappings</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To find the optimal mappings of compound pairs belonging to r_group type. In this case, multiple valid mappings</span>
 <span class="sd">        can exist. We need to find the optimal one with the minimal unmapped chemical details.</span>
 <span class="sd">        And the unmapped chemical details can exist in both compounds (generic or specific).</span>
@@ -1958,6 +2192,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
 
+
     <span class="c1"># def with_r_pair_relationship(self, the_other_compound) -&gt; tuple:</span>
     <span class="c1">#</span>
     <span class="c1">#     try:</span>
@@ -1966,8 +2201,10 @@
     <span class="c1">#     except Exception as exception:</span>
     <span class="c1">#         return None, None</span>
 
-<div class="viewcode-block" id="Compound.with_r_pair_relationship"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.with_r_pair_relationship">[docs]</a>    <span class="k">def</span> <span class="nf">with_r_pair_relationship</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_compound</span><span class="p">,</span> <span class="n">seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Compound.with_r_pair_relationship">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.with_r_pair_relationship">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">with_r_pair_relationship</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_compound</span><span class="p">,</span> <span class="n">seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To find the relationship and the atom mappings between the two compounds that have r_groups type with a time limit.</span>
 
 <span class="sd">        :param other_compound: the other :class:`~md_harmonize.compound.Compound` entity.</span>
@@ -1980,8 +2217,11 @@
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exception</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Compound.with_r_pair_relationship_helper"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.with_r_pair_relationship_helper">[docs]</a>    <span class="k">def</span> <span class="nf">with_r_pair_relationship_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_compound</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compound.with_r_pair_relationship_helper">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.with_r_pair_relationship_helper">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">with_r_pair_relationship_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_compound</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To find the relationship and the atom mappings between the two compounds that have r_groups type.</span>
 <span class="sd">        Several steps are involved:</span>
 
@@ -2027,10 +2267,13 @@
 
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Compound.map_r_correspondents"><a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.map_r_correspondents">[docs]</a>    <span class="k">def</span> <span class="nf">map_r_correspondents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">one_rs</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">other_compound</span><span class="p">,</span> <span class="n">mappings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Compound.map_r_correspondents">
+<a class="viewcode-back" href="../../api.html#md_harmonize.compound.Compound.map_r_correspondents">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">map_r_correspondents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">one_rs</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">other_compound</span><span class="p">,</span> <span class="n">mappings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="c1"># again, the self compound is substructure, we need to figure out the R group atom in self compound and its</span>
         <span class="c1"># corresponding atoms in the other compound.</span>
-        <span class="sd">&quot;&quot;&quot; </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">        To map the unmatched branches in the specific compound to the corresponding R group in the generic compound.</span>
 
 <span class="sd">        :param one_rs: the list of R groups in the compound.</span>
@@ -2058,14 +2301,16 @@
                     <span class="n">r_correspondents</span> <span class="o">=</span> <span class="n">other_compound</span><span class="o">.</span><span class="n">get_next_layer_neighbors</span><span class="p">(</span><span class="n">r_correspondents</span><span class="p">,</span> <span class="n">visited</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">mappings</span><span class="p">:</span>
                 <span class="n">full_mappings</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mappings</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">full_mappings</span></div></div>
+        <span class="k">return</span> <span class="n">full_mappings</span></div>
+</div>
+
 </pre></div>
 
           </div>
           
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <h1 class="logo"><a href="../../index.html">md_harmonize</a></h1>
 
@@ -2076,8 +2321,17 @@
 
 
 
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../guide.html">User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">The md_harmonize Tutorial</a></li>
@@ -2094,16 +2348,6 @@
   </ul></li>
 </ul>
 </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
 
 
 
@@ -2117,11 +2361,11 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2022, Huan Jin & Hunter Moseley.
+      &#169;2022, Huan Jin & Hunter Moseley.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
     </div>
 
